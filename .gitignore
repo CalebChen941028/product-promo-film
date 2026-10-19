@@ -1,0 +1,7 @@
+node_modules/
+film_out/
+build/
+**/__pycache__/
+*.part*.mp4
+*.list.txt
+.DS_Store

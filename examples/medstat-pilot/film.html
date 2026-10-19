@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MedStat Pilot Film</title>
+<style>
+  :root {
+    --teal: #2ee6c5; --teal2: #14b8a6; --cyan: #5ad8ff; --amber: #ffb454; --red: #ff6b7d;
+    --ink: #eaf3f7; --dim: rgba(220, 236, 242, 0.66); --faint: rgba(220, 236, 242, 0.16);
+    --zh: "PingFang SC", "Hiragino Sans GB", sans-serif;
+    --en: "SF Pro Display", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    --mono: "SF Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #02060d; }
+  #stage { position: absolute; inset: 0; overflow: hidden; font-family: var(--en); color: var(--ink); }
+  #bg { position: absolute; inset: 0; background: radial-gradient(1200px 800px at 50% 40%, #0f2036 0%, #071222 55%, #02060d 100%); }
+  #grid { position: absolute; inset: -80px; background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px); background-size: 40px 40px; }
+  #glowA, #glowB { position: absolute; width: 1400px; height: 1400px; border-radius: 50%; filter: blur(40px); }
+  #glowA { background: radial-gradient(circle, rgba(46,230,197,0.16), rgba(46,230,197,0) 60%); }
+  #glowB { background: radial-gradient(circle, rgba(90,140,255,0.12), rgba(90,140,255,0) 60%); }
+  #pulse { position: absolute; inset: 0; background: radial-gradient(900px 600px at 50% 50%, rgba(46,230,197,0.10), rgba(46,230,197,0) 70%); opacity: 0; }
+  .scene { position: absolute; inset: 0; perspective: 2400px; perspective-origin: 50% 45%; display: none; }
+  .abs { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; will-change: transform, opacity; }
+  .win { border-radius: 16px; overflow: hidden; background: #f5f7fa; box-shadow: 0 50px 120px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.10), 0 0 80px rgba(46,230,197,0.10); }
+  .win-bar { height: 34px; background: linear-gradient(#262f3d, #1c2430); display: flex; align-items: center; padding: 0 14px; gap: 8px; position: relative; }
+  .win-bar i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .win-bar i:nth-child(1) { background: #ff5f57; } .win-bar i:nth-child(2) { background: #febc2e; } .win-bar i:nth-child(3) { background: #28c840; }
+  .win-bar span { position: absolute; left: 0; right: 0; text-align: center; font: 600 13px var(--en); color: rgba(230,240,245,0.7); letter-spacing: 0.5px; pointer-events: none; }
+  .win-body { position: relative; overflow: hidden; }
+  .win-body img.shot { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .ov { position: absolute; inset: 0; pointer-events: none; }
+  .hl { position: absolute; border: 3px solid var(--teal); border-radius: 12px; box-shadow: 0 0 0 4px rgba(46,230,197,0.18), 0 0 40px rgba(46,230,197,0.55); opacity: 0; }
+  .tag { position: absolute; padding: 8px 16px; border-radius: 999px; background: rgba(8,20,32,0.92); border: 1.5px solid var(--teal); color: var(--ink); font: 600 20px var(--zh); white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,0.4); opacity: 0; }
+  .tag em { font-style: normal; color: var(--teal); font: 600 16px var(--en); margin-left: 8px; letter-spacing: 0.5px; }
+  .cursor { position: absolute; width: 34px; height: 34px; z-index: 50; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.45)); }
+  .ripple { position: absolute; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 3px solid var(--teal); opacity: 0; }
+  .chip { display: inline-flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 999px; border: 1.5px solid rgba(220,236,242,0.28); font: 600 20px var(--zh); color: var(--ink); background: rgba(10,22,36,0.6); white-space: nowrap; }
+  .card { border-radius: 18px; background: rgba(12,24,40,0.86); border: 1px solid rgba(140,220,230,0.18); box-shadow: 0 30px 80px rgba(0,0,0,0.5); }
+  .h1 { font: 700 96px var(--en); letter-spacing: 1px; white-space: nowrap; }
+  .zhH { font: 600 56px var(--zh); letter-spacing: 4px; white-space: nowrap; }
+  .kicker { font: 700 18px var(--en); letter-spacing: 6px; color: var(--teal); white-space: nowrap; }
+  #chapter { position: absolute; left: 96px; top: 70px; display: flex; align-items: baseline; gap: 18px; opacity: 0; }
+  #chapter b { font: 600 22px var(--mono); color: var(--teal); letter-spacing: 2px; }
+  #chapter .ln { width: 56px; height: 2px; background: var(--teal); align-self: center; }
+  #chapter .z { font: 600 24px var(--zh); }
+  #chapter .e { font: 700 14px var(--en); color: var(--dim); letter-spacing: 5px; }
+  #caption { position: absolute; left: 0; right: 0; bottom: 0; height: 250px; pointer-events: none; }
+  #capband { position: absolute; inset: 0; background: linear-gradient(rgba(2,6,13,0), rgba(2,6,13,0.55) 45%, rgba(2,6,13,0.88)); opacity: 0; }
+  #capzh { position: absolute; left: 0; right: 0; bottom: 104px; text-align: center; font: 500 44px var(--zh); letter-spacing: 2px; text-shadow: 0 2px 16px rgba(0,0,0,0.8); }
+  #capen { position: absolute; left: 0; right: 0; bottom: 60px; text-align: center; font: 400 27px var(--en); color: rgba(214,236,242,0.85); text-shadow: 0 2px 12px rgba(0,0,0,0.8); }
+  #vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,0.55) 100%); pointer-events: none; }
+  #fade { position: absolute; inset: 0; background: #000; pointer-events: none; }
+  .code { font: 500 21px/1.65 var(--mono); white-space: pre; color: #e6eef3; }
+  .code .c { color: rgba(230,240,245,0.42); } .code .k { color: #b8a6ff; } .code .s { color: #ffc27a; } .code .f { color: #6fd6ff; } .code .o { color: var(--teal); } .code .n { color: #ffb454; }
+  .row { display: grid; grid-template-columns: 1fr 120px 1fr; align-items: center; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div><div id="glowA"></div><div id="glowB"></div><div id="grid"></div><div id="pulse"></div>
+  <div id="scenes"></div>
+  <div id="chapter"><b></b><div class="ln"></div><span class="z"></span><span class="e"></span></div>
+  <div id="caption"><div id="capband"></div><div id="capzh"></div><div id="capen"></div></div>
+  <div id="vignette"></div>
+  <div id="fade"></div>
+</div>
+<script src="script.js"></script>
+<script src="vo_timing.js"></script>
+<script src="data.js"></script>
+<script src="film.js"></script>
+</body>
+</html>

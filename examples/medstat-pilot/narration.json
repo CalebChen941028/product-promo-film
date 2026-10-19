@@ -1,0 +1,249 @@
+[
+ {
+  "id": "pain",
+  "bar": 3.15,
+  "end_bar": 7,
+  "en": "One study. Too many tools. Clean the data here, analyze it there, then plot and format it somewhere else.",
+  "zh": "一项研究，太多软件。在这里清洗，在那里分析，作图和排版又要换个地方。"
+ },
+ {
+  "id": "meet",
+  "bar": 7.3,
+  "end_bar": 10,
+  "en": "Meet MedStat Pilot. One workbench, from raw data to manuscript.",
+  "zh": "MedStat Pilot：从原始数据到论文，一个工作台。"
+ },
+ {
+  "id": "vars",
+  "bar": 10.2,
+  "end_bar": 13,
+  "en": "Drop in a file, and it's understood instantly. Variable types, missing values, ranges.",
+  "zh": "拖入文件，即刻识别：变量类型、缺失值、取值范围。"
+ },
+ {
+  "id": "copy",
+  "bar": 13.2,
+  "end_bar": 16,
+  "en": "Every edit happens on a working copy. Your original file is never touched.",
+  "zh": "所有编辑都在工作副本上进行，原始文件从不改动。"
+ },
+ {
+  "id": "tools1",
+  "bar": 16.2,
+  "end_bar": 19,
+  "en": "Compute, recode, or batch-edit variables. It's all built in.",
+  "zh": "变量计算、重编码、批量处理，全部内置。"
+ },
+ {
+  "id": "tools2",
+  "bar": 19.1,
+  "end_bar": 22,
+  "en": "Along with medical-standard conversions, smart merging, and AI-assisted text coding.",
+  "zh": "还有医学标准转换、智能合并与 AI 文本编码。"
+ },
+ {
+  "id": "tools3",
+  "bar": 22.1,
+  "end_bar": 24,
+  "en": "Then export to Excel, SPSS, or Stata.",
+  "zh": "完成后可导出 Excel、SPSS 或 Stata 格式。"
+ },
+ {
+  "id": "methods",
+  "bar": 24.4,
+  "end_bar": 28,
+  "en": "Seventeen research domains. More than a hundred statistical methods.",
+  "zh": "17 个研究领域，100 余种统计方法。",
+  "cap": "17 research domains. More than 100 statistical methods."
+ },
+ {
+  "id": "assign",
+  "bar": 28.3,
+  "end_bar": 32,
+  "en": "Pick a method, drag in your variables, and press Run. No code required.",
+  "zh": "选方法、拖变量、点运行——不写一行代码。"
+ },
+ {
+  "id": "result",
+  "bar": 32.3,
+  "end_bar": 36,
+  "en": "In seconds, you get an APA-style table, a publication-ready figure, and an AI interpretation.",
+  "zh": "几秒钟，APA 三线表、出版级图表与 AI 解读一起生成。"
+ },
+ {
+  "id": "ai",
+  "bar": 36.2,
+  "end_bar": 40,
+  "en": "The AI reads your results like a statistician: the key finding, its clinical meaning, and even the sentence for your paper.",
+  "zh": "AI 像统计师一样读懂结果：核心结论、临床意义，甚至论文里的那句话。"
+ },
+ {
+  "id": "chat1",
+  "bar": 40.4,
+  "end_bar": 43.6,
+  "en": "Not sure which test to use? Ask the assistant. It knows statistics, and the shape of your data.",
+  "zh": "不确定该用什么检验？问问 AI 助手——它懂统计，也懂你的数据结构。"
+ },
+ {
+  "id": "chat2",
+  "bar": 43.7,
+  "end_bar": 47,
+  "en": "It sees variable information, never your raw rows. And with a local model, nothing leaves your computer.",
+  "zh": "它只看到变量层面的信息，看不到原始数据行；接入本机模型，内容不离开电脑。"
+ },
+ {
+  "id": "g_km",
+  "bar": 47.15,
+  "end_bar": 48,
+  "en": "Survival curves.",
+  "zh": "生存曲线。"
+ },
+ {
+  "id": "g_cox",
+  "bar": 48.15,
+  "end_bar": 49,
+  "en": "Cox regression.",
+  "zh": "Cox 回归。"
+ },
+ {
+  "id": "g_roc",
+  "bar": 49.15,
+  "end_bar": 50,
+  "en": "ROC analysis.",
+  "zh": "ROC 分析。"
+ },
+ {
+  "id": "g_logit",
+  "bar": 50.15,
+  "end_bar": 51,
+  "en": "Logistic regression.",
+  "zh": "Logistic 回归。"
+ },
+ {
+  "id": "g_sub",
+  "bar": 51.15,
+  "end_bar": 52,
+  "en": "Subgroup analysis.",
+  "zh": "亚组分析。"
+ },
+ {
+  "id": "g_meta",
+  "bar": 52.15,
+  "end_bar": 53,
+  "en": "Meta-analysis.",
+  "zh": "Meta 分析。"
+ },
+ {
+  "id": "g_dca",
+  "bar": 53.15,
+  "end_bar": 54,
+  "en": "Decision curves.",
+  "zh": "决策曲线。"
+ },
+ {
+  "id": "g_ml",
+  "bar": 54.15,
+  "end_bar": 56,
+  "en": "And machine-learning prediction models, side by side.",
+  "zh": "还有机器学习预测模型，并排对比。"
+ },
+ {
+  "id": "figs",
+  "bar": 56.3,
+  "end_bar": 60,
+  "en": "Every figure is journal-ready. Choose a chart type and palette, then download at three hundred or six hundred DPI.",
+  "zh": "每张图都达到期刊标准：选好图型与配色，300 或 600 DPI 一键下载。",
+  "cap": "Every figure is journal-ready. Choose a chart type and palette, then download at 300 or 600 DPI."
+ },
+ {
+  "id": "word",
+  "bar": 60.3,
+  "end_bar": 64,
+  "en": "One click builds a Word report. Parameters, tables, and figures, already formatted.",
+  "zh": "一键生成 Word 报告：参数、三线表、图表，排版就绪。"
+ },
+ {
+  "id": "r",
+  "bar": 64.3,
+  "end_bar": 68,
+  "en": "You also get a reproducible R script. Run it anywhere, and the numbers match exactly.",
+  "zh": "同时得到可复现的 R 脚本——在任何地方重跑，结果完全一致。"
+ },
+ {
+  "id": "airs",
+  "bar": 68.3,
+  "end_bar": 72,
+  "en": "For bigger projects, the AI-R Studio takes you from study design to script, execution, and automatic repair.",
+  "zh": "更大的课题，交给 AI-R 研究工作台：从研究设计到脚本、执行与自动修复。"
+ },
+ {
+  "id": "cmp0",
+  "bar": 72.3,
+  "end_bar": 74,
+  "en": "So what's really different? It's a new way to work.",
+  "zh": "真正的不同是什么？是一种全新的工作方式。"
+ },
+ {
+  "id": "cmp1",
+  "bar": 74.15,
+  "end_bar": 76,
+  "en": "One workbench, instead of five tools.",
+  "zh": "一个工作台，取代五个软件。"
+ },
+ {
+  "id": "cmp2",
+  "bar": 76.15,
+  "end_bar": 78,
+  "en": "A guided flow, instead of menus and syntax.",
+  "zh": "引导式流程，取代繁杂菜单与语法。"
+ },
+ {
+  "id": "cmp3",
+  "bar": 78.15,
+  "end_bar": 80,
+  "en": "Tables and figures that are ready, not retyped.",
+  "zh": "表格与图表直接可用，无需手工重排。"
+ },
+ {
+  "id": "cmp4",
+  "bar": 80.15,
+  "end_bar": 82,
+  "en": "Interpretation, not just output.",
+  "zh": "不只给出结果，更给出解读。"
+ },
+ {
+  "id": "cmp5",
+  "bar": 82.15,
+  "end_bar": 84,
+  "en": "Reproducible, by design.",
+  "zh": "可复现，从设计之初就是如此。"
+ },
+ {
+  "id": "cmp6",
+  "bar": 84.15,
+  "end_bar": 86,
+  "en": "And modern methods, built right in.",
+  "zh": "前沿方法，开箱即用。"
+ },
+ {
+  "id": "platform",
+  "bar": 86.2,
+  "end_bar": 88,
+  "en": "On macOS and Windows, in English or Chinese.",
+  "zh": "macOS 与 Windows 双平台，中英文界面。"
+ },
+ {
+  "id": "tagline",
+  "bar": 92.4,
+  "end_bar": 96,
+  "en": "MedStat Pilot. From data, to discovery.",
+  "zh": "MedStat Pilot，从数据，到发现。"
+ },
+ {
+  "id": "motto",
+  "bar": 96.9,
+  "end_bar": 103,
+  "en": "Hand the tedium to AI. Give researchers their time back, to think through the questions that truly matter.",
+  "zh": "把繁琐交给 AI，把时间还给研究者——去想清楚一个真正的科学问题。"
+ }
+]

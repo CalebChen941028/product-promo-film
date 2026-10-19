@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Product Film</title>
+<style>
+  /* Structural CSS shared by all styles. Colours, fonts, frames and caption looks live in styles/<id>.css. */
+  * { box-sizing: border-box; }
+  html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg-edge, #000); }
+  #stage { position: absolute; inset: 0; overflow: hidden; font-family: var(--en); color: var(--ink); }
+  #bg, #bg > * { position: absolute; }
+  #bg { inset: 0; overflow: hidden; }
+  #bg .bg-base { inset: 0; }
+  #bg .glow, #bg .blob, #bg .ink { left: 50%; top: 50%; border-radius: 50%; }
+  #pulse, #flash { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  .scene { position: absolute; inset: 0; perspective: 2400px; perspective-origin: 50% 45%; display: none; transform-origin: 50% 50%; }
+  .abs { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; will-change: transform, opacity; }
+  .win { overflow: hidden; }
+  .win-body { position: relative; overflow: hidden; }
+  .win-body .shot { position: absolute; left: 0; top: 0; transform-origin: 0 0; object-fit: fill; }
+  .bar { height: 34px; display: flex; align-items: center; padding: 0 14px; gap: 8px; position: relative; }
+  .bar i { width: 12px; height: 12px; border-radius: 50%; display: block; }
+  .bar span { position: absolute; left: 0; right: 0; text-align: center; font: 600 13px var(--en); letter-spacing: 0.5px; pointer-events: none; }
+  .bar.browser b { margin-left: 18px; flex: 1; height: 22px; border-radius: 11px; font: 500 12px/22px var(--en); padding: 0 12px; }
+  .pic { overflow: hidden; }
+  .ov { position: absolute; inset: 0; pointer-events: none; }
+  .hl { position: absolute; opacity: 0; }
+  .tag { position: absolute; white-space: nowrap; opacity: 0; }
+  .cursor { position: absolute; width: 34px; height: 34px; z-index: 50; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.45)); }
+  .ripple { position: absolute; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 3px solid var(--accent); opacity: 0; }
+  .chip { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
+  .row { display: grid; grid-template-columns: 1fr 120px 1fr; align-items: center; }
+  .code { white-space: pre; }
+  .big-num, .h-display { line-height: 1 !important; }   /* tight boxes so automatic QA measures the glyphs, not air */
+  #chapter { position: absolute; display: flex; align-items: baseline; gap: 18px; opacity: 0; }
+  #chapter .ln { align-self: center; }
+  #caption { position: absolute; left: 0; right: 0; bottom: 0; height: 250px; pointer-events: none; }
+  #capband { position: absolute; inset: 0; opacity: 0; }
+  #capzh, #capen { position: absolute; }
+  #vignette { position: absolute; inset: 0; pointer-events: none; }
+  #fade { position: absolute; inset: 0; background: #000; pointer-events: none; }
+</style>
+<script src="config.js"></script>
+<script>
+  // Style loader: styles/<id>.css + styles/<id>.js (window.STYLE profile). Synchronous, so it is ready before scenes.
+  document.write(`<link rel="stylesheet" href="styles/${CONFIG.STYLE}.css"><script src="styles/${CONFIG.STYLE}.js"><\/script>`);
+</script>
+</head>
+<body>
+<div id="stage">
+  <div id="bg"></div><div id="pulse"></div>
+  <div id="scenes"></div>
+  <div id="flash"></div>
+  <div id="chapter"><b></b><div class="ln"></div><span class="z"></span><span class="e"></span></div>
+  <div id="caption"><div id="capband"></div><div id="capzh"></div><div id="capen"></div></div>
+  <div id="vignette"></div>
+  <div id="fade"></div>
+</div>
+<script src="vo_timing.js"></script>
+<script src="engine.js"></script>
+<script src="patterns.js"></script>
+<script src="library.js"></script>
+<script src="scenes.js"></script>
+<script>FILM.start();</script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "_how": "Fill with the user before storyboarding. Every claim must be checkable (README, config, the user's own words). Keep feature lines short — they become narration and on-screen labels.",
+  "product": {
+    "name": "MedStat", "nameAccent": "Pilot",
+    "positioning": {"zh": "医学科研统计工作台", "en": "Research statistics workbench"},
+    "tagline": {"zh": "从数据，到发现", "en": "From data to discovery"},
+    "status": "Beta",
+    "platforms": ["macOS · Apple silicon", "Windows · x64"]
+  },
+  "audience": "clinicians and medical researchers who are not full-time statisticians",
+  "pain": {"zh": "一项研究，太多软件：清洗、统计、作图、排版各自为战。", "en": "One study, too many tools — cleaning, statistics, figures and formatting all live in different places."},
+  "features": [
+    {"id": "data", "zh": "导入即识别：变量类型、缺失、取值范围", "en": "Import, and it's understood: types, missingness, ranges", "materials": ["variables.png", "preview.png"], "energy": "mid"},
+    {"id": "tools", "zh": "数据工具箱：计算、重编码、批量、医学标准、合并", "en": "A data toolbox: compute, recode, batch, standards, merge", "materials": ["tool_*.png"], "energy": "mid"},
+    {"id": "methods", "zh": "17 个领域、100 余种方法", "en": "17 domains, 100+ methods", "materials": ["sidebar_full.png"], "energy": "high", "numbers": [17, 100]},
+    {"id": "results", "zh": "三线表、图表与 AI 解读一次生成", "en": "Tables, figures and AI interpretation together", "materials": ["tt_result.png", "ai_stream/"], "energy": "high"},
+    {"id": "privacy", "zh": "不发送原始数据行；可接本机模型", "en": "Never sends raw rows; local models supported", "materials": ["chat_consent.png"], "energy": "low"},
+    {"id": "outputs", "zh": "期刊级图表、Word 报告、可复现 R 脚本", "en": "Journal figures, Word reports, reproducible R", "materials": ["dl_dialog.png", "word_page1.png", "export.R"], "energy": "high"}
+  ],
+  "differentiators": [
+    ["清洗、统计、作图、排版分散在多个软件", "Scattered across several tools", "一个工作台，从数据到论文", "One workbench, data to manuscript"],
+    ["结果需手工整理成三线表", "Tables retyped by hand", "APA 三线表与期刊级图表自动生成", "APA tables & journal figures, automatic"],
+    ["分析过程难以复现", "Hard to reproduce", "Word 报告 + 可复现 R 脚本", "Word report + reproducible R script"]
+  ],
+  "motto": {"zh": ["把繁琐交给 AI，把时间还给研究者——", "去想清楚一个真正的科学问题。"], "en": "Hand the tedium to AI. Give researchers their time back — to think through the questions that truly matter."},
+  "contacts": [["DEVELOPER", "开发者", "Name", "email@example.com"], ["WECHAT", "公众号", "Account", "Official account"], ["GITHUB", "主页", "user", "github.com/user"]],
+  "style": "midnight-tech",
+  "voice": {"language": "en", "engine": "kokoro", "voice": "am_michael", "or_user_recording": false},
+  "captions": ["zh", "en"],
+  "music": "materials/music.mp3",
+  "target_duration_s": "follow the music (extend a chorus if the story needs more time)"
+}

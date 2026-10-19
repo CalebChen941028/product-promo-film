@@ -1,0 +1,99 @@
+# film.json reference · film.json 字段说明
+
+English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats (120 BPM → 2 s).
+
+## English
+
+### Top level
+| Field | Type | Required | Meaning |
+| --- | --- | --- | --- |
+| `name` | string | yes | output file prefix |
+| `out` | string | no | working folder (default `film_out`) |
+| `style` | string | yes | look: `midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` |
+| `motion` | string | no | motion language: `cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`; empty = the style's default |
+| `music.file` | path | yes | the user's track (mp3/wav/m4a…) |
+| `music.extend` | object | no | `{"from_bar": A, "to_bar": B, "times": 1}` repeats bars A–B once (a chorus) to lengthen the film |
+| `voice.engine` | `kokoro` / `files` / `none` | no | TTS, the user's recordings (`"files": {"<say id>": "rec.wav"}`), or captions only |
+| `voice.voice` / `lang` / `python` / `espeak_data` | — | for kokoro | e.g. `am_michael`, `a`, path to a Python with kokoro, short copy of espeak-ng-data |
+| `brand` | object | yes | see below |
+| `scenes` | list | yes | in playing order; first `cover`, last `endcard` with `"bars": "rest"` |
+| `tools.ffmpeg` / `tools.node_modules` / `tools.workers` | — | no | override tool discovery / render workers |
+| `cover_t` | number | no | second used for the cover poster (default 4.2) |
+
+### brand
+`name`, `nameAccent` (second word in the accent colour), `logo` (transparent PNG), `positioningZh`, `positioningEn`, `taglineZh`, `taglineEn`, `motto` = [zh line 1, zh line 2 (accent), English line], `contacts` = list of [LABEL_EN, 中文标签, value, sub-line] (≤ 3 reads best), `chips` = platforms/status (last chip highlighted if it says Beta/Preview/内测).
+
+### Every scene
+| Field | Meaning |
+| --- | --- |
+| `type` | one of the types below |
+| `bars` | length in bars (number ≥ the type's minimum) or `"rest"` (only the last scene) |
+| `chapter` | optional `["01", "数据", "DATA"]` → top-left chapter label while the scene plays |
+| `say` | optional narration lines `[{en, zh, cap?, at?, id?}]`. `en` is spoken, `zh` is the Chinese caption, `cap` replaces the English caption (digits: "300 DPI"), `at` = start in bars from the scene start (default spread evenly from 0.3), `id` = `tagline`/`motto` to hide the caption because the text is already on screen |
+
+### Scene types
+| type | min bars | fields | notes |
+| --- | --- | --- | --- |
+| `cover` | 3 | `media?` (blurred UI behind), `base?` | logo, name, positioning, chips; also the poster |
+| `pain` | 3 | `items?` = 4 × [zh, en] | "the old way": grey tool windows tangle and collapse |
+| `feature` | 3 (≥ 1 + points) | `media`, `base?`, `title{zh,en}`, `points[{zh,en,rect,focus?}]` ≤ 4 | the workhorse; layout depends on the motion language |
+| `carousel` | 2 | `title?`, `panels[{zh,en,media,base?,crop?}]` ≤ 6 | dialogs/tools flip in one per slice beside a menu |
+| `numbers` | 2 | `stats[{value,suffix?,zh,en}]` ≤ 3, `chips?` ≤ 12 | counters on the beat |
+| `gallery` | 2 | `items[{media,zh?,en?}]` ≤ 8 | coverflow of result images; say one name per item (`at`) |
+| `clip` | 2 | `media` (.webm), `base?`, `title?`, `offset?`, `rate?` | screen recording, seeked frame-exactly |
+| `phone` | 2 | `media`, `base` (points, e.g. [393,852]), `title{zh,en}` | mobile screenshot in a device frame |
+| `compare` | 3 | `rows[[oldZh,oldEn,newZh,newEn]]` ≤ 6, `header?` | traditional vs this product |
+| `statement` | 1 | `zh`, `en?` | one big line (manifesto beat) |
+| `finale` | 4 | `media` = list of images | tilted wall of real screens + name + tagline |
+| `endcard` | 4 | — | logo, name, positioning, motto, contacts, chips |
+
+### Coordinates
+`base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units. Measure with `scripts/grid_overlay.py` (grid labels are base units for 1920×1080 captures) or `scripts/modal_bbox.py` for dialogs.
+
+## 中文
+
+### 顶层字段
+| 字段 | 类型 | 必填 | 含义 |
+| --- | --- | --- | --- |
+| `name` | 字符串 | 是 | 输出文件名前缀 |
+| `out` | 字符串 | 否 | 工作目录（默认 `film_out`） |
+| `style` | 字符串 | 是 | 视觉风格：`midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` |
+| `motion` | 字符串 | 否 | 动效语言：`cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`；留空则用风格默认值 |
+| `music.file` | 路径 | 是 | 用户提供的音乐 |
+| `music.extend` | 对象 | 否 | `{"from_bar": A, "to_bar": B, "times": 1}`：把第 A–B 小节（通常是副歌）重复一遍来加长 |
+| `voice.engine` | `kokoro` / `files` / `none` | 否 | 合成配音、用户录音（`"files": {"<say id>": "rec.wav"}`）、或只要字幕 |
+| `voice.voice` / `lang` / `python` / `espeak_data` | — | 用 kokoro 时 | 如 `am_michael`、`a`、装了 kokoro 的 Python 路径、espeak-ng 数据的短路径副本 |
+| `brand` | 对象 | 是 | 见下 |
+| `scenes` | 列表 | 是 | 按播放顺序；第一个是 `cover`，最后一个是 `"bars": "rest"` 的 `endcard` |
+| `tools.*` | — | 否 | 手动指定 ffmpeg、node_modules、渲染进程数 |
+| `cover_t` | 数字 | 否 | 封面海报取第几秒（默认 4.2） |
+
+### brand（品牌）
+`name`、`nameAccent`（强调色显示的第二个词）、`logo`（透明 PNG）、`positioningZh` / `positioningEn`（定位）、`taglineZh` / `taglineEn`（口号）、`motto` = [中文第一行, 中文第二行（强调色）, 英文一句]、`contacts` = [英文标签, 中文标签, 值, 副行] 的列表（3 组最好看）、`chips` = 平台 / 版本状态（最后一个若是 Beta / 内测 会高亮）。
+
+### 每个场景都有
+| 字段 | 含义 |
+| --- | --- |
+| `type` | 场景类型（见下表） |
+| `bars` | 小节数（不少于该类型最小值），或 `"rest"`（只能用在最后一个场景） |
+| `chapter` | 可选，`["01", "数据", "DATA"]`，场景播放时左上角显示章节 |
+| `say` | 可选旁白 `[{en, zh, cap?, at?, id?}]`：`en` 是念出来的英文，`zh` 是中文字幕，`cap` 替换英文字幕（用于显示数字），`at` 为相对场景起点的小节数（默认从 0.3 起均匀分布），`id` 写 `tagline` / `motto` 时隐藏字幕（画面上已有同一句） |
+
+### 场景类型
+| 类型 | 最少小节 | 字段 | 说明 |
+| --- | --- | --- | --- |
+| `cover` | 3 | `media?`（背景虚化界面）、`base?` | Logo、名称、定位、平台标签；同时是封面海报 |
+| `pain` | 3 | `items?` = 4 组 [中文, 英文] | “传统方式”：灰色工具窗口互相牵扯后塌缩 |
+| `feature` | 3（≥ 1 + 要点数） | `media`、`base?`、`title{zh,en}`、`points[{zh,en,rect,focus?}]` ≤ 4 | 主力场景；版式随动效语言变化 |
+| `carousel` | 2 | `title?`、`panels[{zh,en,media,base?,crop?}]` ≤ 6 | 工具 / 对话框逐个翻入，左侧菜单同步高亮 |
+| `numbers` | 2 | `stats[{value,suffix?,zh,en}]` ≤ 3、`chips?` ≤ 12 | 按拍计数的大数字 |
+| `gallery` | 2 | `items[{media,zh?,en?}]` ≤ 8 | 结果图 coverflow，旁白逐张点名（用 `at`） |
+| `clip` | 2 | `media`（.webm）、`base?`、`title?`、`offset?`、`rate?` | 录屏，逐帧精确定位 |
+| `phone` | 2 | `media`、`base`（点尺寸，如 [393,852]）、`title{zh,en}` | 手机截图套设备外框 |
+| `compare` | 3 | `rows[[旧中文,旧英文,新中文,新英文]]` ≤ 6、`header?` | 传统方式 vs 本产品 |
+| `statement` | 1 | `zh`、`en?` | 一句大字（宣言） |
+| `finale` | 4 | `media` = 图片列表 | 真实界面倾斜成墙 + 名称 + 口号 |
+| `endcard` | 4 | — | Logo、名称、定位、理念、联系方式、平台标签 |
+
+### 坐标
+`base` 是图片的坐标空间：1920×1080 窗口的 2 倍截图用 `[1920, 1080]`（默认）；`intake.py` 会为每张图给出建议的 `base`。`rect` / `crop` / `focus` 都是 base 单位下的 `[x, y, 宽, 高]`。用 `scripts/grid_overlay.py` 量取（网格刻度即 1920×1080 截图的 base 单位），弹窗可用 `scripts/modal_bbox.py` 自动求框。

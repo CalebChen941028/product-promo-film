@@ -1,0 +1,349 @@
+"""One-command film pipeline: film.json → checked spec → film page → voice-over → layout QA → video → mix → delivery.
+
+Usage
+  python make_film.py film.json                 # all stages
+  python make_film.py film.json --stage check   # validate only (fast; run this after every edit of film.json)
+  stages: check build vo qa render finish  (each needs the previous ones; `all` runs them in order)
+
+Every problem is printed as  ERROR/WARN … followed by  FIX: …  — do exactly what FIX says, then rerun.
+Outputs (in spec["out"], default ./film_out):
+  film/            self-contained film page (open film/film.html?t=12 to look at second 12 in a browser)
+  qa/              qa_report.json + contact sheets (sheet*.jpg) — read them before rendering
+  final/<name>-1080p.mp4, <name>-cover-4k.png, <name>-cover-1280.jpg, <name>.{bilingual,zh,en}.srt
+See references/film-spec.md for every field. Requires: python3 (numpy, Pillow), node + playwright, ffmpeg.
+"""
+import argparse
+import json
+import math
+import os
+import re
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+SKILL = HERE.parent
+TPL = SKILL / 'templates'
+STYLES = ['midnight-tech', 'keynote-light', 'editorial-mono', 'aurora-glass', 'neon-cyber', 'paper-academic']
+MOTIONS = ['cinematic-3d', 'precision-data', 'kinetic-launch', 'gentle-story', 'playful-pop', 'editorial-type']
+# minimum bars, required keys, list limits per scene type
+TYPES = {
+    'cover': (3, [], {}), 'pain': (3, [], {'items': 4}), 'feature': (3, ['media', 'points'], {'points': 4}),
+    'carousel': (2, ['panels'], {'panels': 6}), 'numbers': (2, ['stats'], {'stats': 3, 'chips': 12}),
+    'gallery': (2, ['items'], {'items': 8}), 'clip': (2, ['media'], {}), 'phone': (2, ['media'], {}),
+    'compare': (3, ['rows'], {'rows': 6}), 'statement': (1, ['zh'], {}), 'finale': (4, ['media'], {}), 'endcard': (4, [], {}),
+}
+errors, warns = [], []
+
+
+def err(msg, fix): errors.append(f'ERROR {msg}\n  FIX: {fix}')
+def warn(msg, fix): warns.append(f'WARN  {msg}\n  FIX: {fix}')
+def zhlen(s): return sum(1 for ch in s or '' if '　' <= ch <= '鿿' or '＀' <= ch <= '￯')
+
+
+def find_ffmpeg(spec):
+    cand = [spec.get('tools', {}).get('ffmpeg'), os.environ.get('FFMPEG'), shutil.which('ffmpeg')]
+    try:
+        import imageio_ffmpeg
+        cand.append(imageio_ffmpeg.get_ffmpeg_exe())
+    except Exception:
+        pass
+    for c in cand:
+        if c and Path(c).exists():
+            return c
+    return None
+
+
+def find_playwright(spec):
+    cand = [spec.get('tools', {}).get('node_modules'), os.environ.get('PLAYWRIGHT_NODE_MODULES'), SKILL / 'node_modules', Path.cwd() / 'node_modules']
+    try:
+        cand.append(subprocess.run(['npm', 'root', '-g'], capture_output=True, text=True).stdout.strip())
+    except Exception:
+        pass
+    for c in cand:
+        if c and (Path(c) / 'playwright').exists():
+            return Path(c)
+    return None
+
+
+def run(cmd, **kw):
+    print('  $', ' '.join(str(c) for c in cmd)[:220])
+    r = subprocess.run([str(c) for c in cmd], **kw)
+    if r.returncode != 0:
+        sys.exit(f'command failed ({r.returncode}): {cmd[0]} — read the output above')
+    return r
+
+
+# ---------------------------------------------------------------- check
+def check(spec, base_dir):
+    if spec.get('style') not in STYLES:
+        err(f"style '{spec.get('style')}' unknown", f'use one of {STYLES} (scripts/recommend_style.py suggests one)')
+    if spec.get('motion') and spec['motion'] not in MOTIONS:
+        err(f"motion '{spec.get('motion')}' unknown", f"use one of {MOTIONS} or leave it empty for the style's default")
+    b = spec.get('brand', {})
+    for k in ['name', 'logo', 'positioningZh', 'positioningEn']:
+        if not b.get(k):
+            err(f'brand.{k} missing', 'fill it from the brief (templates/brief.example.json)')
+    if b.get('logo') and not (base_dir / b['logo']).exists():
+        err(f"brand.logo not found: {b['logo']}", 'path is relative to film.json; put a transparent PNG there')
+    mus = spec.get('music', {}).get('file')
+    if not mus or not (base_dir / mus).exists():
+        err(f'music.file not found: {mus}', 'add a licensed music file (the user provides it) and set music.file')
+    scenes = spec.get('scenes', [])
+    if not scenes:
+        err('no scenes', 'start from templates/film.example.json')
+    if scenes and scenes[0].get('type') != 'cover':
+        warn('first scene is not a cover', 'put {"type": "cover", "bars": 3} first — the cover frame is also the poster')
+    if scenes and scenes[-1].get('type') != 'endcard':
+        warn('last scene is not an endcard', 'end with {"type": "endcard", "bars": "rest"}')
+    for i, sc in enumerate(scenes):
+        t, where = sc.get('type'), f'scenes[{i}] ({sc.get("type")})'
+        if t not in TYPES:
+            err(f'{where}: unknown type', f'use one of {list(TYPES)}'); continue
+        mn, req, lim = TYPES[t]
+        bars = sc.get('bars')
+        if bars != 'rest' and (not isinstance(bars, (int, float)) or bars < mn):
+            err(f'{where}: bars={bars} (minimum {mn})', f'set "bars" to ≥ {mn} (1 bar = 4 beats; 120 BPM → 2 s)')
+        if t == 'feature' and isinstance(bars, (int, float)) and bars < 1 + len(sc.get('points', [])):
+            err(f'{where}: {len(sc.get("points", []))} points need ≥ {1 + len(sc.get("points", []))} bars', 'add bars or remove points')
+        for k in req:
+            if not sc.get(k):
+                err(f'{where}: "{k}" missing', f'see references/film-spec.md → {t}')
+        for k, mx in lim.items():
+            if len(sc.get(k, [])) > mx:
+                err(f'{where}: {len(sc[k])} {k} (max {mx})', f'keep the {mx} strongest {k}; split into another scene')
+        media = []
+        for key in ['media']:
+            v = sc.get(key)
+            media += v if isinstance(v, list) else ([v] if v else [])
+        media += [p.get('media') for p in sc.get('panels', [])] + [it.get('media') for it in sc.get('items', []) if isinstance(it, dict)]
+        for m in filter(None, media):
+            if not (base_dir / m).exists():
+                err(f'{where}: media not found: {m}', 'path is relative to film.json; run intake.py and use its paths')
+            elif t == 'clip' and not m.endswith('.webm'):
+                err(f'{where}: clip must be .webm (Chromium cannot decode H.264)', 'run intake.py — it converts videos to build/clips/*.webm')
+        basewh = sc.get('base', [1920, 1080])
+        for j, p in enumerate(sc.get('points', [])):
+            r = p.get('rect')
+            if not r or len(r) != 4:
+                err(f'{where}.points[{j}]: rect [x,y,w,h] missing', 'measure it with grid_overlay.py on the screenshot (base coordinates)')
+            elif r[0] < 0 or r[1] < 0 or r[0] + r[2] > basewh[0] + 1 or r[1] + r[3] > basewh[1] + 1:
+                err(f'{where}.points[{j}]: rect {r} outside base {basewh}', 'rects are in base units (CSS px of the capture); check base and rect')
+            if zhlen(p.get('zh')) > 14:
+                warn(f'{where}.points[{j}]: zh label {zhlen(p.get("zh"))} chars', 'keep on-screen labels ≤ 14 Chinese characters')
+        for j, s in enumerate(sc.get('say', [])):
+            if zhlen(s.get('zh')) > 30:
+                warn(f'{where}.say[{j}]: Chinese caption {zhlen(s.get("zh"))} chars (one line fits ~30)', 'shorten the zh line')
+            if len(s.get('en', '')) > 110:
+                warn(f'{where}.say[{j}]: English line {len(s["en"])} chars', 'shorten to ≤ 110 characters (~18 words)')
+            if not s.get('en'):
+                err(f'{where}.say[{j}]: "en" missing', 'every narration line needs the spoken English (and zh caption)')
+    for k in ('ffmpeg',):
+        if not find_ffmpeg(spec):
+            err('ffmpeg not found', 'pip install imageio-ffmpeg  (or install ffmpeg)  — then rerun')
+    if not find_playwright(spec):
+        err('playwright not found', f'cd "{SKILL}" && npm i playwright && npx playwright install chromium')
+
+
+# ---------------------------------------------------------------- build
+def build(spec, base_dir, out):
+    ff = find_ffmpeg(spec)
+    film, aud = out / 'film', out / 'audio'
+    for d in (film / 'media', film / 'styles', aud):
+        d.mkdir(parents=True, exist_ok=True)
+    music_wav = aud / 'music.wav'
+    run([ff, '-y', '-loglevel', 'error', '-i', base_dir / spec['music']['file'], '-ar', '48000', '-ac', '2', music_wav])
+    run([sys.executable, HERE / 'beat_grid.py', music_wav, '--ffmpeg', ff, '--out', aud / 'grid.json'], stderr=subprocess.DEVNULL)
+    grid = json.load(open(aud / 'grid.json'))
+    G, BAR = grid['first_beat'], grid['bar_seconds']
+    ext = spec['music'].get('extend')
+    final_wav = music_wav
+    if ext:
+        final_wav = aud / 'music_ext.wav'
+        run([sys.executable, HERE / 'extend_music.py', music_wav, final_wav, '--grid', G, '--bar', BAR, '--repeat-from-bar', ext['from_bar'], '--repeat-to-bar', ext['to_bar'], '--times', ext.get('times', 1)])
+    import wave
+    with wave.open(str(final_wav)) as w:
+        dur = w.getnframes() / w.getframerate()
+    total_bars = int((dur - G - 1.0) // BAR)
+    fixed = sum(sc['bars'] for sc in spec['scenes'] if sc.get('bars') != 'rest')
+    rest = [sc for sc in spec['scenes'] if sc.get('bars') == 'rest']
+    if fixed > total_bars or (rest and fixed + 4 * len(rest) > total_bars):
+        sys.exit(f"ERROR scenes need {fixed} bars but the music has {total_bars} ({dur:.0f} s).\n  FIX: shorten scenes, or extend the music: \"music\": {{\"extend\": {{\"from_bar\": A, \"to_bar\": B}}}} — pick a chorus span from {aud / 'grid.json'} (see references/audio.md).")
+    if not rest and total_bars - fixed > 6:
+        print(f'WARN  {total_bars - fixed} bars of music left unused — set the last scene to "bars": "rest"')
+    each_rest = (total_bars - fixed) // max(1, len(rest))
+    # hi-energy bars → chorus ranges (background pulse)
+    his = [bb['hi'] for bb in grid['bars']]
+    q = sorted(his)[int(len(his) * 0.66)] if his else 1
+    chorus, cur = [], None
+    for i, h in enumerate(his + [0] * 64):
+        if i >= total_bars: break
+        if h >= q and cur is None: cur = i
+        if h < q and cur is not None:
+            if i - cur >= 4: chorus.append([cur, i])
+            cur = None
+    # copy engine + media, lay scenes on bars, collect narration
+    for f in ['film.html', 'engine.js', 'patterns.js', 'library.js']:
+        shutil.copy(TPL / f, film / f)
+    for f in (TPL / 'styles').glob('*'):
+        shutil.copy(f, film / 'styles' / f.name)
+    copied = {}
+
+    def media(p):
+        if not p: return p
+        if p not in copied:
+            src = base_dir / p
+            dst = film / 'media' / f'{len(copied):02d}-{Path(p).name}'
+            if src.suffix.lower() in ('.png', '.jpg', '.jpeg', '.webp'):
+                # downscale huge captures: coordinates live in `base` units, so pixels can shrink freely.
+                # Keeps every render worker's memory low (4K screenshots × 6 workers swaps a 24 GB machine).
+                from PIL import Image
+                im = Image.open(src)
+                if im.width > 2400 and im.width >= im.height:
+                    im = im.resize((2400, round(im.height * 2400 / im.width)), Image.LANCZOS)
+                    im.save(dst, quality=92) if dst.suffix.lower() in ('.jpg', '.jpeg') else im.save(dst)
+                else:
+                    shutil.copy(src, dst)
+            else:
+                shutil.copy(src, dst)
+            copied[p] = 'media/' + dst.name
+        return copied[p]
+    brand = dict(spec['brand']); brand['logo'] = media(brand['logo'])
+    lines, calls, chapters, b0 = [], [], [], 0
+    for i, sc in enumerate(spec['scenes']):
+        nb = each_rest if sc.get('bars') == 'rest' else sc['bars']
+        b1 = b0 + nb
+        o = {k: v for k, v in sc.items() if k not in ('type', 'bars', 'say', 'chapter')}
+        if isinstance(o.get('media'), list): o['media'] = [media(m) for m in o['media']]
+        elif o.get('media'): o['media'] = media(o['media'])
+        for p in o.get('panels', []): p['media'] = media(p['media'])
+        for it in o.get('items', []):
+            if isinstance(it, dict) and it.get('media'): it['media'] = media(it['media'])
+        calls.append(f"LIB.{sc['type']}(bar({b0}), {'CONFIG.DUR' if i == len(spec['scenes']) - 1 else f'bar({b1})'}, {json.dumps(o, ensure_ascii=False)});")
+        if sc.get('chapter'):
+            n, zh, en = sc['chapter']; chapters.append([b0, b1, n, zh, en])
+        says = sc.get('say', [])
+        for k, s in enumerate(says):
+            at = s.get('at', 0.3 + k * nb / max(1, len(says)))
+            lines.append({'id': s.get('id', f's{i}_{k}'), 'bar': round(b0 + at, 3), 'end_bar': b1, 'en': s['en'], 'zh': s.get('zh', ''), **({'cap': s['cap']} if s.get('cap') else {})})
+        b0 = b1
+    # merge adjacent chapter entries with the same number
+    merged = []
+    for c in chapters:
+        if merged and merged[-1][2] == c[2] and merged[-1][1] == c[0]: merged[-1][1] = c[1]
+        else: merged.append(c)
+    onscreen = [l['id'] for l in lines if l['id'] in ('tagline', 'motto')]
+    cfg = {'STYLE': spec['style'], 'MOTION': spec.get('motion', ''), 'G': G, 'BAR': BAR, 'DUR': round(dur, 3), 'FADE_OUT': 2.6,
+           'CHORUS_BARS': chorus, 'CHAPTERS': merged, 'ONSCREEN': onscreen, 'SHOTS': 'media/', 'ASSETS': 'media/', 'BRAND': brand}
+    (film / 'config.js').write_text('const CONFIG = ' + json.dumps(cfg, ensure_ascii=False, indent=1) + ';\nconst bar = (b) => CONFIG.G + CONFIG.BAR * b;\nObject.assign(window, { CONFIG, bar });\n')
+    (film / 'scenes.js').write_text("'use strict';\n// generated by make_film.py from film.json — edit film.json, not this file\n" + '\n'.join(calls) + '\n')
+    lines.sort(key=lambda l: l['bar'])
+    json.dump(lines, open(out / 'narration.json', 'w'), ensure_ascii=False, indent=1)
+    if not (film / 'vo_timing.js').exists():  # captions-only placeholder until the vo stage runs
+        est = [{'id': l['id'], 's': G + BAR * l['bar'], 'e': G + BAR * l['bar'] + len(l['en'].split()) / 2.5, 'zh': l['zh'], 'en': l.get('cap', l['en'])} for l in lines]
+        (film / 'vo_timing.js').write_text('const VO = ' + json.dumps(est, ensure_ascii=False) + ';\nwindow.VO = VO;\n')
+    json.dump({'G': G, 'BAR': BAR, 'DUR': dur, 'music': str(final_wav), 'bars_used': b0, 'bars_total': total_bars}, open(out / 'build.json', 'w'), indent=1)
+    nm = find_playwright(spec)
+    link = out / 'node_modules'
+    if not link.exists(): link.symlink_to(nm)
+    tools = out / 'tools'; tools.mkdir(exist_ok=True)   # node resolves 'playwright' from the script's folder upward
+    for f in ['render.mjs', 'cover.mjs', 'qa_check.mjs']:
+        shutil.copy(HERE / f, tools / f)
+    print(f'built {len(calls)} scenes on {b0} bars · music {dur:.1f} s · BPM {grid["bpm"]} · {len(lines)} narration lines → {film}/film.html')
+
+
+# ---------------------------------------------------------------- vo
+def vo(spec, base_dir, out):
+    v = spec.get('voice', {'engine': 'kokoro'})
+    b = json.load(open(out / 'build.json'))
+    eng = v.get('engine', 'kokoro')
+    if eng == 'none':
+        print('voice.engine = none → captions only (timing estimated)'); return
+    if eng == 'files':  # user recordings: {"files": {"<line id>": "path.wav"}}
+        vod = out / 'vo'; vod.mkdir(exist_ok=True)
+        ff = find_ffmpeg(spec); timing = []
+        for l in json.load(open(out / 'narration.json')):
+            src = v.get('files', {}).get(l['id'])
+            if not src: continue
+            dst = vod / f"{l['id']}.wav"
+            run([ff, '-y', '-loglevel', 'error', '-i', base_dir / src, '-ar', '24000', '-ac', '1', dst])
+            import wave
+            with wave.open(str(dst)) as w: d = w.getnframes() / w.getframerate()
+            s = b['G'] + b['BAR'] * l['bar']
+            timing.append({'id': l['id'], 's': round(s, 3), 'e': round(s + d, 3), 'zh': l['zh'], 'en': l.get('cap', l['en'])})
+        json.dump(timing, open(vod / 'vo_timing.json', 'w'), ensure_ascii=False, indent=1)
+        (out / 'film' / 'vo_timing.js').write_text('const VO = ' + json.dumps(timing, ensure_ascii=False) + ';\nwindow.VO = VO;\n')
+        return
+    py = v.get('python') or os.environ.get('KOKORO_PYTHON')
+    if not py or not Path(os.path.expanduser(py)).exists():
+        sys.exit('ERROR voice.python (a Python with kokoro installed) not set.\n  FIX: follow references/audio.md "Kokoro setup", then set "voice": {"python": "/path/to/tts/bin/python"} — or "engine": "none" for captions only.')
+    env = dict(os.environ, HF_HUB_DISABLE_XET='1', KOKORO_ESPEAK_DATA=os.path.expanduser(v.get('espeak_data', '~/.cache/kes')))
+    run([os.path.expanduser(py), HERE / 'make_vo.py', '--narration', out / 'narration.json', '--out', out / 'vo', '--js', out / 'film' / 'vo_timing.js',
+         '--grid', b['G'], '--bar', b['BAR'], '--voice', v.get('voice', 'am_michael'), '--lang', v.get('lang', 'a')], env=env)
+
+
+# ---------------------------------------------------------------- qa
+def qa(spec, out):
+    q = out / 'qa'; q.mkdir(exist_ok=True)
+    r = subprocess.run(['node', out / 'tools' / 'qa_check.mjs', out / 'film' / 'film.html', q], cwd=out)
+    rep = json.load(open(q / 'qa_report.json'))
+    print(f"QA: {len(rep['errors'])} errors, {len(rep['warnings'])} warnings — contact sheets in {q}")
+    for e in rep['errors'][:30]: print('  ERROR', e)
+    for w in rep['warnings'][:15]: print('  WARN ', w)
+    if rep['errors']:
+        sys.exit('QA failed. FIX: change film.json (shorter text, fewer points, different scene type, more bars) and rerun --stage build then qa. '
+                 'Look at qa/sheet*.jpg if you can read images. Do not render until QA has 0 errors.')
+
+
+# ---------------------------------------------------------------- render + finish
+def render(spec, out):
+    b = json.load(open(out / 'build.json'))
+    ff = find_ffmpeg(spec)
+    workers = str(spec.get('tools', {}).get('workers', max(2, min(6, (os.cpu_count() or 4) - 2))))
+    run(['node', out / 'tools' / 'render.mjs', 'video', out / 'film' / 'film.html', out / 'silent', ff, b['DUR'], workers], cwd=out)
+
+
+def finish(spec, out):
+    b = json.load(open(out / 'build.json'))
+    ff = find_ffmpeg(spec)
+    fin = out / 'final'; fin.mkdir(exist_ok=True)
+    name = spec.get('name', 'film')
+    vodir = out / 'vo'
+    mix = out / 'audio' / 'mix.wav'
+    if (vodir / 'vo_timing.json').exists():
+        run([sys.executable, HERE / 'mix_audio.py', b['music'], vodir, mix, '--duration', b['DUR'], '--ffmpeg', ff])
+    else:
+        run([ff, '-y', '-loglevel', 'error', '-i', b['music'], '-t', b['DUR'], '-af', f"afade=t=out:st={b['DUR'] - 2.5}:d=2.5", mix])
+    mp4 = fin / f'{name}-1080p.mp4'
+    run([ff, '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', out / 'silent.list.txt', '-i', mix, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+         '-af', 'loudnorm=I=-14:TP=-1.0:LRA=11', '-ar', '48000', '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', '-shortest', mp4])
+    run(['node', out / 'tools' / 'cover.mjs', out / 'film' / 'film.html', fin / f'{name}-cover-4k.png', spec.get('cover_t', 4.2)], cwd=out)
+    from PIL import Image
+    Image.open(fin / f'{name}-cover-4k.png').convert('RGB').resize((1280, 720)).save(fin / f'{name}-cover-1280.jpg', quality=92)
+    tj = vodir / 'vo_timing.json'
+    if tj.exists():
+        run([sys.executable, HERE / 'make_srt.py', tj, fin, name])
+    print(f'DONE → {mp4}\nTell the user: what is demo/simulated, what you could not verify (you cannot hear the audio), and what they must supply.')
+
+
+if __name__ == '__main__':
+    ap = argparse.ArgumentParser()
+    ap.add_argument('spec'); ap.add_argument('--stage', default='all', choices=['all', 'check', 'build', 'vo', 'qa', 'render', 'finish'])
+    a = ap.parse_args()
+    spec_path = Path(a.spec).resolve()
+    spec = json.load(open(spec_path))
+    base = spec_path.parent
+    out = (base / spec.get('out', 'film_out')).resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    check(spec, base)
+    for w in warns: print(w)
+    if errors:
+        print('\n'.join(errors)); sys.exit(f'{len(errors)} error(s) in {spec_path.name} — fix them and rerun.')
+    print(f'spec OK ({len(spec["scenes"])} scenes, style {spec["style"]}, motion {spec.get("motion") or "style default"})')
+    order = ['build', 'vo', 'qa', 'render', 'finish']
+    stages = order if a.stage == 'all' else ([] if a.stage == 'check' else [a.stage])
+    for st in stages:
+        print(f'== {st}')
+        {'build': lambda: build(spec, base, out), 'vo': lambda: vo(spec, base, out), 'qa': lambda: qa(spec, out),
+         'render': lambda: render(spec, out), 'finish': lambda: finish(spec, out)}[st]()

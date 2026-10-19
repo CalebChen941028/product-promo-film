@@ -1,0 +1,52 @@
+{
+  "name": "demo-film",
+  "out": "film_out",
+  "style": "midnight-tech",
+  "motion": "",
+  "music": { "file": "demo-music.m4a" },
+  "voice": { "engine": "kokoro", "voice": "am_michael", "lang": "a", "python": "~/.venvs/kokoro/bin/python", "espeak_data": "~/.cache/kes" },
+  "brand": {
+    "name": "Demo", "nameAccent": "Studio", "logo": "../../templates/assets/logo.png",
+    "positioningZh": "一句话产品定位", "positioningEn": "ONE-LINE POSITIONING",
+    "taglineZh": "从数据，到发现", "taglineEn": "FROM DATA TO DISCOVERY",
+    "motto": ["把繁琐交给 AI，把时间还给研究者——", "去想清楚一个真正的科学问题。", "Hand the tedium to AI. Give researchers their time back."],
+    "contacts": [["DEVELOPER", "开发者", "Your Name", "you@example.com"], ["WECHAT", "公众号", "Account", "Official account"], ["GITHUB", "主页", "username", "github.com/username"]],
+    "chips": ["macOS · Apple silicon", "Windows · x64", "Beta"]
+  },
+  "scenes": [
+    { "type": "cover", "bars": 3, "media": "../../templates/assets/ui-sample.png" },
+    { "type": "pain", "bars": 3,
+      "say": [{ "en": "One project. Too many tools.", "zh": "一个项目，太多工具。" }] },
+    { "type": "feature", "bars": 5, "chapter": ["01", "功能", "FEATURES"], "media": "../../templates/assets/ui-sample.png",
+      "title": { "zh": "一屏看懂结果", "en": "Results at a glance" },
+      "points": [
+        { "zh": "关键指标卡片", "en": "Key metrics", "rect": [300, 160, 600, 300] },
+        { "zh": "趋势对比", "en": "Trends side by side", "rect": [960, 160, 600, 300] },
+        { "zh": "明细一键导出", "en": "Details, one-click export", "rect": [300, 500, 1560, 540] }
+      ],
+      "say": [{ "en": "Meet Demo Studio. Everything you need, on one screen.", "zh": "Demo Studio：你需要的一切，都在一屏之内。" }] },
+    { "type": "carousel", "bars": 2, "chapter": ["01", "功能", "FEATURES"],
+      "panels": [
+        { "zh": "卡片视图", "en": "Cards", "media": "../../templates/assets/ui-sample.png", "crop": [300, 160, 600, 300] },
+        { "zh": "数据表", "en": "Table", "media": "../../templates/assets/ui-sample.png", "crop": [300, 500, 1560, 540] }
+      ] },
+    { "type": "numbers", "bars": 2, "chapter": ["02", "能力", "CAPABILITIES"],
+      "stats": [{ "value": 12, "zh": "模块", "en": "Modules" }, { "value": 100, "suffix": "+", "zh": "模板", "en": "Templates" }],
+      "say": [{ "en": "Twelve modules. More than a hundred templates.", "cap": "12 modules. 100+ templates.", "zh": "12 个模块，100 余个模板。" }] },
+    { "type": "gallery", "bars": 3, "chapter": ["02", "能力", "CAPABILITIES"],
+      "items": [
+        { "media": "../../templates/assets/plot-1.png", "zh": "生存曲线", "en": "Survival" },
+        { "media": "../../templates/assets/plot-2.png", "zh": "ROC 曲线", "en": "ROC" },
+        { "media": "../../templates/assets/plot-3.png", "zh": "森林图", "en": "Forest plot" }
+      ],
+      "say": [{ "en": "Survival curves.", "zh": "生存曲线。", "at": 0.15 }, { "en": "ROC analysis.", "zh": "ROC 分析。", "at": 1.15 }, { "en": "Forest plots.", "zh": "森林图。", "at": 2.15 }] },
+    { "type": "clip", "bars": 2, "media": "../../templates/assets/clip.webm", "title": { "zh": "真实录屏", "en": "Screen recording" } },
+    { "type": "compare", "bars": 3, "chapter": ["03", "创新", "WHAT IS NEW"],
+      "rows": [["分散在多个软件", "Scattered tools", "一个工作台", "One workbench"], ["手工整理结果", "Retyped by hand", "自动生成", "Generated for you"]],
+      "say": [{ "en": "One workbench, instead of five tools.", "zh": "一个工作台，取代五个软件。" }] },
+    { "type": "finale", "bars": 4, "media": ["../../templates/assets/ui-sample.png", "../../templates/assets/plot-1.png", "../../templates/assets/plot-2.png"],
+      "say": [{ "id": "tagline", "en": "Demo Studio. From data, to discovery.", "zh": "Demo Studio，从数据，到发现。", "at": 1.2 }] },
+    { "type": "endcard", "bars": "rest",
+      "say": [{ "id": "motto", "en": "Hand the tedium to AI. Give researchers their time back.", "zh": "把繁琐交给 AI，把时间还给研究者。", "at": 0.6 }] }
+  ]
+}

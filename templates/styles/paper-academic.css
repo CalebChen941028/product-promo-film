@@ -1,0 +1,49 @@
+/* paper-academic — warm paper stage with grain, serif display type, ink-blue accent, figures framed like
+   journal plates, captions as typeset footnotes, page-turn motion. */
+:root {
+  --accent: #1f4e8c; --accent-2: #b5452f; --warn: #b5452f; --amber: #b07d2b;
+  --ink: #23201b; --dim: rgba(35, 32, 27, 0.62); --faint: rgba(35, 32, 27, 0.14);
+  --bg-edge: #efe8dc;
+  --zh: "Songti SC", "STSong", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
+  --en: "Georgia", "Times New Roman", "Noto Serif", serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+  --display: "Didot", "Bodoni 72", "Playfair Display", "Georgia", serif;
+}
+#bg .bg-base { background: radial-gradient(1400px 900px at 50% 40%, #f8f3ea 0%, #f1eadf 60%, #e7dece 100%); }
+#bg .grain { left: 0; top: 0; mix-blend-mode: multiply; }
+#bg .ink { width: 700px; height: 700px; filter: blur(80px); }
+#bg .ink.a { background: radial-gradient(circle, rgba(31,78,140,0.14), transparent 62%); }
+#bg .ink.b { background: radial-gradient(circle, rgba(181,69,47,0.10), transparent 62%); }
+#pulse { background: none; }
+#flash { background: rgba(248,243,234,0.9); }
+.win { border-radius: 6px; background: #fff; box-shadow: 0 2px 0 rgba(0,0,0,0.04), 0 30px 70px rgba(60,40,10,0.18), 0 0 0 1px rgba(60,40,10,0.12); }
+.bar.mac.dark, .bar.mac.light, .bar.browser { background: #f4efe6; border-bottom: 1px solid rgba(60,40,10,0.12); height: 30px; }
+.bar i { width: 10px; height: 10px; background: rgba(60,40,10,0.25) !important; }
+.bar span, .bar.browser { color: var(--dim); font-family: var(--en); font-style: italic; }
+.bar.browser b { background: rgba(60,40,10,0.06); color: var(--dim); }
+.win.phone { border-radius: 44px; padding: 10px; background: #2b2722; }
+.win.phone .win-body { border-radius: 34px; }
+.pic { border-radius: 2px; background: #fff; padding: 0; box-shadow: 0 30px 70px rgba(60,40,10,0.18), 0 0 0 1px rgba(60,40,10,0.14); }
+.hl { border: 2.5px solid var(--accent-2); border-radius: 50% / 40%; box-shadow: none; }
+.tag { padding: 6px 14px; background: #fffaf2; border: 1px solid rgba(60,40,10,0.25); color: var(--ink); font: 500 20px var(--zh); border-radius: 2px; box-shadow: 0 8px 20px rgba(60,40,10,0.12); }
+.tag em { font: italic 400 17px var(--en); color: var(--accent); margin-left: 8px; }
+.chip { padding: 9px 18px; border: 1px solid rgba(60,40,10,0.35); border-radius: 2px; font: 500 20px var(--zh); color: var(--ink); background: rgba(255,250,242,0.7); }
+.chip.accent { border-color: var(--accent); color: var(--accent); }
+.card { border-radius: 2px; background: #fffaf2; border: 1px solid rgba(60,40,10,0.18); box-shadow: 0 24px 60px rgba(60,40,10,0.15); }
+.h-display { font: 400 132px var(--display); letter-spacing: 0; color: var(--ink); }
+.h-zh { font: 600 42px var(--zh); letter-spacing: 12px; color: var(--ink); }
+.kicker { font: italic 400 24px var(--en); letter-spacing: 2px; color: var(--accent); }
+.big-num { font: 400 230px var(--display); color: var(--ink); }
+.big-num.accent { color: var(--accent); }
+.muted { color: var(--dim); } .accent { color: var(--accent); } .warn { color: var(--warn); }
+.code { font: 500 21px/1.65 var(--mono); color: #2b2722; }
+#chapter { left: 96px; top: 64px; }
+#chapter b { font: 400 30px var(--display); color: var(--accent-2); }
+#chapter .ln { width: 46px; height: 1px; background: var(--ink); }
+#chapter .z { font: 600 24px var(--zh); color: var(--ink); } #chapter .e { font: italic 400 17px var(--en); color: var(--dim); letter-spacing: 1px; }
+#capband { background: linear-gradient(rgba(239,232,220,0), rgba(239,232,220,0.85) 45%, rgba(239,232,220,0.98)); }
+#capband::before { content: ''; position: absolute; left: 50%; bottom: 168px; width: 120px; height: 1px; background: var(--ink); transform: translateX(-50%); opacity: 0.4; }
+#capzh { left: 0; right: 0; bottom: 104px; text-align: center; font: 600 40px var(--zh); letter-spacing: 2px; color: var(--ink); }
+#capen { left: 0; right: 0; bottom: 60px; text-align: center; font: italic 400 26px var(--en); color: var(--dim); }
+#vignette { background: radial-gradient(ellipse at center, rgba(0,0,0,0) 60%, rgba(80,55,20,0.18) 100%); }
+#fade { background: #1c1915 !important; }

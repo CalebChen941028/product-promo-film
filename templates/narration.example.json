@@ -1,0 +1,9 @@
+[
+  {"id": "pain", "bar": 3.15, "end_bar": 7, "en": "One study. Too many tools. Clean the data here, analyze it there, then plot and format it somewhere else.", "zh": "一项研究，太多软件。在这里清洗，在那里分析，作图和排版又要换个地方。"},
+  {"id": "meet", "bar": 7.3, "end_bar": 10, "en": "Meet MedStat Pilot. One workbench, from raw data to manuscript.", "zh": "MedStat Pilot：从原始数据到论文，一个工作台。"},
+  {"id": "methods", "bar": 24.4, "end_bar": 28, "en": "Seventeen research domains. More than a hundred statistical methods.", "cap": "17 research domains. More than 100 statistical methods.", "zh": "17 个研究领域，100 余种统计方法。"},
+  {"id": "g_km", "bar": 47.15, "end_bar": 48, "en": "Survival curves.", "zh": "生存曲线。"},
+  {"id": "g_cox", "bar": 48.15, "end_bar": 49, "en": "Cox regression.", "zh": "Cox 回归。"},
+  {"id": "tagline", "bar": 92.4, "end_bar": 96, "en": "MedStat Pilot. From data, to discovery.", "zh": "MedStat Pilot，从数据，到发现。"},
+  {"id": "motto", "bar": 96.9, "end_bar": 103, "en": "Hand the tedium to AI. Give researchers their time back, to think through the questions that truly matter.", "zh": "把繁琐交给 AI，把时间还给研究者——去想清楚一个真正的科学问题。"}
+]

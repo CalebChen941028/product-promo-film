@@ -1,0 +1,46 @@
+/* editorial-mono — Swiss / magazine: near-black stage, off-white type, one hot accent, thin rules,
+   giant chapter numerals, square frames, hard wipes on the beat, lower-third captions. */
+:root {
+  --accent: #ff4d2e; --accent-2: #f2f0eb; --warn: #ff4d2e; --amber: #ffb000;
+  --ink: #f2f0eb; --dim: rgba(242, 240, 235, 0.58); --faint: rgba(242, 240, 235, 0.14);
+  --bg-edge: #0b0b0b;
+  --zh: "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+  --en: "Helvetica Neue", "Inter", Helvetica, Arial, sans-serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+  --display: "Helvetica Neue", "Inter", Helvetica, Arial, sans-serif;
+}
+#bg .bg-base { background: #0b0b0b; }
+#bg .rule.h { left: 0; right: 0; top: 50%; height: 1px; background: var(--faint); }
+#bg .rule.v { top: 0; bottom: 0; left: 62%; width: 1px; background: var(--faint); }
+#bg .mark { right: 60px; bottom: 120px; font: 800 520px/0.8 var(--display); color: rgba(242,240,235,0.04); letter-spacing: -20px; }
+#pulse { background: linear-gradient(90deg, var(--accent) 0 8px, transparent 8px); }
+#flash { background: var(--accent); mix-blend-mode: multiply; }
+.win { border-radius: 4px; background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.12); }
+.bar.mac.dark, .bar.mac.light, .bar.browser { background: #161616; height: 30px; }
+.bar i { width: 10px; height: 10px; background: #3a3a3a !important; }
+.bar span, .bar.browser { color: rgba(242,240,235,0.55); font-family: var(--mono); }
+.bar.browser b { background: #222; color: rgba(242,240,235,0.5); border-radius: 2px; }
+.win.phone { border-radius: 36px; padding: 10px; background: #161616; }
+.win.phone .win-body { border-radius: 28px; }
+.pic { border-radius: 4px; background: #fff; box-shadow: 0 30px 80px rgba(0,0,0,0.6); }
+.hl { border: 3px solid var(--accent); border-radius: 2px; }
+.tag { padding: 8px 14px; background: var(--accent); color: #0b0b0b; font: 700 19px var(--zh); border-radius: 0; }
+.tag em { font: normal 700 14px var(--en); color: #0b0b0b; margin-left: 8px; letter-spacing: 1px; text-transform: uppercase; }
+.chip { padding: 10px 18px; border: 1.5px solid var(--ink); border-radius: 0; font: 600 20px var(--zh); color: var(--ink); }
+.chip.accent { border-color: var(--accent); color: var(--accent); }
+.card { border-radius: 0; background: #141414; border-top: 4px solid var(--accent); }
+.h-display { font: 800 136px var(--display); letter-spacing: -4px; text-transform: none; }
+.h-zh { font: 700 44px var(--zh); letter-spacing: 6px; }
+.kicker { font: 700 18px var(--mono); letter-spacing: 4px; color: var(--accent); text-transform: uppercase; }
+.big-num { font: 800 240px/0.9 var(--display); letter-spacing: -10px; }
+.big-num.accent { color: var(--accent); }
+.muted { color: var(--dim); } .accent { color: var(--accent); } .warn { color: var(--warn); }
+.code { font: 500 21px/1.65 var(--mono); color: #f2f0eb; }
+#chapter { left: 96px; top: 64px; flex-direction: row; }
+#chapter b { font: 800 30px var(--display); color: var(--accent); }
+#chapter .ln { width: 80px; height: 3px; background: var(--ink); }
+#chapter .z { font: 700 24px var(--zh); } #chapter .e { font: 700 14px var(--mono); color: var(--dim); letter-spacing: 3px; }
+#capband { background: linear-gradient(90deg, rgba(11,11,11,0.92) 0 62%, rgba(11,11,11,0) 80%); }
+#capzh { left: 96px; right: 30%; bottom: 112px; text-align: left; font: 700 42px var(--zh); border-left: 6px solid var(--accent); padding-left: 22px; }
+#capen { left: 124px; right: 30%; bottom: 66px; text-align: left; font: 400 25px var(--en); color: var(--dim); }
+#vignette { background: none; }
