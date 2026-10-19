@@ -5,3 +5,4 @@ build/
 *.part*.mp4
 *.list.txt
 .DS_Store
+*.local.json

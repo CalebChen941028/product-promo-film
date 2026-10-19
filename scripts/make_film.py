@@ -26,7 +26,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SKILL = HERE.parent
 TPL = SKILL / 'templates'
-STYLES = ['midnight-tech', 'keynote-light', 'editorial-mono', 'aurora-glass', 'neon-cyber', 'paper-academic']
+STYLES = ['midnight-tech', 'keynote-light', 'editorial-mono', 'aurora-glass', 'neon-cyber', 'paper-academic', 'luxe-noir', 'natural-fresh']
 MOTIONS = ['cinematic-3d', 'precision-data', 'kinetic-launch', 'gentle-story', 'playful-pop', 'editorial-type']
 # minimum bars, required keys, list limits per scene type
 TYPES = {
@@ -34,10 +34,15 @@ TYPES = {
     'carousel': (2, ['panels'], {'panels': 6}), 'numbers': (2, ['stats'], {'stats': 3, 'chips': 12}),
     'gallery': (2, ['items'], {'items': 8}), 'clip': (2, ['media'], {}), 'phone': (2, ['media'], {}),
     'compare': (3, ['rows'], {'rows': 6}), 'statement': (1, ['zh'], {}), 'finale': (4, ['media'], {}), 'endcard': (4, [], {}),
+    # any product: photographs, cut-outs (transparent PNG), people and places
+    'photo': (2, ['media'], {}), 'hero': (3, ['media'], {}), 'detail': (2, ['media'], {'crops': 4}),
+    'lineup': (2, ['items'], {'items': 6}), 'quote': (2, ['zh', 'who'], {}),
 }
+GENRES = json.load(open(Path(__file__).resolve().parent.parent / 'templates' / 'genres.json'))['genres']
+REST_BARS = 5   # end card length when the music is composed for the film
 MOODS = ['cold', 'neutral', 'peak', 'warm', 'night']
 CUT_TYPES = ['style', 'whip', 'push']
-LOOKS = ['teal-night', 'clean-bright', 'bleach-print', 'pastel-glow', 'neon-night', 'warm-print', 'teal-orange', 'none']
+LOOKS = ['teal-night', 'clean-bright', 'bleach-print', 'pastel-glow', 'neon-night', 'warm-print', 'noir-gold', 'sunlit', 'teal-orange', 'none']
 errors, warns = [], []
 
 
@@ -50,6 +55,38 @@ def style_profile(style):
     for k in ('bloom', 'grain', 'xf'):
         m = re.search(k + r'\s*:\s*([\d.]+)', src); out[k] = float(m.group(1)) if m else 0.0
     return out
+
+
+def resolve_look(spec):
+    """Fill style/motion from the genre when they are "auto" or missing (genres.json), in place."""
+    g = GENRES.get(spec.get('genre') or '', None)
+    if spec.get('style') in (None, '', 'auto'):
+        spec['style'] = g['style'][0] if g else 'midnight-tech'
+    if spec.get('motion') in (None, 'auto'):
+        spec['motion'] = g['motion'] if g else ''
+    return spec
+
+
+def has_alpha(path):
+    try:
+        from PIL import Image
+        im = Image.open(path)
+        return im.mode in ('RGBA', 'LA') and im.getextrema()[-1][0] < 250
+    except Exception:
+        return False
+
+
+def music_mood(spec):
+    """Underscore mood for a composed track: the genre's, else one that suits the style/motion."""
+    gen = (spec.get('music') or {}).get('generate') or {}
+    if gen.get('mood') not in (None, '', 'auto'): return gen['mood'], gen.get('bpm')
+    g = GENRES.get(spec.get('genre') or '')
+    if g: return g['music']['mood'], gen.get('bpm') or g['music']['bpm']
+    by_style = {'luxe-noir': 'luxe-lounge', 'natural-fresh': 'warm-acoustic'}
+    by_motion = {'cinematic-3d': 'cinematic-pulse', 'precision-data': 'minimal-electronic', 'kinetic-launch': 'minimal-electronic',
+                 'gentle-story': 'warm-piano', 'playful-pop': 'bright-pop', 'editorial-type': 'warm-piano'}
+    mo = spec.get('motion') or style_profile(spec['style'])['motionDefault'] or 'cinematic-3d'
+    return by_style.get(spec['style'], by_motion.get(mo, 'cinematic-pulse')), gen.get('bpm')
 
 
 def cinema_spec(spec):
@@ -68,6 +105,13 @@ def cinema_spec(spec):
 
 
 def err(msg, fix): errors.append(f'ERROR {msg}\n  FIX: {fix}')
+def _strings(o, path=''):
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if not str(k).startswith('_'): yield from _strings(v, f'{path}.{k}' if path else k)
+    elif isinstance(o, list):
+        for i, v in enumerate(o): yield from _strings(v, f'{path}[{i}]')
+    elif isinstance(o, str): yield path, o
 def warn(msg, fix): warns.append(f'WARN  {msg}\n  FIX: {fix}')
 def zhlen(s): return sum(1 for ch in s or '' if '　' <= ch <= '鿿' or '＀' <= ch <= '￯')
 
@@ -107,6 +151,9 @@ def run(cmd, **kw):
 
 # ---------------------------------------------------------------- check
 def check(spec, base_dir):
+    if spec.get('genre') and spec['genre'] != 'auto' and spec['genre'] not in GENRES:
+        err(f"genre '{spec['genre']}' unknown", f'use one of {list(GENRES)} (scripts/genres.py --list)')
+    resolve_look(spec)
     if spec.get('style') not in STYLES:
         err(f"style '{spec.get('style')}' unknown", f'use one of {STYLES} (scripts/recommend_style.py suggests one)')
     if spec.get('motion') and spec['motion'] not in MOTIONS:
@@ -117,9 +164,19 @@ def check(spec, base_dir):
             err(f'brand.{k} missing', 'fill it from the brief (templates/brief.example.json)')
     if b.get('logo') and not (base_dir / b['logo']).exists():
         err(f"brand.logo not found: {b['logo']}", 'path is relative to film.json; put a transparent PNG there')
-    mus = spec.get('music', {}).get('file')
-    if not mus or not (base_dir / mus).exists():
-        err(f'music.file not found: {mus}', 'add a licensed music file (the user provides it) and set music.file')
+    mus = (spec.get('music') or {}).get('file')
+    if mus and not (base_dir / mus).exists():
+        err(f'music.file not found: {mus}', 'fix the path (relative to film.json), or remove "file" to have an original underscore composed')
+    if not mus:
+        mood, _ = music_mood(spec)
+        warns.append(f'NOTE  no music file → an original underscore will be composed ({mood}); a licensed track from the user is still preferred for a hero film')
+    todo = [p for p, v in _strings(spec) if 'TODO' in v]
+    for p in todo[:20]:
+        err(f'copy not written: {p}', 'write it (crew: copywriter, references/crew.md) — or remove the field/scene')
+    sys.path.insert(0, str(HERE))
+    import lint_copy
+    for p, prob, fix in lint_copy.lint(spec)[:25]:
+        warn(f'copy {p}: {prob}', fix)
     c = spec.get('cinema', 'auto')
     if isinstance(c, dict):
         if c.get('grade', 'auto') not in LOOKS + ['auto']:
@@ -174,8 +231,11 @@ def check(spec, base_dir):
         basewh = sc.get('base', [1920, 1080])
         for j, p in enumerate(sc.get('points', [])):
             r = p.get('rect')
-            if not r or len(r) != 4:
-                err(f'{where}.points[{j}]: rect [x,y,w,h] missing', 'measure it with grid_overlay.py on the screenshot (base coordinates)')
+            if r is None:
+                if sc.get('frame') != 'photo':
+                    warn(f'{where}.points[{j}]: no rect → no highlight box', 'for screens, measure the region with grid_overlay.py (base coordinates); photos ("frame": "photo") need none')
+            elif len(r) != 4:
+                err(f'{where}.points[{j}]: rect must be [x,y,w,h]', 'measure it with grid_overlay.py on the screenshot (base coordinates)')
             elif r[0] < 0 or r[1] < 0 or r[0] + r[2] > basewh[0] + 1 or r[1] + r[3] > basewh[1] + 1:
                 err(f'{where}.points[{j}]: rect {r} outside base {basewh}', 'rects are in base units (CSS px of the capture); check base and rect')
             if zhlen(p.get('zh')) > 14:
@@ -194,6 +254,30 @@ def check(spec, base_dir):
         err('playwright not found', f'cd "{SKILL}" && npm i playwright && npx playwright install chromium')
 
 
+# ---------------------------------------------------------------- composed music (no track supplied)
+ENERGY = {'cover': 0, 'pain': 1, 'statement': 1, 'photo': 1, 'detail': 1, 'quote': 1, 'phone': 1, 'feature': 1, 'clip': 2, 'carousel': 2,
+          'numbers': 2, 'gallery': 2, 'compare': 2, 'lineup': 2, 'hero': 2, 'finale': 3, 'endcard': 0}
+
+
+def compose_music(spec, wav, grid_path):
+    """Compose an original underscore bar-for-bar from the scene plan (make_music.py): sections change on the cuts."""
+    sys.path.insert(0, str(HERE)); import make_music
+    mood, bpm = music_mood(spec)
+    gen = (spec.get('music') or {}).get('generate') or {}
+    energy, hero, b = [], None, 0
+    scenes = spec['scenes']; total = sum(sc['bars'] for sc in scenes if sc.get('bars') != 'rest')
+    for i, sc in enumerate(scenes):
+        nb = REST_BARS if sc.get('bars') == 'rest' else int(sc['bars'])
+        e = sc.get('energy', ENERGY.get(sc['type'], 1))
+        if sc['type'] == 'feature' and 'energy' not in sc and b > total * 0.45: e = 2      # second half of the story lifts
+        if (sc['type'] == 'finale' or sc.get('hit') == 'hero') and hero is None: hero = b
+        energy += [e] * nb; b += nb
+    energy += [0]   # one bar of ring-out after the end card
+    x, grid = make_music.compose(mood, float(bpm or make_music.MOODS[mood]['bpm']), energy, hero, int(gen.get('seed', 3)))
+    make_music.write(wav, x); json.dump(grid, open(grid_path, 'w'), indent=1)
+    print(f'  music: composed {mood} {grid["bpm"]:.0f} BPM, {len(energy)} bars ({len(x) / make_music.SR:.0f} s), hero on bar {hero} — original, royalty-free')
+
+
 # ---------------------------------------------------------------- build
 def build(spec, base_dir, out):
     ff = find_ffmpeg(spec)
@@ -201,11 +285,15 @@ def build(spec, base_dir, out):
     for d in (film / 'media', film / 'styles', aud):
         d.mkdir(parents=True, exist_ok=True)
     music_wav = aud / 'music.wav'
-    run([ff, '-y', '-loglevel', 'error', '-i', base_dir / spec['music']['file'], '-ar', '48000', '-ac', '2', music_wav])
-    run([sys.executable, HERE / 'beat_grid.py', music_wav, '--ffmpeg', ff, '--out', aud / 'grid.json'], stderr=subprocess.DEVNULL)
+    mus = spec.get('music') or {}
+    if mus.get('file'):
+        run([ff, '-y', '-loglevel', 'error', '-i', base_dir / mus['file'], '-ar', '48000', '-ac', '2', music_wav])
+        run([sys.executable, HERE / 'beat_grid.py', music_wav, '--ffmpeg', ff, '--out', aud / 'grid.json'], stderr=subprocess.DEVNULL)
+    else:
+        compose_music(spec, music_wav, aud / 'grid.json')
     grid = json.load(open(aud / 'grid.json'))
     G, BAR = grid['first_beat'], grid['bar_seconds']
-    ext = spec['music'].get('extend')
+    ext = mus.get('extend')
     final_wav = music_wav
     if ext:
         final_wav = aud / 'music_ext.wav'
@@ -221,6 +309,7 @@ def build(spec, base_dir, out):
     if not rest and total_bars - fixed > 6:
         print(f'WARN  {total_bars - fixed} bars of music left unused — set the last scene to "bars": "rest"')
     each_rest = (total_bars - fixed) // max(1, len(rest))
+    if grid.get('generated'): each_rest = REST_BARS
     # hi-energy bars → chorus ranges (background pulse)
     his = [bb['hi'] for bb in grid['bars']]
     q = sorted(his)[int(len(his) * 0.66)] if his else 1
@@ -238,16 +327,23 @@ def build(spec, base_dir, out):
         shutil.copy(f, film / 'styles' / f.name)
     copied = {}
 
-    def media(p):
+    def media(p, trim=False):
         if not p: return p
-        if p not in copied:
+        key = (p, trim)
+        if key not in copied:
             src = base_dir / p
-            dst = film / 'media' / f'{len(copied):02d}-{Path(p).name}'
+            dst = film / 'media' / f'{len(copied):02d}-{"t-" if trim else ""}{Path(p).name}'
             if src.suffix.lower() in ('.png', '.jpg', '.jpeg', '.webp'):
                 # downscale huge captures: coordinates live in `base` units, so pixels can shrink freely.
                 # Keeps every render worker's memory low (4K screenshots × 6 workers swaps a 24 GB machine).
                 from PIL import Image
                 im = Image.open(src)
+                if trim and im.mode in ('RGBA', 'LA') and im.getextrema()[-1][0] < 250:   # hero/lineup only: they ignore `base`
+                    bb = im.getchannel('A').point(lambda v: 255 if v > 8 else 0).getbbox()   # cut-out: trim the empty margin
+                    if bb and (bb[2] - bb[0]) * (bb[3] - bb[1]) < 0.8 * im.width * im.height:
+                        pad = int(0.04 * max(bb[2] - bb[0], bb[3] - bb[1]))
+                        im = im.crop((max(0, bb[0] - pad), max(0, bb[1] - pad), min(im.width, bb[2] + pad), min(im.height, bb[3] + pad)))
+                        im.save(dst); copied[key] = 'media/' + dst.name; return copied[key]
                 if im.width > 2400 and im.width >= im.height:
                     im = im.resize((2400, round(im.height * 2400 / im.width)), Image.LANCZOS)
                     im.save(dst, quality=92) if dst.suffix.lower() in ('.jpg', '.jpeg') else im.save(dst)
@@ -255,20 +351,24 @@ def build(spec, base_dir, out):
                     shutil.copy(src, dst)
             else:
                 shutil.copy(src, dst)
-            copied[p] = 'media/' + dst.name
-        return copied[p]
+            copied[key] = 'media/' + dst.name
+        return copied[key]
     brand = dict(spec['brand']); brand['logo'] = media(brand['logo'])
     lines, calls, chapters, b0, segs = [], [], [], 0, []
     for i, sc in enumerate(spec['scenes']):
         nb = each_rest if sc.get('bars') == 'rest' else sc['bars']
         b1 = b0 + nb
         segs.append((sc, b0, b1))
-        o = {k: v for k, v in sc.items() if k not in ('type', 'bars', 'say', 'chapter', 'mood', 'cut', 'hit')}
-        if isinstance(o.get('media'), list): o['media'] = [media(m) for m in o['media']]
-        elif o.get('media'): o['media'] = media(o['media'])
+        o = {k: v for k, v in sc.items() if k not in ('type', 'bars', 'say', 'chapter', 'mood', 'cut', 'hit', 'energy')}
+        if sc['type'] in ('hero', 'lineup') and 'cutout' not in o:   # transparent PNG → stand it on the stage
+            first = ([sc.get('media')] if isinstance(sc.get('media'), str) else (sc.get('media') or [])) + [it.get('media') for it in sc.get('items', [])]
+            o['cutout'] = bool(first and first[0] and has_alpha(base_dir / first[0]))
+        tr = sc['type'] in ('hero', 'lineup') and o.get('cutout')
+        if isinstance(o.get('media'), list): o['media'] = [media(m, tr) for m in o['media']]
+        elif o.get('media'): o['media'] = media(o['media'], tr)
         for p in o.get('panels', []): p['media'] = media(p['media'])
         for it in o.get('items', []):
-            if isinstance(it, dict) and it.get('media'): it['media'] = media(it['media'])
+            if isinstance(it, dict) and it.get('media'): it['media'] = media(it['media'], tr)
         calls.append(f"LIB.{sc['type']}(bar({b0}), {'CONFIG.DUR' if i == len(spec['scenes']) - 1 else f'bar({b1})'}, {json.dumps(o, ensure_ascii=False)});")
         if sc.get('chapter'):
             n, zh, en = sc['chapter']; chapters.append([b0, b1, n, zh, en])
@@ -310,7 +410,7 @@ def build(spec, base_dir, out):
 
 
 # ---------------------------------------------------------------- direction (colour script, hits, cuts, light, sound)
-AUTO_MOOD = {'pain': 'cold', 'numbers': 'peak', 'finale': 'peak', 'endcard': 'warm'}
+AUTO_MOOD = {'pain': 'cold', 'numbers': 'peak', 'finale': 'peak', 'endcard': 'warm', 'quote': 'warm'}
 # sound palette per motion language: what a cut, a hit, a logo and a small item sound like
 PALETTE = {
     'cinematic-3d':   {'cut': 'whoosh', 'hit': 'impact', 'logo': 'shimmer', 'item': 'tick', 'riser': True},
@@ -338,7 +438,7 @@ def direct(cin, segs, G, BAR, dur):
     for i, (sc, b0, b1) in enumerate(segs):
         t0, t1, typ = T(b0), (round(dur, 3) if i == len(segs) - 1 else T(b1)), sc['type']
         moods.append([0 if i == 0 else t0, t1, sc.get('mood') or AUTO_MOOD.get(typ, 'neutral')])
-        auto_hit = typ in ('numbers', 'finale') or (i > 0 and segs[i - 1][0]['type'] == 'pain')
+        auto_hit = typ in ('numbers', 'finale', 'hero') or (i > 0 and segs[i - 1][0]['type'] == 'pain')
         hit = bool(sc.get('hit', auto_hit)) and i > 0
         hero = i == hero_i
         if hit or hero: hits.append(t0)
@@ -487,7 +587,8 @@ if __name__ == '__main__':
     for w in warns: print(w)
     if errors:
         print('\n'.join(errors)); sys.exit(f'{len(errors)} error(s) in {spec_path.name} — fix them and rerun.')
-    print(f'spec OK ({len(spec["scenes"])} scenes, style {spec["style"]}, motion {spec.get("motion") or "style default"})')
+    print(f'spec OK ({len(spec["scenes"])} scenes, genre {spec.get("genre") or "—"}, style {spec["style"]}, motion {spec.get("motion") or "style default"}, '
+          f'music {"file" if (spec.get("music") or {}).get("file") else "composed " + music_mood(spec)[0]})')
     order = ['build', 'vo', 'qa', 'render', 'finish']
     stages = order if a.stage == 'all' else ([] if a.stage == 'check' else [a.stage])
     for st in stages:

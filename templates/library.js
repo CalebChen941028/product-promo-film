@@ -8,10 +8,10 @@ const LIB = (() => {
   const nameHTML = () => `${BR().name} <span class="accent">${BR().nameAccent || ''}</span>`;
   const chipsHTML = (list, size = 20) => (list || []).map((c, i, a) => `<span class="chip${i === a.length - 1 && /beta|preview|内测|新/i.test(c) ? ' accent' : ''}" style="font-size:${size}px;margin:0 7px">${c}</span>`).join('');
 
-  // cover { media?, base? } — logo, name, positioning, platform chips; blurred real UI behind.
+  // cover { media?, base?, frame?: 'photo' } — logo, name, positioning, platform chips; blurred real UI behind.
   function cover(start, end, o = {}) {
     scene(start, end, (R, S) => {
-      if (o.media) { S.back = win(R, { srcs: o.media, base: o.base, w: 1500 }); S.back.root.style.filter = 'blur(3px) saturate(0.85)'; qaIgnore(S.back.root); }
+      if (o.media) { S.back = win(R, { srcs: o.media, base: o.base, w: 1500, chrome: o.frame === 'photo' ? 'frame' : 'auto' }); S.back.root.style.filter = 'blur(3px) saturate(0.85)'; qaIgnore(S.back.root); }
       S.icon = img(BR().logo, R, 'abs'); S.icon.style.width = '250px';
       S.title = textEl(R, nameHTML(), { whiteSpace: 'nowrap' }); S.title.className += ' h-display';
       S.sub = textEl(R, BR().positioningZh || '', { whiteSpace: 'nowrap' }); S.sub.className += ' h-zh';
@@ -54,7 +54,7 @@ const LIB = (() => {
   }
 
   // feature { media, base?, title: {zh, en}, points: [{zh, en, rect, focus?}] (≤ 4) } — see patterns.js
-  function featureScene(start, end, o) { feature(start, end, { srcs: o.media, base: o.base, title: o.title, points: o.points }); }
+  function featureScene(start, end, o) { feature(start, end, { srcs: o.media, base: o.base, title: o.title, points: o.points, chrome: o.frame === 'photo' ? 'frame' : o.frame }); }
 
   // carousel { title?: {zh, en}, panels: [{zh, en, media, base?, crop?}] } — one panel per equal slice, menu tracks it.
   function carousel(start, end, o) {
@@ -191,5 +191,99 @@ const LIB = (() => {
     });
   }
 
-  return { cover, pain, feature: featureScene, carousel, numbers, gallery, clip: clipScene, phone, compare, statement, finale, endcard };
+  // ---------- scenes for any product (photos, cut-outs, people, places) ----------
+  const fill169 = (base) => { const [bw, bh] = base, w = Math.min(bw, bh * 16 / 9), h = w * 9 / 16; return [(bw - w) / 2, (bh - h) / 2, w, h]; };
+  const zoomIn = (r, k, cx = 0.5, cy = 0.5) => { const w = r[2] / k, h = r[3] / k; return [r[0] + (r[2] - w) * cx, r[1] + (r[3] - h) * cy, w, h]; };
+  const backdrop = (R, media, base) => { const W = win(R, { srcs: media, base, w: 1920, chrome: 'none', radius: 0 }); W.root.dataset.qa = 'backdrop'; W.root.style.boxShadow = 'none'; return W; };
+  const scrim = (R, side) => { const d = div('', R); Object.assign(d.style, { position: 'absolute', inset: 0, pointerEvents: 'none',
+    background: side === 'left' ? 'linear-gradient(90deg, rgba(0,0,0,0.62), rgba(0,0,0,0.25) 45%, rgba(0,0,0,0) 70%)' : 'linear-gradient(rgba(0,0,0,0) 45%, rgba(0,0,0,0.55))' }); return d; };
+  // a product cut-out (transparent PNG) standing on the stage: soft contact shadow + faint floor reflection
+  function cutout(R, src, w, h) {
+    const root = div('abs', R); Object.assign(root.style, { width: w + 'px', height: h + 'px' }); root.dataset.qa = 'media';
+    const sh = div('', root); Object.assign(sh.style, { position: 'absolute', left: '15%', right: '15%', bottom: '-4%', height: '9%', borderRadius: '50%',
+      background: `radial-gradient(closest-side, rgba(0,0,0,${ST.light ? 0.28 : 0.6}), transparent)`, filter: 'blur(8px)' });
+    const im = img(src, root); Object.assign(im.style, { position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', filter: `drop-shadow(0 30px 40px rgba(0,0,0,${ST.light ? 0.18 : 0.45}))` });
+    const rf = img(src, root); Object.assign(rf.style, { position: 'absolute', left: 0, top: '100%', width: '100%', height: '100%', objectFit: 'contain', transform: 'scaleY(-1)', opacity: ST.light ? 0.08 : 0.14,
+      WebkitMaskImage: 'linear-gradient(rgba(0,0,0,0) 60%, rgba(0,0,0,1))', maskImage: 'linear-gradient(rgba(0,0,0,0) 60%, rgba(0,0,0,1))' });
+    rf.dataset.qa = 'ignore';
+    return { root, im };
+  }
+
+  // photo { media, base?, title?: {zh, en}, focus?: [x,y,w,h], side?: 'left'|'bottom' } — full-bleed photograph, slow push-in, text on a scrim.
+  function photo(start, end, o) {
+    const base = o.base || [1920, 1080], from = fill169(base), to = o.focus || zoomIn(from, 1.12, 0.5, 0.45);
+    scene(start, end, (R, S) => {
+      S.W = backdrop(R, o.media, base);
+      if (o.title) { S.scrim = scrim(R, o.side || 'left');
+        S.t = textEl(R, `<div class="h-zh" style="color:#fff;font-size:52px;letter-spacing:8px;text-shadow:0 4px 30px rgba(0,0,0,0.5)">${o.title.zh || ''}</div><div style="margin-top:14px;font:500 22px var(--en);letter-spacing:4px;color:rgba(255,255,255,0.86)">${o.title.en || ''}</div>`, { width: '760px' }); }
+    }, (S, lt, d) => {
+      const k = esoft(prog(lt, 0, d + ST.xf));
+      setCrop(S.W, from.map((v, j) => lerp(v, to[j], k)), 1920); place(S.W.root, { o: 1 });
+      if (S.t) { M.text(S.t, lt, 0.6, { x: -960 + 120 + 380, y: o.side === 'bottom' ? 200 : 40 }); S.scrim.style.opacity = prog(lt, 0.2, 1.0); }   // 120 px margin
+    });
+  }
+
+  // hero { media | [angles], base?, cutout?: bool, title: {zh, en}, kicker? } — the reveal: the product lights up, then breathes.
+  function hero(start, end, o) {
+    const srcs = [].concat(o.media || []);
+    scene(start, end, (R, S) => {
+      S.glow = div('', R); Object.assign(S.glow.style, { position: 'absolute', left: '50%', top: '52%', width: '1300px', height: '900px', margin: '-450px 0 0 -650px', borderRadius: '50%',
+        background: `radial-gradient(closest-side, color-mix(in srgb, var(--accent) ${ST.light ? 10 : 16}%, transparent), transparent)`, filter: 'blur(20px)' });
+      S.items = srcs.map((src) => (o.cutout ? cutout(R, src, 1000, 560) : (() => { const W = win(R, { srcs: src, base: o.base, w: 1100, chrome: 'frame' }); return { root: W.root, im: W.root }; })()));
+      S.t = textEl(R, `<div class="h-zh" style="text-align:center">${o.title?.zh || ''}</div><div class="kicker" style="text-align:center;margin-top:12px">${o.title?.en || ''}</div>`, { whiteSpace: 'nowrap' });
+    }, (S, lt, d) => {
+      const on = esoft(prog(lt, 0.1, 1.4)), n = S.items.length, per = d / n;
+      S.glow.style.opacity = on;
+      S.items.forEach((it, i) => {
+        const a = n === 1 ? 1 : clamp(1 - Math.abs((lt - per * i - per / 2) / (per * 0.62)) + 0.35);
+        place(it.root, { y: o.cutout ? 20 : 30, s: lerp(0.94, 1, on) * (1 + 0.035 * prog(lt, 0, d)), ry: (o.cutout ? -4 + 8 * prog(lt, 0, d) : 0) * MO.tilt, o: clamp(a) * prog(lt, 0, 0.5) });
+        it.im.style.filter = (o.cutout ? it.im.style.filter.replace(/ ?brightness\([^)]*\)/, '') : '') + ` brightness(${lerp(0.25, 1, on).toFixed(3)})`;
+      });
+      M.text(S.t, lt, 1.0, { y: -420 });
+    });
+  }
+
+  // detail { media, base?, crops?: [{rect, zh?, en?}] (≤ 4) } — macro close-ups: texture before the whole (a tease).
+  function detail(start, end, o) {
+    const base = o.base || [1920, 1080], f = fill169(base);
+    const C = (o.crops && o.crops.length ? o.crops : [{ rect: zoomIn(f, 2.6, 0.5, 0.45) }, { rect: zoomIn(f, 2.2, 0.25, 0.5) }, { rect: zoomIn(f, 2.2, 0.75, 0.55) }]).slice(0, 4);
+    scene(start, end, (R, S) => {
+      S.layers = C.map(() => backdrop(R, o.media, base));
+      S.labels = C.map((c) => (c.zh ? textEl(R, `<span class="chip">${c.zh}${c.en ? ` <span class="muted" style="font:500 15px var(--en)">${c.en}</span>` : ''}</span>`, { whiteSpace: 'nowrap' }) : null));
+    }, (S, lt, d) => {
+      const n = C.length, per = d / n;
+      S.layers.forEach((W, i) => {
+        const l = lt - i * per, inA = i === 0 ? 1 : prog(l, -0.25, 0.35), outA = i === n - 1 ? 1 : 1 - prog(l, per - 0.25, per + 0.35);
+        const r = C[i].rect, k = esoft(prog(l, -0.3, per + 0.4));
+        setCrop(W, zoomIn(r, lerp(1, 1.1, k)), 1920); place(W.root, { o: clamp(Math.min(inA, outA)) });
+        W.root.style.display = l > -0.3 && l < per + 0.4 ? 'block' : 'none';
+        if (S.labels[i]) M.text(S.labels[i], l, 0.35, { x: -560, y: 300, o: clamp(Math.min(prog(l, 0.3, 0.7), 1 - prog(l, per - 0.3, per))) });
+      });
+    });
+  }
+
+  // lineup { items: [{media, zh?, en?}] (2–6), cutout?: bool, title?: {zh, en} } — the range, standing together.
+  function lineup(start, end, o) {
+    const I = (o.items || []).slice(0, 6), n = Math.max(1, I.length), bw = Math.min(380, 1560 / n), bh = 420;
+    scene(start, end, (R, S) => {
+      S.items = I.map((it) => (o.cutout ? cutout(R, it.media, bw - 30, bh) : { root: pic(R, it.media, bw - 30, bh) }));
+      S.labels = I.map((it) => textEl(R, `<div style="font:600 26px var(--zh);text-align:center">${it.zh || ''}</div><div class="muted" style="font:500 15px var(--en);letter-spacing:3px;text-align:center;margin-top:6px">${(it.en || '').toUpperCase()}</div>`, { width: bw - 30 + 'px' }));
+      if (o.title) S.t = textEl(R, `<div class="h-zh" style="text-align:center">${o.title.zh}</div><div class="kicker" style="text-align:center;margin-top:10px">${o.title.en || ''}</div>`, { whiteSpace: 'nowrap' });
+    }, (S, lt, d) => {
+      const drift = -20 + 40 * prog(lt, 0, d);
+      I.forEach((_, i) => { const x = (i - (n - 1) / 2) * bw + drift; place(S.items[i].root, M.pop(lt, 0.3 + i * 0.22, { x, y: -10 })); M.text(S.labels[i], lt, 0.7 + i * 0.22, { x, y: 290 }); });
+      if (S.t) M.text(S.t, lt, 0.1, { y: -400 });
+    });
+  }
+
+  // quote { zh, en?, who, role? } — a REAL testimonial (with permission), large and quiet.
+  function quote(start, end, o) {
+    scene(start, end, (R, S) => {
+      S.mark = textEl(R, '“', { font: '400 260px/1 var(--display)', color: 'var(--accent)', opacity: 0.35 }); S.mark.dataset.qa = 'ignore';
+      S.q = textEl(R, `<div style="font:500 50px/1.45 var(--zh);letter-spacing:3px;text-align:center">${o.zh}</div>${o.en ? `<div class="muted" style="font:italic 400 27px/1.5 var(--en);text-align:center;margin-top:24px">${o.en}</div>` : ''}`, { width: '1300px' });
+      S.who = textEl(R, `<div class="kicker" style="text-align:center">— ${o.who || ''}${o.role ? ` · ${o.role}` : ''}</div>`, { whiteSpace: 'nowrap' });
+    }, (S, lt, d) => { place(S.mark, { x: -600, y: -300, o: prog(lt, 0.1, 0.8) * 0.35 }); M.text(S.q, lt, 0.3, { y: -40 }); M.text(S.who, lt, 1.4, { y: 230 }); });
+  }
+
+  return { cover, pain, feature: featureScene, carousel, numbers, gallery, clip: clipScene, phone, compare, statement, finale, endcard, photo, hero, detail, lineup, quote };
 })();

@@ -7,6 +7,7 @@
 //   E caption-hit     the bottom caption overlaps a visible text block (> 10%)
 //   W caption-media   the caption covers > 35% of a media frame's lower area (often fine; check the sheet)
 //   W small-text      rendered text smaller than 14 px
+//   W chapter-on-photo the chapter label sits on a full-bleed photo (data-qa="backdrop" is otherwise skipped)
 //   E missing-media   an image/video failed to load
 // Elements are found by data-qa="text|media" (set by engine/library); data-qa="ignore" subtrees are skipped.
 import { chromium } from 'playwright';
@@ -44,7 +45,8 @@ for (const { scene, t } of times) {
       .filter((e) => e.o > 0.6 && e.r.w > 2 && e.r.h > 2);
     const ch = document.getElementById('chapter'), cz = document.getElementById('capzh'), ce = document.getElementById('capen');
     const capR = [cz, ce].filter((c) => vis(c) > 0.5 && c.textContent.trim()).map((c) => { const r = c.getBoundingClientRect(); const w = Math.min(r.width, (c.scrollWidth || r.width)); const tw = (() => { const rg = document.createRange(); rg.selectNodeContents(c); const b = rg.getBoundingClientRect(); return { x: b.x, y: b.y, w: b.width, h: b.height }; })(); return tw; });
-    return { els, chapter: vis(ch) > 0.5 ? rect(ch) : null, captions: capR };
+    const photoBg = [...document.querySelectorAll('[data-qa="backdrop"]')].some((el) => vis(el) > 0.6);
+    return { els, chapter: vis(ch) > 0.5 ? rect(ch) : null, captions: capR, photoBg };
   });
   const tag = `scene ${scene} @ ${t}s`;
   const texts = info.els.filter((e) => e.kind === 'text'), medias = info.els.filter((e) => e.kind === 'media');
@@ -58,6 +60,7 @@ for (const { scene, t } of times) {
     const a = texts[i], b = texts[j], ov = inter(a.r, b.r);
     if (ov > 0.12 * Math.min(area(a.r), area(b.r)) && !(a.r.x <= b.r.x && a.r.y <= b.r.y && a.r.x + a.r.w >= b.r.x + b.r.w && a.r.y + a.r.h >= b.r.y + b.r.h)) errors.push(`text-overlap ${tag}: "${a.label}" × "${b.label}"`);
   }
+  if (info.chapter && info.photoBg) warnings.push(`chapter-on-photo ${tag}: chapter label sits on a full-bleed photo — remove "chapter" from that scene if it is hard to read`);
   if (info.chapter) for (const e of info.els) if (inter(info.chapter, e.r) > 0.15 * area(info.chapter)) errors.push(`chapter-hit ${tag}: chapter label overlaps "${e.label}"`);
   for (const c of info.captions) {
     for (const e of texts) if (inter(c, e.r) > 0.1 * Math.min(area(c), area(e.r)) && !e.solid) errors.push(`caption-hit ${tag}: caption overlaps text "${e.label}"`);

@@ -17,14 +17,16 @@ function padTo169([x, y, w, h], base, k = 1.9) {
   return [clamp(cx - W / 2, 0, base[0] - W), clamp(cy - H / 2, 0, base[1] - H), W, H];
 }
 function feature(start, end, opts) {
-  const base = opts.base || [1920, 1080], P = opts.points || [], n = Math.max(1, P.length);
+  const base = opts.base || [1920, 1080], n = Math.max(1, (opts.points || []).length);
+  // points without a rect (e.g. a product photo) get a region in reading order and no highlight box
+  const P = (opts.points || []).map((p, i) => (p.rect ? p : { ...p, nohl: true, rect: [base[0] * (0.12 + 0.76 * i / n), base[1] * 0.25, base[0] * 0.76 / n, base[1] * 0.5] }));
   const full = [0, 0, base[0], base[1]];
   const L = {
     'cinematic-3d': { w: 1320, x: 0, y: 40 }, 'precision-data': { w: 1120, x: -300, y: 10 }, 'kinetic-launch': { w: 1400, x: 0, y: 30 },
     'gentle-story': { w: 1120, x: -250, y: -10 }, 'playful-pop': { w: 1180, x: -120, y: 0 }, 'editorial-type': { w: 1000, x: 330, y: 20 },
   }[MO_ID] || { w: 1400, x: 0, y: 0 };
   scene(start, end, (R, S) => {
-    S.W = win(R, { srcs: opts.srcs, base, w: L.w });
+    S.W = win(R, { srcs: opts.srcs, base, w: L.w, chrome: opts.chrome || 'auto' });
     S.h = P.map((p) => hl(S.W, p.rect));
     S.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     S.svg.setAttribute('width', 1920); S.svg.setAttribute('height', 1080); Object.assign(S.svg.style, { position: 'absolute', left: 0, top: 0, pointerEvents: 'none' });
@@ -57,7 +59,7 @@ function feature(start, end, opts) {
       const k = cur >= 0 ? Math.exp(-(lt - T[cur]) * 6) : 0;
       place(S.W.root, { ...M.win(lt, d, { x: L.x, y: L.y }), s: 1 + 0.06 * k });
     } else place(S.W.root, M.win(lt, d, { x: L.x, y: L.y, ry: MO_ID === 'playful-pop' ? -6 : 0 }));
-    S.h.forEach((H, i) => posHL(S.W, H, i === cur || (MO_ID === 'precision-data' && i < cur) ? fade(lt, T[i], i === cur ? d + 0.2 : T[i] + step * 0.9, 0.3) : 0));
+    S.h.forEach((H, i) => posHL(S.W, H, P[i].nohl ? 0 : i === cur || (MO_ID === 'precision-data' && i < cur) ? fade(lt, T[i], i === cur ? d + 0.2 : T[i] + step * 0.9, 0.3) : 0));
     // stage coordinate of a point's centre (window is near-flat for these layouts)
     const stageXY = (i) => { const [x, y, w, h] = P[i].rect; const bar = S.W.root.firstElementChild?.classList?.contains('bar') ? 34 : 0; return [960 + L.x - S.W.w / 2 + mapX(S.W, x + w / 2), 540 + L.y - (S.W.h + bar) / 2 + bar + mapY(S.W, y + h / 2)]; };
     if (MO_ID === 'precision-data' || MO_ID === 'editorial-type') {
@@ -67,7 +69,7 @@ function feature(start, end, opts) {
       if (S.index) { S.index.textContent = String(Math.max(cur, 0) + 1).padStart(2, '0'); M.text(S.index, lt, 0.2, { x: -700, y: -360, o: 0.9 }); }
       S.items.forEach((it, i) => M.text(it, lt, T[i] - 0.2, { x: colX, y: iy + i * 120, o: i === cur ? 1 : 0.45 }));
       S.lines.forEach((ln, i) => {
-        if (MO_ID !== 'precision-data' || lt < T[i] + MO.focus.dur * 0.6) { ln.setAttribute('d', ''); return; }
+        if (MO_ID !== 'precision-data' || P[i].nohl || lt < T[i] + MO.focus.dur * 0.6) { ln.setAttribute('d', ''); return; }
         const [hx, hy] = stageXY(i), lx = 960 + colX - 280, ly = 540 - 170 + i * 120 + 6, mid = (lx + hx) / 2;
         const len = Math.hypot(lx - hx, ly - hy) * 1.3, a = ex(prog(lt, T[i] + MO.focus.dur * 0.6, T[i] + MO.focus.dur * 0.6 + 0.5));
         ln.setAttribute('d', `M${lx},${ly} C${mid},${ly} ${mid},${hy} ${hx},${hy}`);

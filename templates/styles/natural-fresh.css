@@ -1,0 +1,47 @@
+/* natural-fresh — daylight and materials: warm linen stage, soft sun glow, sage + terracotta, rounded humanist type,
+   photographs with soft natural shadows, gentle page dissolves. Food & drink, wellness, travel, home, family. */
+:root {
+  --accent: #3f7d58; --accent-2: #d98a4e; --warn: #c2553f; --amber: #d98a4e;
+  --ink: #23302a; --dim: rgba(35, 48, 42, 0.6); --faint: rgba(35, 48, 42, 0.12);
+  --bg-edge: #f4efe6;
+  --zh: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans SC", "Microsoft YaHei", sans-serif;
+  --en: "Avenir Next", "Nunito", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --mono: "SF Mono", Menlo, Consolas, monospace;
+  --display: "Avenir Next", "Nunito", "Helvetica Neue", Arial, sans-serif;
+}
+#bg .bg-base { background: linear-gradient(170deg, #f8f4ec 0%, #f1ebe0 60%, #ebe3d4 100%); }
+#bg .sun { width: 1500px; height: 1200px; border-radius: 50%; left: 50%; top: 50%; background: radial-gradient(closest-side, rgba(255,214,150,0.35), transparent 70%); filter: blur(40px); }
+#bg .leaf { width: 1100px; height: 900px; border-radius: 50%; left: 50%; top: 50%; background: radial-gradient(closest-side, rgba(120,170,130,0.16), transparent 70%); filter: blur(50px); }
+#pulse { background: none; }
+#flash { background: rgba(255,250,240,0.8); }
+.win { border-radius: 20px; background: #fffdf9; box-shadow: 0 50px 120px rgba(60,50,30,0.18), 0 10px 30px rgba(60,50,30,0.08), 0 0 0 1px rgba(60,50,30,0.06); }
+.bar.mac.dark, .bar.mac.light, .bar.browser { background: #f6f1e8; border-bottom: 1px solid rgba(60,50,30,0.08); }
+.bar span, .bar.browser { color: rgba(35,48,42,0.5); }
+.bar.browser b { background: rgba(60,50,30,0.06); color: rgba(35,48,42,0.45); }
+.bar i:nth-child(1) { background: #e9806e; } .bar i:nth-child(2) { background: #e8c170; } .bar i:nth-child(3) { background: #8cbf8f; }
+.win.phone { border-radius: 56px; padding: 12px; background: #2b2a27; box-shadow: 0 50px 120px rgba(60,50,30,0.25); }
+.win.phone .win-body { border-radius: 44px; }
+.win.frameless, .pic.frameless { background: transparent; box-shadow: none; border-radius: 0; overflow: visible; }
+.pic { border-radius: 18px; background: #fffdf9; box-shadow: 0 50px 120px rgba(60,50,30,0.2); }
+.hl { border: 3px solid var(--accent); border-radius: 14px; background: rgba(63,125,88,0.06); }
+.tag { padding: 9px 18px; border-radius: 999px; background: #fffdf9; color: var(--ink); font: 600 20px var(--zh); box-shadow: 0 10px 26px rgba(60,50,30,0.16); }
+.tag em { font: normal 600 16px var(--en); color: var(--accent); margin-left: 8px; }
+.chip { padding: 10px 22px; border-radius: 999px; background: rgba(255,253,249,0.9); color: var(--ink); font: 600 20px var(--zh); box-shadow: 0 6px 18px rgba(60,50,30,0.1); }
+.chip.accent { color: var(--accent); }
+.card { border-radius: 22px; background: rgba(255,253,249,0.9); box-shadow: 0 30px 80px rgba(60,50,30,0.14); }
+.h-display { font: 700 124px var(--display); letter-spacing: -1px; color: var(--ink); }
+.h-zh { font: 600 42px var(--zh); letter-spacing: 10px; color: var(--ink); }
+.kicker { font: 600 19px var(--en); letter-spacing: 6px; color: var(--accent-2); text-transform: uppercase; }
+.big-num { font: 700 210px var(--display); letter-spacing: -4px; color: var(--ink); }
+.big-num.accent { color: var(--accent); }
+.muted { color: var(--dim); } .accent { color: var(--accent); } .warn { color: var(--warn); }
+.code { font: 500 21px/1.65 var(--mono); color: var(--ink); }
+#chapter { left: 96px; top: 66px; }
+#chapter b { font: 700 22px var(--en); color: var(--accent-2); }
+#chapter .ln { width: 40px; height: 2px; background: var(--faint); }
+#chapter .z { font: 600 24px var(--zh); color: var(--ink); } #chapter .e { font: 600 14px var(--en); color: var(--dim); letter-spacing: 4px; }
+#capband { background: linear-gradient(rgba(244,239,230,0), rgba(244,239,230,0.75) 45%, rgba(244,239,230,0.96)); }
+#capzh { left: 0; right: 0; bottom: 104px; text-align: center; font: 600 42px var(--zh); letter-spacing: 1px; color: var(--ink); }
+#capen { left: 0; right: 0; bottom: 60px; text-align: center; font: 400 26px var(--en); color: var(--dim); }
+#vignette { background: radial-gradient(ellipse at center, rgba(255,255,255,0) 60%, rgba(150,120,80,0.18) 100%); }
+#fade { background: #f4efe6 !important; }

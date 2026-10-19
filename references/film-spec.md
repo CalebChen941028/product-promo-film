@@ -9,9 +9,11 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | --- | --- | --- | --- |
 | `name` | string | yes | output file prefix |
 | `out` | string | no | working folder (default `film_out`) |
-| `style` | string | yes | look: `midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` |
+| `genre` | string | no | product type from `templates/genres.json` (`python3 scripts/genres.py --list`); sets the defaults for style, motion and composed music |
+| `style` | string | yes | look: `midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`, or `auto` (from the genre) |
 | `motion` | string | no | motion language: `cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`; empty = the style's default |
-| `music.file` | path | yes | the user's track (mp3/wav/m4a…) |
+| `music.file` | path | no | the user's track (mp3/wav/m4a…). Without it, an original underscore is composed bar-for-bar from the scenes |
+| `music.generate` | object | no | `{"mood": "auto"\|"cinematic-pulse"\|"minimal-electronic"\|"warm-piano"\|"bright-pop"\|"luxe-lounge"\|"ambient-air"\|"warm-acoustic", "bpm": 98, "seed": 3}`. The end card (`"rest"`) is then 5 bars |
 | `music.extend` | object | no | `{"from_bar": A, "to_bar": B, "times": 1}` repeats bars A–B once (a chorus) to lengthen the film |
 | `voice.engine` | `kokoro` / `files` / `none` | no | TTS, the user's recordings (`"files": {"<say id>": "rec.wav"}`), or captions only |
 | `voice.voice` / `lang` / `python` / `espeak_data` | — | for kokoro | e.g. `am_michael`, `a`, path to a Python with kokoro, short copy of espeak-ng-data |
@@ -45,6 +47,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `say` | optional narration lines `[{en, zh, cap?, at?, id?}]`. `en` is spoken, `zh` is the Chinese caption, `cap` replaces the English caption (digits: "300 DPI"), `at` = start in bars from the scene start (default spread evenly from 0.3), `id` = `tagline`/`motto` to hide the caption because the text is already on screen |
 | `mood` | optional colour-script mood: `cold` `neutral` `peak` `warm` `night` (default by type: pain cold, numbers/finale peak, endcard warm) |
 | `cut` | optional cut INTO this scene: `style` (the style's transition), `whip` (pan + motion blur), `push` (camera flies through). Default by motion language |
+| `energy` | optional 0–3: the music section under this scene when the music is composed (default by type) |
 | `hit` | optional `true`/`false`/`"hero"`. A hit is a small camera kick plus a soft sound on the scene's first beat (default: the scene after `pain`, `numbers`). The one `"hero"` beat (default `finale`) also gets the flare, the impact and a riser |
 
 ### Scene types
@@ -52,7 +55,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | --- | --- | --- | --- |
 | `cover` | 3 | `media?` (blurred UI behind), `base?` | logo, name, positioning, chips; also the poster |
 | `pain` | 3 | `items?` = 4 × [zh, en] | "the old way": grey tool windows tangle and collapse |
-| `feature` | 3 (≥ 1 + points) | `media`, `base?`, `title{zh,en}`, `points[{zh,en,rect,focus?}]` ≤ 4 | the workhorse; layout depends on the motion language |
+| `feature` | 3 (≥ 1 + points) | `media`, `base?`, `title{zh,en}`, `points[{zh,en,rect?,focus?}]` ≤ 4, `frame?: "photo"` | the workhorse; layout depends on the motion language. `rect` highlights a screen region; photos (`"frame": "photo"`) need none |
 | `carousel` | 2 | `title?`, `panels[{zh,en,media,base?,crop?}]` ≤ 6 | dialogs/tools flip in one per slice beside a menu |
 | `numbers` | 2 | `stats[{value,suffix?,zh,en}]` ≤ 3, `chips?` ≤ 12 | counters on the beat |
 | `gallery` | 2 | `items[{media,zh?,en?}]` ≤ 8 | coverflow of result images; say one name per item (`at`) |
@@ -62,6 +65,11 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `statement` | 1 | `zh`, `en?` | one big line (manifesto beat) |
 | `finale` | 4 | `media` = list of images | tilted wall of real screens + name + tagline |
 | `endcard` | 4 | — | logo, name, positioning, motto, contacts, chips |
+| `photo` | 2 | `media`, `base?`, `title?{zh,en}`, `focus?` (end crop), `side?: "left"\|"bottom"` | full-bleed photograph with a slow push-in; text on a soft scrim |
+| `hero` | 3 | `media` (one image or several angles), `base?`, `title{zh,en}`, `cutout?` | the reveal: the product lights up and breathes. Transparent PNGs stand on the stage with a contact shadow and reflection (auto-detected) |
+| `detail` | 2 | `media`, `base?`, `crops?[{rect,zh?,en?}]` ≤ 4 | macro close-ups (texture before the whole); default crops are chosen for you |
+| `lineup` | 2 | `items[{media,zh?,en?}]` ≤ 6, `title?`, `cutout?` | the range (colours, models, sizes) standing together |
+| `quote` | 2 | `zh`, `en?`, `who`, `role?` | a **real**, approved testimonial; large and quiet |
 
 ### Coordinates
 `base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units. Measure with `scripts/grid_overlay.py` (grid labels are base units for 1920×1080 captures) or `scripts/modal_bbox.py` for dialogs.
@@ -73,9 +81,11 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | --- | --- | --- | --- |
 | `name` | 字符串 | 是 | 输出文件名前缀 |
 | `out` | 字符串 | 否 | 工作目录（默认 `film_out`） |
-| `style` | 字符串 | 是 | 视觉风格：`midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` |
+| `genre` | 字符串 | 否 | 产品类型（`templates/genres.json`，`python3 scripts/genres.py --list`），决定风格、动效、原创配乐的默认值 |
+| `style` | 字符串 | 是 | 视觉风格：`midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`，或 `auto`（按类型） |
 | `motion` | 字符串 | 否 | 动效语言：`cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`；留空则用风格默认值 |
-| `music.file` | 路径 | 是 | 用户提供的音乐 |
+| `music.file` | 路径 | 否 | 用户提供的音乐；不提供时按场景逐小节原创一段配乐 |
+| `music.generate` | 对象 | 否 | `{"mood": "auto" 或 情绪名, "bpm": 98, "seed": 3}`；此时结尾页（`"rest"`）为 5 小节 |
 | `music.extend` | 对象 | 否 | `{"from_bar": A, "to_bar": B, "times": 1}`：把第 A–B 小节（通常是副歌）重复一遍来加长 |
 | `voice.engine` | `kokoro` / `files` / `none` | 否 | 合成配音、用户录音（`"files": {"<say id>": "rec.wav"}`）、或只要字幕 |
 | `voice.voice` / `lang` / `python` / `espeak_data` | — | 用 kokoro 时 | 如 `am_michael`、`a`、装了 kokoro 的 Python 路径、espeak-ng 数据的短路径副本 |
@@ -109,6 +119,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `say` | 可选旁白 `[{en, zh, cap?, at?, id?}]`：`en` 是念出来的英文，`zh` 是中文字幕，`cap` 替换英文字幕（用于显示数字），`at` 为相对场景起点的小节数（默认从 0.3 起均匀分布），`id` 写 `tagline` / `motto` 时隐藏字幕（画面上已有同一句） |
 | `mood` | 可选，色彩脚本情绪：`cold` `neutral` `peak` `warm` `night`（默认：痛点 cold，数字和高潮 peak，结尾 warm） |
 | `cut` | 可选，进入本场景的转场：`style`（风格自带）、`whip`（甩镜 + 运动模糊）、`push`（镜头推进穿越）；默认随动效语言 |
+| `energy` | 可选 0–3：原创配乐时本场景下的音乐强度（默认按类型） |
 | `hit` | 可选 `true`/`false`/`"hero"`：击点是场景第一拍的轻微镜头冲击加轻声音效（默认：痛点之后的场景、`numbers`）；唯一的 `"hero"` 高潮（默认 `finale`）另有镜头光晕、重击和上升音 |
 
 ### 场景类型
@@ -116,7 +127,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | --- | --- | --- | --- |
 | `cover` | 3 | `media?`（背景虚化界面）、`base?` | Logo、名称、定位、平台标签；同时是封面海报 |
 | `pain` | 3 | `items?` = 4 组 [中文, 英文] | “传统方式”：灰色工具窗口互相牵扯后塌缩 |
-| `feature` | 3（≥ 1 + 要点数） | `media`、`base?`、`title{zh,en}`、`points[{zh,en,rect,focus?}]` ≤ 4 | 主力场景；版式随动效语言变化 |
+| `feature` | 3（≥ 1 + 要点数） | `media`、`base?`、`title{zh,en}`、`points[{zh,en,rect?,focus?}]` ≤ 4、`frame?: "photo"` | 主力场景；版式随动效语言变化；`rect` 用于高亮界面区域，照片（`"frame": "photo"`）不需要 |
 | `carousel` | 2 | `title?`、`panels[{zh,en,media,base?,crop?}]` ≤ 6 | 工具 / 对话框逐个翻入，左侧菜单同步高亮 |
 | `numbers` | 2 | `stats[{value,suffix?,zh,en}]` ≤ 3、`chips?` ≤ 12 | 按拍计数的大数字 |
 | `gallery` | 2 | `items[{media,zh?,en?}]` ≤ 8 | 结果图 coverflow，旁白逐张点名（用 `at`） |
@@ -126,6 +137,11 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `statement` | 1 | `zh`、`en?` | 一句大字（宣言） |
 | `finale` | 4 | `media` = 图片列表 | 真实界面倾斜成墙 + 名称 + 口号 |
 | `endcard` | 4 | — | Logo、名称、定位、理念、联系方式、平台标签 |
+| `photo` | 2 | `media`、`base?`、`title?{zh,en}`、`focus?`（终止裁切）、`side?` | 满幅照片缓慢推近，文字放在柔和的渐变遮罩上 |
+| `hero` | 3 | `media`（一张或多个角度）、`base?`、`title{zh,en}`、`cutout?` | 揭晓：产品亮起并轻微呼吸；透明底 PNG 会自动带接触阴影与倒影立在舞台上 |
+| `detail` | 2 | `media`、`base?`、`crops?[{rect,zh?,en?}]` ≤ 4 | 微距特写（先质感，后全貌），默认自动选取裁切 |
+| `lineup` | 2 | `items[{media,zh?,en?}]` ≤ 6、`title?`、`cutout?` | 产品系列（颜色、型号、尺寸）并排展示 |
+| `quote` | 2 | `zh`、`en?`、`who`、`role?` | **真实**且经授权的用户评价，大字、安静 |
 
 ### 坐标
 `base` 是图片的坐标空间：1920×1080 窗口的 2 倍截图用 `[1920, 1080]`（默认）；`intake.py` 会为每张图给出建议的 `base`。`rect` / `crop` / `focus` 都是 base 单位下的 `[x, y, 宽, 高]`。用 `scripts/grid_overlay.py` 量取（网格刻度即 1920×1080 截图的 base 单位），弹窗可用 `scripts/modal_bbox.py` 自动求框。

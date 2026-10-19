@@ -1,0 +1,1085 @@
+{
+ "_how": "Product genres → look, motion, music, voice and story arc. scripts/genres.py classifies a product into one of these from the brief, the docs and the materials; autofilm.py builds a film from the arc. Add a genre by copying one entry; keep the arc beats in story order. Words in \"generic\" count half (they appear in every product).",
+ "genres": {
+  "software-saas": {
+   "zh": "软件 / SaaS / 效率工具",
+   "en": "Software, SaaS, productivity",
+   "keywords": [
+    "软件",
+    "平台",
+    "工作台",
+    "系统",
+    "效率",
+    "协作",
+    "办公",
+    "管理",
+    "saas",
+    "software",
+    "platform",
+    "workspace",
+    "workflow",
+    "productivity",
+    "dashboard",
+    "app",
+    "desktop",
+    "crm",
+    "erp",
+    "collaboration"
+   ],
+   "signals": {
+    "desktop": 3,
+    "phone": 1,
+    "video": 1
+   },
+   "style": [
+    "midnight-tech",
+    "keynote-light",
+    "editorial-mono"
+   ],
+   "motion": "cinematic-3d",
+   "music": {
+    "mood": "cinematic-pulse",
+    "bpm": 104
+   },
+   "voice": "am_michael",
+   "arc": "problem-solution",
+   "tone": "confident, concrete, calm — show the product working; no hype words"
+  },
+  "developer-ai": {
+   "zh": "开发者工具 / AI 智能体 / 安全基础设施",
+   "en": "Developer tools, AI agents, infrastructure",
+   "keywords": [
+    "开发者",
+    "代码",
+    "编程",
+    "智能体",
+    "大模型",
+    "安全",
+    "运维",
+    "部署",
+    "云",
+    "开源",
+    "developer",
+    "code",
+    "coding",
+    "agent",
+    "llm",
+    "ai",
+    "api",
+    "sdk",
+    "cli",
+    "devops",
+    "security",
+    "infra",
+    "cloud",
+    "open source",
+    "terminal",
+    "repository",
+    "github",
+    "命令行"
+   ],
+   "signals": {
+    "desktop": 2,
+    "video": 2
+   },
+   "style": [
+    "neon-cyber",
+    "midnight-tech",
+    "editorial-mono"
+   ],
+   "motion": "kinetic-launch",
+   "music": {
+    "mood": "minimal-electronic",
+    "bpm": 120
+   },
+   "voice": "am_michael",
+   "arc": "hype",
+   "tone": "precise and fast; show real commands and real output; developers distrust adjectives"
+  },
+  "science-data": {
+   "zh": "科研 / 数据分析 / 统计",
+   "en": "Science, research, data analysis",
+   "keywords": [
+    "科研",
+    "研究",
+    "统计",
+    "数据",
+    "分析",
+    "论文",
+    "实验",
+    "医学",
+    "临床",
+    "生物",
+    "research",
+    "science",
+    "scientific",
+    "statistics",
+    "data",
+    "analysis",
+    "analytics",
+    "paper",
+    "journal",
+    "clinical",
+    "lab",
+    "experiment"
+   ],
+   "signals": {
+    "desktop": 2,
+    "figure": 3
+   },
+   "style": [
+    "paper-academic",
+    "midnight-tech",
+    "keynote-light"
+   ],
+   "motion": "precision-data",
+   "music": {
+    "mood": "minimal-electronic",
+    "bpm": 104
+   },
+   "voice": "am_michael",
+   "arc": "problem-solution",
+   "tone": "exact, modest, evidence first; numbers must be checkable"
+  },
+  "finance-fintech": {
+   "zh": "金融 / 支付 / 理财",
+   "en": "Finance, fintech, payments",
+   "keywords": [
+    "金融",
+    "支付",
+    "理财",
+    "银行",
+    "投资",
+    "账单",
+    "财务",
+    "保险",
+    "finance",
+    "fintech",
+    "payment",
+    "bank",
+    "banking",
+    "invest",
+    "wealth",
+    "accounting",
+    "insurance",
+    "trading",
+    "budget",
+    "payments",
+    "checkout",
+    "merchant",
+    "stores",
+    "invoice",
+    "收款",
+    "商户",
+    "结算"
+   ],
+   "signals": {
+    "phone": 2,
+    "desktop": 2
+   },
+   "style": [
+    "midnight-tech",
+    "keynote-light",
+    "paper-academic"
+   ],
+   "motion": "precision-data",
+   "music": {
+    "mood": "minimal-electronic",
+    "bpm": 108
+   },
+   "voice": "am_michael",
+   "arc": "problem-solution",
+   "tone": "trustworthy, clear, no promises of returns; compliance-safe claims only"
+  },
+  "mobile-consumer-app": {
+   "zh": "消费级 App / 社交 / 创作",
+   "en": "Consumer app, social, creator tools",
+   "keywords": [
+    "社交",
+    "创作",
+    "短视频",
+    "相机",
+    "音乐",
+    "约会",
+    "社区",
+    "生活",
+    "social",
+    "creator",
+    "camera",
+    "photo",
+    "video",
+    "music",
+    "community",
+    "chat",
+    "dating",
+    "lifestyle",
+    "consumer"
+   ],
+   "signals": {
+    "phone": 4,
+    "video": 1
+   },
+   "style": [
+    "aurora-glass",
+    "keynote-light",
+    "natural-fresh"
+   ],
+   "motion": "playful-pop",
+   "music": {
+    "mood": "bright-pop",
+    "bpm": 118
+   },
+   "voice": "af_heart",
+   "arc": "hype",
+   "tone": "warm, human, a little playful; speak to one person"
+  },
+  "consumer-electronics": {
+   "zh": "消费电子 / 智能硬件 / 设备",
+   "en": "Consumer electronics, smart hardware",
+   "keywords": [
+    "耳机",
+    "手机",
+    "音箱",
+    "相机",
+    "手表",
+    "电脑",
+    "键盘",
+    "智能硬件",
+    "设备",
+    "芯片",
+    "续航",
+    "headphones",
+    "earbuds",
+    "speaker",
+    "phone",
+    "watch",
+    "laptop",
+    "keyboard",
+    "device",
+    "hardware",
+    "gadget",
+    "battery",
+    "chip",
+    "smart home",
+    "wireless",
+    "noise-cancelling",
+    "bluetooth",
+    "降噪",
+    "无线",
+    "thermostat",
+    "sensor",
+    "smart",
+    "robot vacuum",
+    "projector",
+    "drone camera",
+    "智能家居",
+    "传感器",
+    "投影"
+   ],
+   "signals": {
+    "cutout": 4,
+    "photo": 2
+   },
+   "style": [
+    "keynote-light",
+    "midnight-tech",
+    "luxe-noir"
+   ],
+   "motion": "cinematic-3d",
+   "music": {
+    "mood": "cinematic-pulse",
+    "bpm": 100
+   },
+   "voice": "am_michael",
+   "arc": "reveal",
+   "tone": "sculptural and precise: material, detail, one bold claim"
+  },
+  "fashion-beauty-luxury": {
+   "zh": "时尚 / 美妆 / 奢品 / 珠宝",
+   "en": "Fashion, beauty, luxury",
+   "keywords": [
+    "时尚",
+    "服装",
+    "美妆",
+    "护肤",
+    "香水",
+    "珠宝",
+    "腕表",
+    "奢",
+    "皮具",
+    "设计师",
+    "fashion",
+    "apparel",
+    "beauty",
+    "skincare",
+    "fragrance",
+    "perfume",
+    "jewelry",
+    "watch",
+    "luxury",
+    "leather",
+    "couture",
+    "atelier"
+   ],
+   "signals": {
+    "photo": 3,
+    "cutout": 3
+   },
+   "style": [
+    "luxe-noir",
+    "editorial-mono",
+    "natural-fresh"
+   ],
+   "motion": "gentle-story",
+   "music": {
+    "mood": "luxe-lounge",
+    "bpm": 90
+   },
+   "voice": "af_heart",
+   "arc": "sensory",
+   "tone": "few words, sensory, unhurried; let the image carry it"
+  },
+  "food-beverage": {
+   "zh": "食品 / 饮品 / 餐饮",
+   "en": "Food & beverage",
+   "keywords": [
+    "食品",
+    "饮品",
+    "咖啡",
+    "茶",
+    "酒",
+    "餐厅",
+    "烘焙",
+    "零食",
+    "有机",
+    "风味",
+    "food",
+    "drink",
+    "beverage",
+    "coffee",
+    "tea",
+    "wine",
+    "beer",
+    "restaurant",
+    "bakery",
+    "snack",
+    "organic",
+    "flavor",
+    "recipe"
+   ],
+   "signals": {
+    "photo": 4,
+    "cutout": 2
+   },
+   "style": [
+    "natural-fresh",
+    "luxe-noir",
+    "keynote-light"
+   ],
+   "motion": "gentle-story",
+   "music": {
+    "mood": "warm-acoustic",
+    "bpm": 98
+   },
+   "voice": "af_heart",
+   "arc": "sensory",
+   "tone": "appetite and origin: taste, texture, hands, place"
+  },
+  "health-wellness": {
+   "zh": "健康 / 医疗服务 / 身心",
+   "en": "Health, care, wellness",
+   "keywords": [
+    "健康",
+    "医疗",
+    "医院",
+    "患者",
+    "护理",
+    "心理",
+    "睡眠",
+    "运动",
+    "康复",
+    "关怀",
+    "health",
+    "care",
+    "medical",
+    "patient",
+    "clinic",
+    "wellness",
+    "mental",
+    "sleep",
+    "fitness",
+    "therapy",
+    "recovery",
+    "yoga",
+    "meditation",
+    "pilates",
+    "gym",
+    "workout",
+    "瑜伽",
+    "冥想",
+    "健身",
+    "普拉提"
+   ],
+   "signals": {
+    "phone": 2,
+    "photo": 2
+   },
+   "style": [
+    "keynote-light",
+    "natural-fresh",
+    "paper-academic"
+   ],
+   "motion": "gentle-story",
+   "music": {
+    "mood": "warm-piano",
+    "bpm": 84
+   },
+   "voice": "af_heart",
+   "arc": "human-story",
+   "tone": "caring and honest; no medical claims that are not approved; dignity first"
+  },
+  "education-learning": {
+   "zh": "教育 / 学习 / 知识",
+   "en": "Education, learning",
+   "keywords": [
+    "教育",
+    "学习",
+    "课程",
+    "学生",
+    "老师",
+    "考试",
+    "知识",
+    "培训",
+    "education",
+    "learning",
+    "course",
+    "student",
+    "teacher",
+    "school",
+    "exam",
+    "training",
+    "tutor",
+    "classroom",
+    "备考",
+    "单词",
+    "背单词",
+    "考研",
+    "学习方法",
+    "vocabulary",
+    "study"
+   ],
+   "signals": {
+    "desktop": 1,
+    "phone": 2,
+    "photo": 1
+   },
+   "style": [
+    "keynote-light",
+    "paper-academic",
+    "aurora-glass"
+   ],
+   "motion": "gentle-story",
+   "music": {
+    "mood": "warm-piano",
+    "bpm": 96
+   },
+   "voice": "af_heart",
+   "arc": "human-story",
+   "tone": "encouraging, clear, one learner's moment of understanding"
+  },
+  "mobility-industrial": {
+   "zh": "汽车 / 出行 / 工业 / 制造",
+   "en": "Automotive, mobility, industrial",
+   "keywords": [
+    "汽车",
+    "电动车",
+    "出行",
+    "工业",
+    "制造",
+    "机器人",
+    "无人机",
+    "工厂",
+    "能源",
+    "car",
+    "vehicle",
+    "ev",
+    "mobility",
+    "industrial",
+    "manufacturing",
+    "robot",
+    "drone",
+    "factory",
+    "energy",
+    "engineering",
+    "scooter",
+    "bike",
+    "bicycle",
+    "e-bike",
+    "motorcycle",
+    "滑板车",
+    "自行车",
+    "电单车"
+   ],
+   "signals": {
+    "photo": 3,
+    "video": 2,
+    "cutout": 2
+   },
+   "style": [
+    "midnight-tech",
+    "editorial-mono",
+    "luxe-noir"
+   ],
+   "motion": "cinematic-3d",
+   "music": {
+    "mood": "cinematic-pulse",
+    "bpm": 100
+   },
+   "voice": "am_michael",
+   "arc": "reveal",
+   "tone": "engineering pride, scale and precision; measured claims"
+  },
+  "travel-hospitality-living": {
+   "zh": "旅行 / 酒店 / 家居 / 地产",
+   "en": "Travel, hospitality, home, real estate",
+   "keywords": [
+    "旅行",
+    "酒店",
+    "民宿",
+    "家居",
+    "家具",
+    "地产",
+    "空间",
+    "度假",
+    "travel",
+    "hotel",
+    "resort",
+    "hospitality",
+    "home",
+    "furniture",
+    "interior",
+    "real estate",
+    "space",
+    "vacation",
+    "living"
+   ],
+   "signals": {
+    "photo": 4
+   },
+   "style": [
+    "natural-fresh",
+    "luxe-noir",
+    "keynote-light"
+   ],
+   "motion": "gentle-story",
+   "music": {
+    "mood": "ambient-air",
+    "bpm": 88
+   },
+   "voice": "af_heart",
+   "arc": "sensory",
+   "tone": "atmosphere and light; invite, do not sell"
+  },
+  "game-entertainment-event": {
+   "zh": "游戏 / 娱乐 / 活动发布",
+   "en": "Games, entertainment, events",
+   "keywords": [
+    "游戏",
+    "电竞",
+    "娱乐",
+    "演出",
+    "活动",
+    "发布会",
+    "大会",
+    "game",
+    "gaming",
+    "esports",
+    "entertainment",
+    "concert",
+    "event",
+    "festival",
+    "conference",
+    "launch event",
+    "trailer"
+   ],
+   "signals": {
+    "video": 3,
+    "photo": 1
+   },
+   "style": [
+    "neon-cyber",
+    "editorial-mono",
+    "aurora-glass"
+   ],
+   "motion": "kinetic-launch",
+   "music": {
+    "mood": "minimal-electronic",
+    "bpm": 124
+   },
+   "voice": "am_michael",
+   "arc": "hype",
+   "tone": "energy with control; date, place, one promise"
+  },
+  "kids-family": {
+   "zh": "儿童 / 亲子 / 玩具",
+   "en": "Kids, family, toys",
+   "keywords": [
+    "儿童",
+    "孩子",
+    "亲子",
+    "玩具",
+    "绘本",
+    "早教",
+    "kids",
+    "children",
+    "family",
+    "toy",
+    "parent",
+    "baby",
+    "play"
+   ],
+   "signals": {
+    "photo": 2,
+    "phone": 2,
+    "cutout": 2
+   },
+   "style": [
+    "aurora-glass",
+    "natural-fresh",
+    "keynote-light"
+   ],
+   "motion": "playful-pop",
+   "music": {
+    "mood": "bright-pop",
+    "bpm": 116
+   },
+   "voice": "af_heart",
+   "arc": "human-story",
+   "tone": "joyful and safe; speak to parents with respect"
+  },
+  "brand-mission": {
+   "zh": "品牌 / 公益 / 机构宣言",
+   "en": "Brand, mission, non-profit",
+   "keywords": [
+    "品牌",
+    "公益",
+    "使命",
+    "愿景",
+    "宣言",
+    "机构",
+    "基金会",
+    "理念",
+    "brand",
+    "mission",
+    "vision",
+    "manifesto",
+    "non-profit",
+    "nonprofit",
+    "foundation",
+    "purpose",
+    "values",
+    "belief"
+   ],
+   "signals": {
+    "photo": 2
+   },
+   "style": [
+    "editorial-mono",
+    "keynote-light",
+    "luxe-noir"
+   ],
+   "motion": "editorial-type",
+   "music": {
+    "mood": "warm-piano",
+    "bpm": 88
+   },
+   "voice": "am_michael",
+   "arc": "human-story",
+   "tone": "conviction without slogans; one belief, said plainly"
+  }
+ },
+ "arcs": {
+  "_how": "Beats in story order. needs = material role required (any = any image/clip, none = text only, brief:<field> = needs that brief field). per = 'feature' repeats the beat for each brief feature (max 4). energy 0–3 drives the generated music. role names the beat for the crew.",
+  "problem-solution": [
+   {
+    "type": "cover",
+    "bars": 3,
+    "needs": "none",
+    "energy": 0,
+    "role": "hook"
+   },
+   {
+    "type": "pain",
+    "bars": 3,
+    "needs": "brief:pain",
+    "energy": 1,
+    "role": "tension"
+   },
+   {
+    "type": "feature",
+    "bars": 5,
+    "needs": "ui",
+    "per": "feature",
+    "energy": 1,
+    "role": "reveal + proof"
+   },
+   {
+    "type": "carousel",
+    "bars": 3,
+    "needs": "ui:3",
+    "energy": 2,
+    "role": "breadth"
+   },
+   {
+    "type": "numbers",
+    "bars": 2,
+    "needs": "brief:numbers",
+    "energy": 2,
+    "role": "proof"
+   },
+   {
+    "type": "gallery",
+    "bars": 3,
+    "needs": "figure:2",
+    "energy": 2,
+    "role": "outputs"
+   },
+   {
+    "type": "clip",
+    "bars": 2,
+    "needs": "video",
+    "energy": 2,
+    "role": "it really runs"
+   },
+   {
+    "type": "phone",
+    "bars": 3,
+    "needs": "phone",
+    "energy": 1,
+    "role": "everywhere"
+   },
+   {
+    "type": "compare",
+    "bars": 3,
+    "needs": "brief:differentiators",
+    "energy": 2,
+    "role": "why it is new"
+   },
+   {
+    "type": "finale",
+    "bars": 4,
+    "needs": "any",
+    "energy": 3,
+    "role": "hero"
+   },
+   {
+    "type": "endcard",
+    "bars": "rest",
+    "needs": "none",
+    "energy": 0,
+    "role": "close"
+   }
+  ],
+  "reveal": [
+   {
+    "type": "cover",
+    "bars": 3,
+    "needs": "none",
+    "energy": 0,
+    "role": "hook"
+   },
+   {
+    "type": "detail",
+    "bars": 3,
+    "needs": "photo|cutout",
+    "energy": 1,
+    "role": "tease: details before the whole"
+   },
+   {
+    "type": "hero",
+    "bars": 4,
+    "needs": "cutout|photo",
+    "energy": 2,
+    "role": "reveal"
+   },
+   {
+    "type": "feature",
+    "bars": 4,
+    "needs": "photo|cutout|ui",
+    "per": "feature",
+    "energy": 2,
+    "role": "craft + proof"
+   },
+   {
+    "type": "lineup",
+    "bars": 3,
+    "needs": "cutout:2",
+    "energy": 2,
+    "role": "range"
+   },
+   {
+    "type": "numbers",
+    "bars": 2,
+    "needs": "brief:numbers",
+    "energy": 2,
+    "role": "specs that matter"
+   },
+   {
+    "type": "photo",
+    "bars": 3,
+    "needs": "photo",
+    "energy": 1,
+    "role": "in life"
+   },
+   {
+    "type": "finale",
+    "bars": 4,
+    "needs": "any",
+    "energy": 3,
+    "role": "hero"
+   },
+   {
+    "type": "endcard",
+    "bars": "rest",
+    "needs": "none",
+    "energy": 0,
+    "role": "close"
+   }
+  ],
+  "sensory": [
+   {
+    "type": "cover",
+    "bars": 3,
+    "needs": "none",
+    "energy": 0,
+    "role": "hook"
+   },
+   {
+    "type": "photo",
+    "bars": 3,
+    "needs": "photo",
+    "energy": 1,
+    "role": "mood"
+   },
+   {
+    "type": "detail",
+    "bars": 3,
+    "needs": "photo|cutout",
+    "energy": 1,
+    "role": "texture"
+   },
+   {
+    "type": "statement",
+    "bars": 2,
+    "needs": "brief:insight",
+    "energy": 1,
+    "role": "the feeling, named"
+   },
+   {
+    "type": "hero",
+    "bars": 4,
+    "needs": "cutout|photo",
+    "energy": 2,
+    "role": "reveal"
+   },
+   {
+    "type": "feature",
+    "bars": 4,
+    "needs": "photo|cutout",
+    "per": "feature",
+    "energy": 2,
+    "role": "craft + origin"
+   },
+   {
+    "type": "lineup",
+    "bars": 3,
+    "needs": "cutout:2",
+    "energy": 2,
+    "role": "range"
+   },
+   {
+    "type": "quote",
+    "bars": 3,
+    "needs": "brief:testimonials",
+    "energy": 1,
+    "role": "a real voice"
+   },
+   {
+    "type": "finale",
+    "bars": 4,
+    "needs": "any",
+    "energy": 3,
+    "role": "hero"
+   },
+   {
+    "type": "endcard",
+    "bars": "rest",
+    "needs": "none",
+    "energy": 0,
+    "role": "close"
+   }
+  ],
+  "human-story": [
+   {
+    "type": "cover",
+    "bars": 3,
+    "needs": "none",
+    "energy": 0,
+    "role": "hook"
+   },
+   {
+    "type": "statement",
+    "bars": 2,
+    "needs": "brief:insight",
+    "energy": 0,
+    "role": "human truth"
+   },
+   {
+    "type": "photo",
+    "bars": 3,
+    "needs": "photo",
+    "energy": 1,
+    "role": "a person, a moment"
+   },
+   {
+    "type": "pain",
+    "bars": 3,
+    "needs": "brief:pain",
+    "energy": 1,
+    "role": "tension"
+   },
+   {
+    "type": "feature",
+    "bars": 4,
+    "needs": "ui|photo|cutout",
+    "per": "feature",
+    "energy": 1,
+    "role": "how it helps"
+   },
+   {
+    "type": "phone",
+    "bars": 3,
+    "needs": "phone",
+    "energy": 1,
+    "role": "in their hands"
+   },
+   {
+    "type": "quote",
+    "bars": 3,
+    "needs": "brief:testimonials",
+    "energy": 1,
+    "role": "a real voice"
+   },
+   {
+    "type": "numbers",
+    "bars": 2,
+    "needs": "brief:numbers",
+    "energy": 2,
+    "role": "impact"
+   },
+   {
+    "type": "finale",
+    "bars": 4,
+    "needs": "any",
+    "energy": 3,
+    "role": "hero"
+   },
+   {
+    "type": "endcard",
+    "bars": "rest",
+    "needs": "none",
+    "energy": 0,
+    "role": "close"
+   }
+  ],
+  "hype": [
+   {
+    "type": "cover",
+    "bars": 3,
+    "needs": "none",
+    "energy": 0,
+    "role": "hook"
+   },
+   {
+    "type": "statement",
+    "bars": 2,
+    "needs": "brief:insight",
+    "energy": 1,
+    "role": "the promise"
+   },
+   {
+    "type": "clip",
+    "bars": 3,
+    "needs": "video",
+    "energy": 2,
+    "role": "show, don't tell"
+   },
+   {
+    "type": "feature",
+    "bars": 4,
+    "needs": "ui|photo|cutout",
+    "per": "feature",
+    "energy": 2,
+    "role": "proof"
+   },
+   {
+    "type": "carousel",
+    "bars": 2,
+    "needs": "ui:3",
+    "energy": 2,
+    "role": "breadth"
+   },
+   {
+    "type": "phone",
+    "bars": 2,
+    "needs": "phone",
+    "energy": 2,
+    "role": "everywhere"
+   },
+   {
+    "type": "gallery",
+    "bars": 2,
+    "needs": "figure:2",
+    "energy": 3,
+    "role": "outputs"
+   },
+   {
+    "type": "numbers",
+    "bars": 2,
+    "needs": "brief:numbers",
+    "energy": 3,
+    "role": "proof"
+   },
+   {
+    "type": "finale",
+    "bars": 4,
+    "needs": "any",
+    "energy": 3,
+    "role": "hero"
+   },
+   {
+    "type": "endcard",
+    "bars": "rest",
+    "needs": "none",
+    "energy": 0,
+    "role": "close"
+   }
+  ]
+ },
+ "generic": [
+  "app",
+  "platform",
+  "software",
+  "system",
+  "desktop",
+  "solution",
+  "软件",
+  "平台",
+  "系统",
+  "应用",
+  "api",
+  "ai",
+  "cloud",
+  "data"
+ ]
+}

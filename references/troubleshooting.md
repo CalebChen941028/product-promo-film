@@ -24,6 +24,10 @@ English first, 中文在后。
 | Final render is slow | motion blur renders 4 samples per frame | use `--draft` while iterating; `"cinema": {"motion_blur": 2}` for a faster final |
 | An effect looks flashy / cheap | an effect is noticeable on its own | lower it: `cinema.lens` (e.g. `{"flare": 0, "shake": 0}`), `bloom`, `grain`, `sfx_gain_db: -6`; or `"cinema": "off"` |
 | UI colours look wrong after grading | the LUT is too strong for the product's brand colours | `"grade_strength": 0.3` or `"grade": "none"` |
+| autofilm picked the wrong genre | the docs say little, or the product spans two genres | add a line about the product to the README/brief, or `autofilm.py --genre <id>` (`genres.py --list`) |
+| A photo was treated as a screen (or the reverse) | role guess from pixel statistics | rename the file with a hint (`*_photo.jpg`, `*_screen.png`) and rerun autofilm |
+| `copy not written: …TODO` | the crew has not filled that line | write it from treatment.md (references/crew.md) |
+| `check_treatment` fails on the taste average | weak concept, copy or images | redo the weakest role's section; do not inflate scores |
 
 ## 中文
 
@@ -47,3 +51,7 @@ English first, 中文在后。
 | 终版渲染很慢 | 运动模糊每帧渲染 4 次 | 调试时用 `--draft`；或 `"cinema": {"motion_blur": 2}` 加快终版 |
 | 某个效果显得花哨 / 廉价 | 效果单独就能被注意到 | 调低：`cinema.lens`（如 `{"flare": 0, "shake": 0}`）、`bloom`、`grain`、`sfx_gain_db: -6`；或 `"cinema": "off"` |
 | 调色后界面颜色不对 | LUT 对品牌色太强 | `"grade_strength": 0.3` 或 `"grade": "none"` |
+| autofilm 判断的产品类型不对 | 文档信息太少，或产品横跨两类 | 在 README / brief 中补一句产品描述，或用 `autofilm.py --genre <id>`（见 `genres.py --list`） |
+| 照片被当成界面（或相反） | 按像素统计猜测角色 | 文件名加提示（`*_photo.jpg`、`*_screen.png`）后重跑 autofilm |
+| 报 `copy not written: …TODO` | 团队还没写这一句 | 按 treatment.md 写上（见 references/crew.md） |
+| `check_treatment` 品味平均分不够 | 概念、文案或画面偏弱 | 重做最弱角色的部分，不要虚高打分 |

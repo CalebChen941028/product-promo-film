@@ -42,6 +42,25 @@ You cannot hear the result: say so, and ask the user to listen.
 - **Palette:** follows the motion language (`references/director.md` §3). Listen to every sound: `python3 scripts/sfx.py --demo sfx_demo.wav`.
 - **Off:** `"cinema": {"sfx": "off"}`.
 
+### No music supplied? An original underscore (make_music.py)
+Leave out `music.file` (or set `"music": {"generate": {"mood": "auto"}}`). At build time a bed is composed **bar for bar from the scene plan**:
+- sections change exactly on the cuts: intro pads under the cover, rhythm on the features, drums on the proof, the full arrangement at the finale;
+- half a beat of silence falls before the hero downbeat;
+- the end card rings out on a held chord.
+
+It is pure numpy: additive synthesis, FFT-filtered percussion and convolution reverb. It is seeded (`seed`), original and royalty-free.
+
+| Mood | BPM | Feel | Genres |
+| --- | --- | --- | --- |
+| `cinematic-pulse` | 104 | minor, plucked ostinato, low toms | software, hardware, industrial |
+| `minimal-electronic` | 120 | clean 16th plucks, four-on-the-floor | dev tools, data, fintech, events |
+| `warm-piano` | 88 | piano + strings, soft kick and shaker | care, education, mission |
+| `bright-pop` | 118 | offbeat plucks, claps, glockenspiel | consumer apps, kids |
+| `luxe-lounge` | 90 | electric piano, deep bass, brushed groove | fashion, beauty, luxury |
+| `ambient-air` | 86 | airy pads and bells, almost no drums | travel, living, wellness |
+| `warm-acoustic` | 98 | strummed plucks, shaker, warm bass | food, lifestyle, handmade |
+
+Listen to a mood on its own: `python3 scripts/make_music.py --mood warm-piano --bars 32 --out try.wav`. Be honest with the user: this is a tasteful underscore, not a hit song. For a flagship film, a licensed track they love is still better.
 
 
 ## 中文
@@ -70,3 +89,14 @@ You cannot hear the result: say so, and ask the user to listen.
 - **电平**：混音前峰值 −27 到 −9 dBFS，再加 `cinema.sfx_gain_db`（默认 −2）。只有用户要求时才调高。
 - **音色**：随动效语言变化（`references/director.md` 第 3 节）。试听全部音效：`python3 scripts/sfx.py --demo sfx_demo.wav`。
 - **关闭**：`"cinema": {"sfx": "off"}`。
+
+### 没有音乐？原创配乐（make_music.py）
+不填 `music.file`（或写 `"music": {"generate": {"mood": "auto"}}`），构建时会**按场景逐小节**作曲：
+- 段落恰好在切点变化：封面下是前奏铺底，功能段加入节奏，证明段加入鼓，高潮段编制最满；
+- 高潮重拍前有半拍静默；
+- 结尾页在长音和弦上自然收尾。
+
+纯 numpy 实现：加法合成、FFT 滤波打击乐、卷积混响。固定随机种子（`seed`）可复现，原创且无版权问题。七种情绪见上方英文表格。
+
+单独试听：`python3 scripts/make_music.py --mood warm-piano --bars 32 --out try.wav`。请对用户如实说明：这是有品味的配乐铺底，不是热门歌曲；旗舰宣传片仍建议使用用户喜爱的授权曲目。
+

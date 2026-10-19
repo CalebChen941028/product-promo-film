@@ -12,7 +12,7 @@
 //   win(parent, {srcs, crop, w, base, chrome, title, radius})     screenshot(s)/clip in a frame.
 //       base = [w, h] of the source's coordinate space (default [1920,1080] = CSS px of a 2× capture);
 //       crop = [x, y, w, h] in base units; srcs = 'a.png' | ['a.png','b.png'] | [{video:'c.webm'}]
-//       chrome = 'auto' (style default) | 'mac-dark' | 'mac-light' | 'browser' | 'phone' | 'none'
+//       chrome = 'auto' (style default) | 'mac-dark' | 'mac-light' | 'browser' | 'phone' | 'frame' (photo) | 'none'
 //   setCrop(W, crop, w?) · showLayer(W, idx, mix?) · W.time(sec)  pan/zoom · switch state · seek video
 //   hl/posHL · tag/posTag · cursor/posCursor                        highlight, callout, pointer (base coords)
 //   pic(parent, src, w, h) · textEl(parent, html, css) · clip(parent, src, w, h) + clipTime(C, sec)
@@ -152,11 +152,12 @@ const CHROME = {
   'mac-light': (t) => `<div class="bar mac light"><i></i><i></i><i></i><span>${t}</span></div>`,
   browser: (t) => `<div class="bar browser"><i></i><i></i><i></i><b>${t}</b></div>`,
   none: () => '',
+  frame: () => '',
   phone: () => '',
 };
 function win(parent, { srcs, crop, w, base = [1920, 1080], chrome = 'auto', title = CONFIG.BRAND?.name || 'App', radius }) {
-  const kind = chrome === 'auto' ? ST.chrome : chrome;
-  const root = div('abs win' + (kind === 'phone' ? ' phone' : ''), parent); root.dataset.qa = 'media';
+  const kind = chrome === 'auto' ? ST.chrome : chrome;   // 'frame' = a photo with soft corners + shadow, no title bar
+  const root = div('abs win' + (kind === 'phone' ? ' phone' : '') + (kind === 'frame' ? ' photo' : ''), parent); root.dataset.qa = 'media';
   if (radius != null) root.style.borderRadius = radius + 'px';
   root.insertAdjacentHTML('beforeend', CHROME[kind] ? CHROME[kind](title) : '');
   const body = div('win-body', root);
@@ -258,6 +259,16 @@ const BG = {
     host.innerHTML = '<div class="bg-base"></div><div class="floor"><div class="floor-grid"></div></div><div class="glow a"></div><div class="glow b"></div><div class="scan"></div>';
     const fg = host.querySelector('.floor-grid'), [a, b] = [host.querySelector('.glow.a'), host.querySelector('.glow.b')];
     return (t) => { fg.style.transform = `translateY(${(t * 60) % 80}px)`; place(a, { x: -520 + Math.sin(t * 0.1) * 120, y: -160 }); place(b, { x: 520 + Math.cos(t * 0.08) * 120, y: -120 }); };
+  },
+  luxe(host) {
+    host.innerHTML = '<div class="bg-base"></div><div class="spot"></div><div class="floor"></div>';
+    const spot = host.querySelector('.spot');
+    return (t) => { spot.style.transform = `translateX(${Math.sin(t * 0.05) * 60}px) scale(${1 + 0.03 * Math.sin(t * 0.08)})`; };
+  },
+  natural(host) {
+    host.innerHTML = '<div class="bg-base"></div><div class="sun"></div><div class="leaf"></div>';
+    const [sun, leaf] = [host.querySelector('.sun'), host.querySelector('.leaf')];
+    return (t) => { place(sun, { x: 420 + Math.sin(t * 0.04) * 80, y: -260 + Math.cos(t * 0.03) * 40 }); place(leaf, { x: -520 + Math.cos(t * 0.035) * 90, y: 300 + Math.sin(t * 0.05) * 50 }); };
   },
   paper(host) {
     host.innerHTML = '<div class="bg-base"></div><svg class="grain" width="1920" height="1080"><filter id="pg"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0.35  0 0 0 0 0.3  0 0 0 0 0.25  0 0 0 0.08 0"/></filter><rect width="100%" height="100%" filter="url(#pg)"/></svg><div class="ink a"></div><div class="ink b"></div>';

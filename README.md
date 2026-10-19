@@ -1,7 +1,7 @@
 # product-promo-film
 
-**Commercial-grade product promo films from your real UI — an agent skill.**
-**用软件的真实界面，做出商业级宣传片 —— 一个给 AI 智能体用的 skill。**
+**Commercial-grade promo films for any product, from a folder of materials: an agent skill.**
+**任何产品，一个素材文件夹，做出商业级宣传片：给 AI 智能体用的 skill。**
 
 [English](#english) · [中文](#中文)
 
@@ -10,60 +10,58 @@
 <a id="english"></a>
 ## English
 
-Give an AI coding agent your product's screenshots, screen recordings, logo and a music track. It produces a 1–4 minute 1080p film:
-- cover poster
-- real UI animated in 3D, with cuts on the beat
-- natural English voice-over (local, open-source TTS)
-- bilingual captions + SRT
-- a balanced end card with your motto and contacts
+Point an AI coding agent at a folder: screenshots, product photos or cut-outs, clips, a logo and a README. Music is optional. It produces a 1–4 minute 1080p film with:
+- a cover poster;
+- real material animated with restraint, cut on the beat;
+- an original underscore when you have no track;
+- a natural English voice-over (local, open-source TTS);
+- bilingual captions and SRT;
+- an end card with your motto and contacts.
 
-It was built while making the MedStat Pilot launch film and generalised so that **mid-sized models can reach the same quality**.
+It works for software, apps, hardware, fashion, food, services, places and brands.
 
-### Why it works with many agents and models
-- **The film is data, not code.** A `film.json` lists scenes from a library (`cover · pain · feature · carousel · numbers · gallery · clip · phone · compare · statement · finale · endcard`), each with bars, text and screenshot regions.
-- **One command:** `make_film.py` runs check → build → voice → QA → render → mix → deliver. Every error prints a `FIX:` line.
-- **Automatic layout QA:** text overlaps, off-frame elements, chapter-label and caption collisions are measured, so no visual judgement is needed.
-- **Tuned defaults** from a finished commercial film: sizes, timings, mix levels (speech +10 dB over music, −14 LUFS).
-- **A director's cinema layer, restrained by default:** a colour script across scenes, a LUT grade, 180° motion blur, a subtle lens and light, and synthesised sound design. One hero moment.
+![any product](docs/gallery/any-product.jpg)
 
-### 6 visual styles × 6 motion languages
-The **look** (style) and the **movement** (motion language) are chosen separately. Motion follows the theme of your materials; `recommend_style.py` suggests pairs from your brief and music. Each row below is a style with its default motion; any style can take any motion (`"motion"` in film.json).
+### How it gets to a top-tier result
+- **It understands the product.**
+  - `genres.py` classifies it into one of 15 genres (SaaS, developer and AI tools, science, fintech, consumer apps, electronics, fashion and luxury, food and drink, health, education, mobility, travel and living, games and events, kids, brand and mission). That sets the look, the motion, the story arc and the music.
+  - `intake.py` tells screens, photos, cut-outs, figures and logos apart.
+- **One folder, one command to a draft.** `autofilm.py <folder>` casts every material into the beat that suits it (reveal, detail, range, proof, hero…). It writes `film.json` and a `treatment.md` for the crew.
+- **A built-in crew** (`references/crew.md`): producer, strategist, creative director, copywriter, a high-taste art director, motion designer and editor, composer, brand guardian and design critic. They write a treatment with three concepts, one chosen idea, a hook in 3 s, one hero moment, a tagline and a script.
+  - `check_treatment.py` blocks the build until it is complete, consistent and scores ≥ 4/5 on taste.
+  - `lint_copy.py` removes clichés.
+- **No music? It composes one.** `make_music.py` writes an original, royalty-free underscore bar for bar from the scene plan. Sections change on the cuts, half a beat of silence falls before the hero, and the end rings out. There are 7 moods, from cinematic pulse to warm acoustic and luxe lounge.
+- **The film is data, not code.**
+  - `film.json` picks from 17 scene types: cover · pain · feature · carousel · numbers · gallery · clip · phone · compare · statement · finale · endcard, plus photo · hero · detail · lineup · quote for physical products, places and people.
+  - `make_film.py` runs check → build → voice → QA → render → finish, and every error prints a `FIX:` line.
+- **A restrained director's cinema layer:** a colour script, a LUT grade, adaptive 180° motion blur, a subtle lens and light, and quiet synthesised sound design. Effects are felt, not seen.
+- **Automatic layout QA** measures overlaps, off-frame content and caption collisions, so mid-sized models ship clean frames.
 
-| Style | Preview (feature scene) | Default motion language | Theme it suits |
+### 8 visual styles × 6 motion languages
+The look and the movement are chosen separately. Both follow the product's genre and theme.
+
+| Style | Preview | Default motion | Suits |
 | --- | --- | --- | --- |
 | `midnight-tech` | ![](docs/gallery/midnight-tech.jpg) | `cinematic-3d` | platforms, B2B, serious tech |
-| `keynote-light` | ![](docs/gallery/keynote-light.jpg) | `gentle-story` | care, education, mission |
+| `keynote-light` | ![](docs/gallery/keynote-light.jpg) | `gentle-story` | consumer & productivity, care, hardware |
 | `editorial-mono` | ![](docs/gallery/editorial-mono.jpg) | `editorial-type` | manifesto, brand, opinion |
-| `aurora-glass` | ![](docs/gallery/aurora-glass.jpg) | `playful-pop` | consumer, creators, social |
-| `neon-cyber` | ![](docs/gallery/neon-cyber.jpg) | `kinetic-launch` | dev tools, security, AI agents |
+| `aurora-glass` | ![](docs/gallery/aurora-glass.jpg) | `playful-pop` | consumer, creators, kids |
+| `neon-cyber` | ![](docs/gallery/neon-cyber.jpg) | `kinetic-launch` | dev tools, AI agents, games, events |
 | `paper-academic` | ![](docs/gallery/paper-academic.jpg) | `precision-data` | science, data, research, finance |
+| `luxe-noir` | ![](docs/gallery/luxe-noir.jpg) | `gentle-story` | fashion, beauty, jewellery, premium hardware |
+| `natural-fresh` | ![](docs/gallery/natural-fresh.jpg) | `gentle-story` | food & drink, wellness, travel, home, family |
 
-Each motion language also has its own layout for a feature walkthrough:
-- **cinematic-3d:** a 3D window with tags.
-- **precision-data:** a spec sheet with drawn leader lines.
-- **kinetic-launch:** zoom bursts with slammed headlines.
-- **gentle-story:** slow Ken Burns, one line at a time.
-- **playful-pop:** sticker bubbles.
-- **editorial-type:** a magazine split screen.
+The feature walkthrough has a different layout in each motion language:
 
 ![feature layouts](docs/gallery/motions.jpg)
 
 ### Director's cinema layer: restrained, professional, premium
-How a top commercial director works (colour script, grade, lens, light, cuts, sound, finish) is turned into automatic defaults. The guide is [references/director.md](references/director.md). Restraint is the rule: effects are felt, not seen, and the film has exactly one hero moment.
-- **Colour script:** a cold "before", a neutral and honest product, a slightly richer peak, a warm close. The shifts are small and glide across cuts.
-- **Grade + finish:** a LUT per style, blended at 50 % so the real UI colours stay true. Fine grain and gentle bloom, plus 4-sample 180° motion blur.
-- **Lens:**
-  - A barely-there handheld drift, edge depth of field and a short focus pull as each scene lands.
-  - Camera cuts (whip or push) only where the story turns.
-- **Light:**
-  - A soft glint crosses each window once.
-  - Faint rays sit behind the cover logo and the hero tagline.
-  - One anamorphic flare appears, on the hero moment only.
-- **Sound design (synthesised, royalty-free):** about 10 quiet cues a minute. Sounds come only on camera cuts and hits, with one impact plus riser for the hero. The palette follows the motion language.
-- **Control:**
-  - `"cinema": "auto"` is the default; `"off"` turns it off; a `{...}` object tunes it.
-  - Per scene: `mood`, `cut`, `hit`.
-  - `--draft` gives fast previews.
+How a top commercial director works is turned into automatic defaults. The guide is [references/director.md](references/director.md).
+- **Colour:** a colour script (cold "before", honest product, a slightly richer peak, a warm close), and a LUT per style blended at 50 % so real UI and product colours stay true.
+- **Camera:** barely-there handheld, edge depth of field and a focus pull. Camera cuts happen only where the story turns.
+- **Light:** soft glints, faint rays, and one anamorphic flare on the hero moment.
+- **Sound:** about 10 quiet cues a minute, under the music.
+- **Control:** `"cinema": "auto"` is the default; `"off"` turns it off; an object tunes it. `--draft` gives quick looks.
 
 ![cinema off vs auto](docs/gallery/cinema.jpg)
 
@@ -79,98 +77,81 @@ python3 scripts/doctor.py
 Where each agent looks for skills: [references/agents.md](references/agents.md). Agents without skill support: point them at [AGENTS.md](AGENTS.md).
 
 ### Quick start
+Ask your agent: *"Make a promo film for my product from ~/materials with the product-promo-film skill."* It follows [SKILL.md](SKILL.md):
 ```bash
-cd examples/demo
-python3 ../../scripts/make_film.py film.json --stage check
-python3 ../../scripts/make_film.py film.json          # build → voice → QA → render → finish
+python3 scripts/autofilm.py ~/materials --out ~/my-film      # draft: genre, look, arc, music, film.json, treatment.md
+# the crew fills treatment.md and every TODO (references/crew.md), then:
+python3 scripts/check_treatment.py ~/my-film/treatment.md ~/my-film/film.json
+python3 scripts/make_film.py ~/my-film/film.json              # check → build → voice → QA → render → finish
 ```
-The demo uses placeholder UI and an original public-domain track. For your product, ask your agent: *"Make a promo film for my product with the product-promo-film skill"*. It will follow [SKILL.md](SKILL.md).
+Examples:
+- [examples/product-demo](examples/product-demo): a physical product, no music supplied, with the full crew treatment.
+- [examples/demo](examples/demo): software, the user's track.
+- [examples/medstat-pilot](examples/medstat-pilot): a 3:26 production film.
 
 ### Requirements
-- Python 3.9+ with numpy and Pillow
-- Node 18+ with Playwright (Chromium)
-- ffmpeg (`pip install imageio-ffmpeg` works)
-- Optional, for the voice-over: a Python 3.12 venv with [Kokoro](https://github.com/hexgrad/kokoro) (Apache-2.0); setup in [references/audio.md](references/audio.md)
+- Python 3.9+ with numpy and Pillow.
+- Node 18+ with Playwright (Chromium).
+- ffmpeg (`pip install imageio-ffmpeg` works).
+- Optional, for the voice-over: Kokoro (Apache-2.0) in a Python 3.12 venv; see [references/audio.md](references/audio.md).
 
 ### Docs
-- [SKILL.md](SKILL.md): the procedure
-- [director](references/director.md): colour, camera, light, rhythm, sound, and restraint
-- [film-spec](references/film-spec.md)
-- [styles](references/styles.md)
-- [motion](references/motion.md)
-- [materials](references/materials.md)
-- [capture](references/capture.md)
-- [audio](references/audio.md)
-- [storyboard](references/storyboard.md)
-- [qa](references/qa.md)
-- [troubleshooting](references/troubleshooting.md)
-- [agents](references/agents.md)
+- [SKILL.md](SKILL.md): the procedure.
+- [crew](references/crew.md): the roles and the taste rubric.
+- [genres](references/genres.md): product type → look, motion, music, arc.
+- [director](references/director.md): colour, camera, light, sound, restraint.
+- [film-spec](references/film-spec.md): every `film.json` field.
+- [materials](references/materials.md): what to put in the folder.
+- [styles](references/styles.md), [motion](references/motion.md), [audio](references/audio.md).
+- [storyboard](references/storyboard.md), [capture](references/capture.md), [qa](references/qa.md), [troubleshooting](references/troubleshooting.md), [agents](references/agents.md).
 
 ### Credits & licences
 - **This skill:** MIT. © 2026 Liangliang Chen (陈亮亮), [github.com/CalebChen941028](https://github.com/CalebChen941028), WeChat official account 科研牛马研习社. Built with Codex & Claude.
 - **Not bundled, installed by you:** Playwright (Apache-2.0), Kokoro-82M (Apache-2.0), ffmpeg (LGPL/GPL builds).
-- **Demo music** (`examples/demo/demo-music.m4a`): original, CC0.
-- Use only music and voices you have the rights to.
+- **Demo music** (`examples/demo/demo-music.m4a`): original, CC0. Music composed by `make_music.py` is yours to use.
+- **Placeholders:** the product-demo images are drawn placeholders for a fictional brand.
+- Use only material, music and voices you have the rights to.
 
 <a id="中文"></a>
 ## 中文
 
-把产品的截图、录屏、Logo 和一段音乐交给 AI 编程智能体，它就能做出一部 1–4 分钟的 1080p 宣传片：
-- 封面海报
-- 真实界面的 3D 动效演示，切点卡在节拍上
-- 自然的英文配音（本地开源 TTS）
-- 中英双语字幕与 SRT
-- 居中协调、带理念与联系方式的结尾页
+把一个文件夹交给 AI 编程智能体：截图、产品照片或透明底产品图、录屏、Logo、README，音乐可有可无。它会做出一部 1–4 分钟的 1080p 宣传片：
+- 封面海报；
+- 克制而有节奏的真实素材动效，切点卡在节拍上；
+- 没有音乐时自动原创配乐；
+- 自然的英文配音（本地开源 TTS）；
+- 中英双语字幕与 SRT；
+- 带理念和联系方式的结尾页。
 
-这个 skill 来自 MedStat Pilot 宣传片的实战，并做了通用化，**让中等规模的模型也能做出同样水准的作品**。
+适用于软件、App、硬件、时尚、食品、服务、空间与品牌。
 
-### 为什么很多智能体和模型都能用好
-- **片子是数据而不是代码**：`film.json` 从场景库里选场景（封面、痛点、功能演示、工具轮播、大数字、结果图集、录屏、手机、对比、宣言、高潮、结尾页），每个场景只需填写小节数、文字和截图区域。
-- **一条命令**：`make_film.py` 依次完成检查 → 构建 → 配音 → QA → 渲染 → 混音 → 交付，出错时给出 `FIX:` 修复指令。
-- **自动版式 QA**：用数值检测文字重叠、出画、章节标签与字幕冲突，不依赖视觉判断。
-- **调好的默认值**：尺寸、节奏、混音电平（人声比音乐高约 10 dB，成片 −14 LUFS）都来自完成的商业成片。
-- **导演电影层（默认克制）**：跨场景的色彩脚本、LUT 调色、180° 运动模糊、含蓄的镜头与光效、合成声音设计；全片只有一个高潮。
+### 怎样做到顶级效果
+- **先理解产品**：
+  - `genres.py` 把产品归入 15 类之一（SaaS、开发者与 AI 工具、科研、金融、消费级 App、消费电子、时尚奢品、食品饮品、健康、教育、出行工业、旅行家居、游戏活动、儿童、品牌公益），据此决定风格、动效、叙事结构与音乐。
+  - `intake.py` 自动区分界面截图、照片、透明底产品图、图表与 Logo。
+- **一个文件夹，一条命令出草稿**：`autofilm.py <文件夹>` 把每份素材分配到最合适的拍点（揭晓、细节、系列、证明、高潮……），写出 `film.json` 和供团队填写的 `treatment.md`。
+- **内置制作团队**（`references/crew.md`）：制片、策略、创意总监、文案、高品味美术指导、动效与剪辑、作曲、品牌把关、设计评审。他们产出包含三个概念、选定创意、3 秒钩子、唯一高潮、口号与脚本的创意方案。
+  - `check_treatment.py` 在方案完整、一致且品味评分 ≥ 4/5 之前阻止构建。
+  - `lint_copy.py` 清除空话套话。
+- **没有音乐就作曲**：`make_music.py` 按场景逐小节原创无版权配乐，段落在切点变化，高潮前留半拍静默，结尾自然收束；有七种情绪可选。
+- **片子是数据而不是代码**：
+  - `film.json` 从 17 种场景中选择；新增的 photo · hero · detail · lineup · quote 用于实物产品、空间与人物。
+  - `make_film.py` 一条命令完成检查到交付，出错时给出 `FIX:`。
+- **克制的导演电影层**：色彩脚本、LUT 调色、自适应 180° 运动模糊、含蓄的镜头与光效、轻声的合成声音设计；效果感受得到，看不出来。
+- **自动版式 QA**：用数值检测重叠、出画、字幕冲突，中等规模的模型也能交出干净的画面。
 
-### 6 种视觉风格 × 6 种动效语言
-**画面风格**与**动效语言**分开选择；动效依据素材传递的主题来选，`recommend_style.py` 会根据 brief 和音乐推荐搭配（对照表见上方英文部分）。每种动效语言对“功能演示”也有不同版式：
-- **cinematic-3d**：3D 窗口加标签。
-- **precision-data**：规格表加绘制引线。
-- **kinetic-launch**：放大爆发加大标题。
-- **gentle-story**：慢速推拉，一次一句。
-- **playful-pop**：贴纸气泡。
-- **editorial-type**：杂志分屏。
+### 8 种视觉风格 × 6 种动效语言
+风格与动效分开选择，都依据产品类型与主题；对照表与预览见上方英文部分。新增 `luxe-noir`（安静的奢华感：时尚、美妆、珠宝、高端硬件）与 `natural-fresh`（日光与材质：食品、身心健康、旅行、家居、亲子）。
 
-### 导演电影层：克制、专业、高级
-把顶级广告导演的做法（色彩脚本、调色、镜头、光、转场、声音、成片质感）变成自动默认值，手册见 [references/director.md](references/director.md)。原则是克制：效果“感受得到，看不出来”，全片只有一个高潮。
-- **色彩脚本**：冷色的“过去”，中性真实的产品，略微饱满的高潮，温暖的结尾；变化幅度小，跨切点平滑过渡。
-- **调色与质感**：每种风格一个 LUT，按 50% 混合，保证真实界面颜色不失真；细腻颗粒、轻微辉光；每帧 4 次采样的 180° 运动模糊。
-- **镜头**：
-  - 几乎察觉不到的手持漂移、边缘景深、场景落定时的短暂对焦。
-  - 只在故事转折处用镜头转场（甩镜或推进穿越）。
-- **光**：
-  - 每个窗口扫过一次柔和高光。
-  - 封面 Logo 和高潮口号后有淡淡光芒。
-  - 只在高潮出现一次宽银幕光晕。
-- **声音设计（程序合成，无版权问题）**：约每分钟 10 个轻声音效，只在镜头转场和击点出现，高潮有一次重击加上升音；音色随动效语言变化。
-- **控制**：
-  - 默认 `"cinema": "auto"`，用 `"off"` 关闭，或用 `{...}` 对象微调。
-  - 每个场景可设 `mood`、`cut`、`hit`。
-  - `--draft` 快速预览。
-
-### 安装
-命令同上方英文部分。`./install.sh all` 会同时安装到 OpenCode、Antigravity、DeepSeek Harness、Kimi Code、Cursor、Copilot、Gemini CLI、Qwen Code、Trae 等的目录。各智能体的目录见 [references/agents.md](references/agents.md)；不支持 skill 的智能体请让它读取 [AGENTS.md](AGENTS.md)。
-
-### 快速开始
-运行 `examples/demo` 里的示例（占位界面 + 原创公有领域音乐）。做自己产品的片子时，对智能体说：“用 product-promo-film skill 给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。
-
-### 环境要求
-- Python 3.9+（numpy、Pillow）
-- Node 18+ 与 Playwright（Chromium）
-- ffmpeg（可用 `pip install imageio-ffmpeg`）
-- 可选：配音需要 Python 3.12 虚拟环境与 Kokoro（Apache-2.0），安装方法见 [references/audio.md](references/audio.md)
+### 安装与快速开始
+命令见上方英文部分。对智能体说：“用 product-promo-film skill，根据 ~/materials 里的素材给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。示例：
+- [examples/product-demo](examples/product-demo)：实物产品，无音乐，含完整团队方案。
+- [examples/demo](examples/demo)：软件，使用用户音乐。
+- [examples/medstat-pilot](examples/medstat-pilot)：3:26 正式成片。
 
 ### 署名与许可
 - **本 skill**：MIT 许可。© 2026 陈亮亮，[github.com/CalebChen941028](https://github.com/CalebChen941028)，微信公众号：科研牛马研习社。由 Codex 与 Claude 协作开发。
-- **不随仓库分发、需自行安装**：Playwright（Apache-2.0）、Kokoro-82M（Apache-2.0）、ffmpeg。
-- **示例音乐**：原创，CC0。
-- 请只使用你有权使用的音乐和声音。
+- **不随仓库分发、需自行安装**：Playwright、Kokoro-82M、ffmpeg。
+- **示例音乐**：原创，CC0；`make_music.py` 生成的配乐可自由使用。
+- **占位图**：产品示例中的图片是虚构品牌的绘制占位图。
+- 请只使用你有权使用的素材、音乐和声音。

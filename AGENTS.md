@@ -1,32 +1,42 @@
 # AGENTS.md — product-promo-film
 
-**For any AI coding agent** (Codex, Claude Code, OpenCode, Antigravity, DeepSeek Harness, Kimi Code, ZCode, Cursor, Copilot, Gemini CLI, Qwen Code, Trae …).
+**For any AI coding agent**: Codex, Claude Code, OpenCode, Antigravity, DeepSeek Harness, Kimi Code, ZCode, Cursor, Copilot, Gemini CLI, Qwen Code, Trae and others.
 面向任何 AI 编程智能体。
 
 ## English
-When the user asks for a product promo / launch / explainer video, **read `SKILL.md` in this folder and follow its 11 steps in order.** Short version:
+When the user asks for a promo, launch, ad, brand or explainer film for **any product**, read `SKILL.md` in this folder and follow its 10 steps in order. Short version:
 
 1. `python3 scripts/doctor.py` → fix every MISS.
-2. Put the user's materials in `materials/`; run `scripts/intake.py`.
-3. Fill `brief.json` (from `templates/brief.example.json`) with the user.
-4. `scripts/recommend_style.py` → let the user pick look + motion.
-5. Copy `templates/film.example.json` → `film.json`; fill scenes from the library (`references/film-spec.md`).
-6. Director's pass (`references/director.md` §5): one hero moment, mood arc, camera cuts only where the story turns. Defaults do most of it.
-7. `python3 scripts/make_film.py film.json --stage check` until no ERROR, then `build` → `vo` → `qa` (0 errors) → `render` → `finish` (`--draft` for a quick look).
-8. Report files, what is demo/simulated, and what the user must still supply.
+2. `python3 scripts/autofilm.py <materials folder> --out <project>` → the genre, look, motion, arc and music (the user's track, or composed) are chosen, and drafts are written: `film.json` with TODO copy, plus `treatment.md`.
+3. Confirm with the user: the genre on a CLOSE CALL, music, voice, contacts.
+4. Play the crew in `references/crew.md` to fill `treatment.md`. Then `python3 scripts/check_treatment.py treatment.md` must pass.
+5. Write the copy into `film.json` (replace every TODO) and re-check with `check_treatment.py treatment.md film.json`.
+6. Do the director's pass (`references/director.md` §5).
+7. `python3 scripts/make_film.py film.json --stage check`, then `build` → `vo` → `qa` (0 errors) → `render` → `finish`. Use `--draft` for a quick look.
+8. Report the files, the concept, what is placeholder or composed, and what the user must still supply.
 
-Rules: real UI only · honest claims · user-provided/licensed music · Kokoro or user voice (no OS voices) · never type the user's API keys · ask before downloading models · never render before QA passes.
+Rules:
+- Real material only; honest claims; real quotes.
+- The user's music or a composed track; never one from the web.
+- Kokoro or the user's voice; ask before any download.
+- Never type the user's API keys.
+- Restraint: one hero moment.
 
 ## 中文
-用户要做产品宣传片、发布视频或讲解视频时，**读取本目录的 `SKILL.md`，按其中 11 个步骤依次执行。** 简版：
+用户要为**任何产品**做宣传片、发布片、广告片、品牌片或讲解片时，读取本目录的 `SKILL.md`，按 10 个步骤依次执行。简版：
 
 1. `python3 scripts/doctor.py`，修好所有 MISS。
-2. 用户素材放进 `materials/`，运行 `scripts/intake.py`。
-3. 与用户一起填写 `brief.json`（模板：`templates/brief.example.json`）。
-4. 运行 `scripts/recommend_style.py`，让用户选定视觉风格与动效语言。
-5. 复制 `templates/film.example.json` 为 `film.json`，从场景库填写场景（`references/film-spec.md`）。
-6. 导演检查（`references/director.md` 第 5 节）：一个高潮、情绪弧线、只在故事转折处用镜头转场；默认值已完成大部分。
-7. `python3 scripts/make_film.py film.json --stage check` 直到没有 ERROR，再依次 `build` → `vo` → `qa`（0 错误）→ `render` → `finish`（`--draft` 可快速预览）。
-8. 汇报文件位置、哪些是演示 / 模拟内容、用户还需补充什么。
+2. `python3 scripts/autofilm.py <素材文件夹> --out <项目目录>`：自动选定类型、风格、动效、叙事结构与音乐（用户的曲子或原创），并写出草稿：文案为 TODO 的 `film.json`，以及 `treatment.md`。
+3. 与用户确认：CLOSE CALL 时确认类型，以及音乐、配音、联系方式。
+4. 按 `references/crew.md` 扮演团队填写 `treatment.md`，`check_treatment.py treatment.md` 必须通过。
+5. 把文案写进 `film.json`（替换所有 TODO），再用 `check_treatment.py treatment.md film.json` 检查。
+6. 做导演检查（`references/director.md` 第 5 节）。
+7. 运行 `make_film.py film.json --stage check`，再依次 `build` → `vo` → `qa`（0 错误）→ `render` → `finish`；`--draft` 可快速预览。
+8. 汇报文件、创意概念、哪些是占位或原创配乐、用户还需补充什么。
 
-规则：只用真实界面 · 说法可核实 · 音乐由用户提供或已授权 · 配音用 Kokoro 或用户录音（不用系统语音）· 不替用户填写 API Key · 下载模型前先征得同意 · QA 不通过不渲染。
+规则：
+- 只用真实素材；说法可核实；引言真实。
+- 音乐用用户的或原创配乐，不从网上找。
+- 配音用 Kokoro 或用户录音；任何下载前先征得同意。
+- 不替用户填写 API Key。
+- 保持克制，全片只有一个高潮。

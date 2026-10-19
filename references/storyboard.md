@@ -4,6 +4,8 @@ English first, 中文在后。
 
 ## English
 
+> `scripts/autofilm.py` now drafts the storyboard for you from the product genre's story arc (`references/genres.md`). Use this page to adjust it, or for the manual route.
+
 ### Draft automatically
 ```bash
 python3 scripts/beat_grid.py music.mp3 --ffmpeg "$FFMPEG" --out build/grid.json
@@ -31,6 +33,8 @@ The draft keeps the brief's order, gives each scene a bar range, and flags a fea
 ~2.5 English words per second. One sentence per line. Gallery: one short phrase per item, `at` = item index + 0.15. Lines already typeset on screen get `id: "tagline"` / `"motto"`.
 
 ## 中文
+
+> `scripts/autofilm.py` 会按产品类型的叙事结构（`references/genres.md`）自动起草分镜；本页用于调整，或走手动路线时参考。
 
 ### 自动起草
 运行上方两条命令。草稿保持 brief 的顺序，给每个场景分配小节；某个功能的 `energy` 与所在音乐段相差两级时标 ⚠（调整 brief 顺序或移动这一段）。

@@ -12,6 +12,8 @@ English first, 中文在后。A style = `styles/<id>.css` (colours, fonts, frame
 | `aurora-glass` | moving colour mesh, frosted-glass cards, white type, caption pill | zoom · glow | playful-pop | consumer/creator/AI apps, social-first launches |
 | `neon-cyber` | black + neon grid floor, scanlines, magenta/cyan glow, monospace labels | glitch RGB-split + flash · flash | kinetic-launch | dev/security/infra, gaming-adjacent, EDM/trap music |
 | `paper-academic` | warm paper with grain, serif display, ink-blue accent, hand-drawn ellipse highlights, footnote captions | page turn · none | precision-data | research, statistics, education, publishing |
+| `luxe-noir` | velvet black, one warm spotlight, champagne accent, high-contrast serif, frameless photography | slow dissolve · none | gentle-story | fashion, beauty, fragrance, jewellery, watches, premium hardware, wine |
+| `natural-fresh` | warm linen, soft sun glow, sage + terracotta, humanist type, photos with natural shadows | soft zoom · none | gentle-story | food & drink, wellness, travel, home & living, family, sustainable brands |
 
 ### Finish per style (applied after rendering; `cinema` in film.json overrides)
 | id | Grade (LUT) | Bloom | Grain |
@@ -22,6 +24,8 @@ English first, 中文在后。A style = `styles/<id>.css` (colours, fonts, frame
 | `aurora-glass` | pastel-glow: lifted blacks, violet shadows | 0.18 | 0.15 |
 | `neon-cyber` | neon-night: deep blacks, magenta/cyan split | 0.24 | 0.20 |
 | `paper-academic` | warm-print: warm paper, soft contrast | 0.03 | 0.28 |
+| `luxe-noir` | noir-gold: deep blacks, warm golden highlights | 0.10 | 0.22 |
+| `natural-fresh` | sunlit: warm daylight, soft lifted shadows | 0.06 | 0.14 |
 
 All looks blend at 50 % by default, so the product's real UI colours stay true. Preview one on a still: `python3 scripts/grade.py teal-night look.cube --preview in.png out.png`.
 
@@ -41,6 +45,8 @@ Copy the closest pair of files, rename the id in both, change `:root` tokens and
 | `aurora-glass` | 流动彩色渐变、毛玻璃卡片、白字、胶囊字幕 | 缩放 · 辉光 | playful-pop | 消费 / 创作者 / AI 应用、社交平台首发 |
 | `neon-cyber` | 黑底霓虹网格地面、扫描线、品红青色辉光、等宽字体 | 故障 RGB 分离 + 闪白 · 闪光 | kinetic-launch | 开发 / 安全 / 基础设施、游戏相关、电子乐 |
 | `paper-academic` | 暖色纸张颗粒、衬线标题、墨蓝主色、手绘椭圆高亮、脚注式字幕 | 翻页 · 无 | precision-data | 科研、统计、教育、出版 |
+| `luxe-noir` | 丝绒黑、一束暖光、香槟金主色、高反差衬线字体、无边框摄影 | 慢溶解 · 无 | gentle-story | 时尚、美妆、香氛、珠宝、腕表、高端硬件、酒类 |
+| `natural-fresh` | 暖色亚麻底、柔和阳光、鼠尾草绿与陶土色、人文无衬线字体、自然阴影的照片 | 柔和缩放 · 无 | gentle-story | 食品饮品、身心健康、旅行、家居、亲子、可持续品牌 |
 
 ### 各风格的成片质感（渲染后施加，film.json 的 `cinema` 可覆盖）
 | id | 调色（LUT） | 辉光 | 颗粒 |
@@ -51,6 +57,8 @@ Copy the closest pair of files, rename the id in both, change `:root` tokens and
 | `aurora-glass` | pastel-glow：抬升的黑、紫色暗部 | 0.18 | 0.15 |
 | `neon-cyber` | neon-night：深黑、品红 / 青色分离 | 0.24 | 0.20 |
 | `paper-academic` | warm-print：暖纸色、柔和对比 | 0.03 | 0.28 |
+| `luxe-noir` | noir-gold：深黑、温暖的金色高光 | 0.10 | 0.22 |
+| `natural-fresh` | sunlit：温暖日光、柔和抬升的暗部 | 0.06 | 0.14 |
 
 默认按 50% 强度混合，保证产品真实界面颜色不失真。单帧预览：`python3 scripts/grade.py teal-night look.cube --preview in.png out.png`。
 

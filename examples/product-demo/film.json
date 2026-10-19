@@ -1,0 +1,216 @@
+{
+ "_how": "Drafted by autofilm.py from materials/, copy written by the crew (treatment.md). Placeholder brand and drawn placeholder images.",
+ "name": "aurel-film",
+ "out": "film_out",
+ "genre": "food-beverage",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes",
+  "_note": "genre suggests af_heart (warm female); am_michael is used here because it is already downloaded"
+ },
+ "brand": {
+  "name": "Aurel",
+  "nameAccent": "Stoneware",
+  "logo": "materials/logo.png",
+  "positioningZh": "手作炻器马克杯",
+  "positioningEn": "HANDMADE STONEWARE MUGS",
+  "taglineZh": "每一只，都只有一只",
+  "taglineEn": "ONE OF ONE",
+  "motto": [
+   "慢慢做，",
+   "慢慢喝。",
+   "Made slowly. Best enjoyed the same way."
+  ],
+  "contacts": [
+   [
+    "STUDIO",
+    "工作室",
+    "Aurel Studio",
+    "placeholder brand · demo"
+   ]
+  ],
+  "chips": [
+   "手工拉坯 · Wheel-thrown",
+   "每周 40 只 · 40 a week"
+  ]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "materials/morning-table.jpg",
+   "say": [
+    {
+     "en": "Some things shouldn't be made the same way twice.",
+     "zh": "有些东西，不该做成一模一样。",
+     "at": 0.6
+    }
+   ],
+   "base": [
+    1920,
+    1280
+   ],
+   "frame": "photo"
+  },
+  {
+   "type": "photo",
+   "bars": 3,
+   "media": "materials/morning-table.jpg",
+   "base": [
+    1920,
+    1280
+   ],
+   "title": {
+    "zh": "清晨第一杯",
+    "en": "The first cup of the day"
+   },
+   "say": [
+    {
+     "en": "Like the first cup of the morning.",
+     "zh": "比如，清晨的第一杯。",
+     "at": 0.5
+    }
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 3,
+   "media": "materials/glaze-detail.jpg",
+   "base": [
+    1920,
+    1080
+   ],
+   "say": [
+    {
+     "en": "Each glaze finds its own way through the kiln.",
+     "zh": "每一层釉，都在窑火里走出自己的纹路。",
+     "at": 0.4
+    }
+   ]
+  },
+  {
+   "type": "hero",
+   "bars": 4,
+   "media": [
+    "materials/mug-clay.png",
+    "materials/mug-cream.png",
+    "materials/mug-sage.png"
+   ],
+   "base": [
+    1200,
+    1000
+   ],
+   "title": {
+    "zh": "每一只，都只有一只",
+    "en": "ONE OF ONE"
+   },
+   "say": [
+    {
+     "en": "Aurel stoneware. Thrown on the wheel, glazed by hand, fired twice.",
+     "zh": "Aurel 炻器：拉坯成形，手工施釉，两次烧制。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 4,
+   "media": "materials/shelf.jpg",
+   "base": [
+    1920,
+    1080
+   ],
+   "title": {
+    "zh": "三种釉色",
+    "en": "Three glazes"
+   },
+   "points": [
+    {
+     "zh": "鼠尾草绿",
+     "en": "Sage"
+    },
+    {
+     "zh": "奶油白",
+     "en": "Cream"
+    },
+    {
+     "zh": "陶土红",
+     "en": "Clay"
+    }
+   ],
+   "say": [
+    {
+     "en": "Sage, cream and clay. Three hundred and fifty millilitres, in a double-thick wall that holds the heat.",
+     "cap": "Sage, cream and clay. 350 ml, in a double-thick wall that holds the heat.",
+     "zh": "鼠尾草绿、奶油白、陶土红；350 毫升，加厚杯壁更保温。",
+     "at": 0.3
+    }
+   ],
+   "frame": "photo"
+  },
+  {
+   "type": "lineup",
+   "bars": 3,
+   "items": [
+    {
+     "media": "materials/mug-clay.png",
+     "zh": "陶土红",
+     "en": "Clay"
+    },
+    {
+     "media": "materials/mug-cream.png",
+     "zh": "奶油白",
+     "en": "Cream"
+    },
+    {
+     "media": "materials/mug-sage.png",
+     "zh": "鼠尾草绿",
+     "en": "Sage"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "materials/glaze-detail.jpg",
+    "materials/morning-table.jpg",
+    "materials/mug-clay.png",
+    "materials/mug-cream.png",
+    "materials/mug-sage.png",
+    "materials/shelf.jpg"
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Aurel. One of one.",
+     "zh": "Aurel，每一只，都只有一只。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Made slowly. Best enjoyed the same way.",
+     "zh": "慢慢做，慢慢喝。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

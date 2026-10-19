@@ -4,7 +4,8 @@ Usage:
   python intake.py materials/ --out build/ [--ffmpeg ffmpeg] [--no-transcode]
 
 What it does
-  images   → size, alpha, role guess (logo / desktop / phone / figure), suggested `base` for win()
+  images   → size, alpha, role guess (logo / desktop / phone / photo / cutout / figure), suggested `base` for win()
+             photo = natural photograph; cutout = product on a transparent background (hero/lineup scenes)
              (captures ≥ 2400 px wide are treated as 2× → base = size / 2)
   videos   → duration/size/fps; transcoded to build/clips/<name>.webm (VP9, ≤1920 wide, 30 fps, no audio)
              because Playwright's Chromium cannot decode H.264 and WebM seeks frame-exactly
@@ -43,6 +44,22 @@ def probe(path):
     return {'duration': round(dur, 2) if dur else None, 'size': [int(v.group(1)), int(v.group(2))] if v else None, 'fps': float(fps.group(1)) if fps else None}
 
 
+def look(im):
+    """'photo' (natural image), 'ui' (screen/flat graphic) or 'cutout' (object on transparency), from pixel statistics."""
+    import numpy as np
+    a = np.asarray(im.convert('RGBA'))
+    alpha = a[..., 3]
+    if 0.15 < (alpha > 200).mean() < 0.85:
+        return 'cutout'
+    h, w = alpha.shape
+    c = a[h // 4: h // 4 + min(512, h // 2), w // 4: w // 4 + min(512, w // 2), :3].astype(int)   # native-resolution centre patch
+    d = np.abs(np.diff(c, axis=1)).sum(axis=2)
+    same, edges = (d == 0).mean(), (d > 60).mean()     # screens: pixel-identical areas + sharp text edges; photos: neither
+    if same < 0.25: return 'photo'
+    if same > 0.9 or (same > 0.6 and edges > 0.004): return 'ui'
+    return 'ui' if edges > 0.015 else 'photo'
+
+
 items = []
 for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswith('.')):
     ext, rel = f.suffix.lower(), str(f.relative_to(src))
@@ -50,12 +67,20 @@ for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswi
         im = Image.open(f); w, h = im.size
         alpha = im.mode in ('RGBA', 'LA') and im.getextrema()[-1][0] < 250
         ar = w / h
-        if alpha and 0.8 < ar < 1.25 and w <= 2048: role = 'logo'
+        kind = look(im)
+        hint = f.stem.lower()
+        if re.search(r'screen|screenshot|截图|界面|\bui\b|dashboard', hint): kind = 'ui'
+        elif re.search(r'photo|lifestyle|shot|scene|product|实拍|照片|场景', hint) and kind != 'cutout': kind = 'photo'
+        if alpha and 0.8 < ar < 1.25 and w <= 1200 and re.search(r'logo|icon|mark|标志', f.stem, re.I): role = 'logo'
+        elif alpha and kind == 'cutout': role = 'cutout'            # product shot on a transparent background
+        elif alpha and 0.8 < ar < 1.25 and w <= 1200: role = 'logo'
+        elif kind == 'photo': role = 'photo'                         # photograph: lifestyle, product, people, place
         elif ar < 0.75: role = 'phone'
         elif ar > 1.45 and w >= 1200: role = 'desktop'
         else: role = 'figure'
         scale = 2 if w >= 2400 else 1
         if role == 'phone': scale = 3 if w >= 1000 else (2 if w >= 700 else 1)
+        if role in ('photo', 'cutout'): scale = max(1, w / 1920)          # photos: base ≈ 1920 wide
         items.append({'file': rel, 'kind': 'image', 'role': role, 'size': [w, h], 'alpha': bool(alpha), 'base': [round(w / scale), round(h / scale)]})
     elif ext in VID:
         info = probe(f)
@@ -81,12 +106,13 @@ for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswi
 
 json.dump({'materials': str(src.resolve()), 'items': items}, open(out / 'manifest.json', 'w'), ensure_ascii=False, indent=1)
 count = lambda k, r=None: sum(1 for i in items if i['kind'] == k and (r is None or i.get('role') == r))
-print(f"images {count('image')} (desktop {count('image', 'desktop')}, phone {count('image', 'phone')}, figure {count('image', 'figure')}, logo {count('image', 'logo')})"
+print(f"images {count('image')} (desktop {count('image', 'desktop')}, phone {count('image', 'phone')}, photo {count('image', 'photo')}, cutout {count('image', 'cutout')}, figure {count('image', 'figure')}, logo {count('image', 'logo')})"
       f" · videos {count('video')} · music {count('audio', 'music')} · voice {count('audio', 'voice')} · texts {count('text')}")
 missing = []
 if not count('image', 'logo'): missing.append('logo (transparent PNG) — ask the user, or use the app icon from the repo (e.g. build/icon.png)')
-if not count('audio', 'music'): missing.append('music — ask for a licensed track (or use one the user owns); never pick one yourself from the web')
-if count('image', 'desktop') + count('image', 'phone') + count('video') < 4: missing.append('real UI material — fewer than 4 screens/clips: capture more with capture_kit.mjs if the product can run')
+if not count('audio', 'music'): missing.append('music — none supplied: make_film.py will compose an original underscore (make_music.py) unless the user provides a licensed track; never pick one from the web')
+visual = sum(count('image', r) for r in ('desktop', 'phone', 'photo', 'cutout', 'figure')) + count('video')
+if visual < 4: missing.append(f'visual material — only {visual} images/clips: ask for more real product shots or screens (software: capture_kit.mjs; physical products: photos, ideally cut-outs on transparency)')
 if not count('text', 'brief'): missing.append('brief — fill templates/brief.example.json with the user (name, one-liner, features, differentiators, contacts, style)')
 print('missing:' if missing else 'nothing obviously missing')
 for m in missing: print('  -', m)

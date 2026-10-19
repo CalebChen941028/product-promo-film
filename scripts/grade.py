@@ -15,6 +15,8 @@ Looks (default style in brackets):
   pastel-glow  [aurora-glass]   lifted blacks, violet shadows, peach highlights, juicy mid saturation
   neon-night   [neon-cyber]     crushed blacks, magenta shadows, cyan highlights, strong contrast
   warm-print   [paper-academic] warm paper, lifted blacks, low contrast, slightly muted colour
+  noir-gold    [luxe-noir]      deep blacks, warm golden highlights, slightly muted colour
+  sunlit       [natural-fresh]  warm daylight highlights, soft lifted shadows, a touch of green in the mids
   teal-orange  (any)            the blockbuster split-tone, used lightly
   none                          identity (grade off)
 """
@@ -50,6 +52,10 @@ def look(rgb, name):
         r = np.clip((r - 0.025) / 0.975, 0, 1); r = s_curve(r, 0.3) + sh * np.array([0.035, -0.01, 0.055]) + hi * np.array([-0.02, 0.015, 0.03]); r = sat(r, 1.14)
     elif name == 'warm-print':
         r = r * 0.95 + 0.04; r = s_curve(r, 0.1) + np.array([0.022, 0.01, -0.022]); r = sat(r, 0.9)
+    elif name == 'noir-gold':
+        r = np.clip((r - 0.02) / 0.98, 0, 1); r = s_curve(r, 0.25) + sh * np.array([0.01, 0.005, -0.005]) + hi * np.array([0.035, 0.02, -0.015]); r = sat(r, 0.88)
+    elif name == 'sunlit':
+        r = r * 0.96 + 0.03; r = s_curve(r, 0.1) + hi * np.array([0.025, 0.015, -0.01]) + sh * np.array([0.0, 0.012, 0.0]); r = sat(r, 1.04)
     elif name == 'teal-orange':
         r = s_curve(r, 0.2) + sh * np.array([-0.03, 0.02, 0.05]) + hi * np.array([0.05, 0.02, -0.04]); r = sat(r, 1.04)
     elif name != 'none':
@@ -57,7 +63,7 @@ def look(rgb, name):
     return np.clip(r, 0, 1)
 
 
-LOOKS = ['teal-night', 'clean-bright', 'bleach-print', 'pastel-glow', 'neon-night', 'warm-print', 'teal-orange', 'none']
+LOOKS = ['teal-night', 'clean-bright', 'bleach-print', 'pastel-glow', 'neon-night', 'warm-print', 'noir-gold', 'sunlit', 'teal-orange', 'none']
 
 
 def write_cube(name, path, strength=0.6, n=33):

@@ -1,0 +1,10 @@
+{
+  "_how": "Brief for the placeholder brand used in this demo. autofilm.py reads brief.json from the materials folder or --brief.",
+  "product": {"name": "Aurel", "nameAccent": "Stoneware", "positioning": {"zh": "手作炻器马克杯", "en": "Handmade stoneware mugs"}, "tagline": {"zh": "每一只，都只有一只", "en": "One of one"}},
+  "genre": "food-beverage",
+  "audience": "people who make coffee or tea at home and care how a morning feels",
+  "insight": {"zh": "清晨的第一杯，是一天里唯一属于自己的时刻。", "en": "The first cup of the day is the one quiet moment that is mine."},
+  "features": [{"id": "glazes", "zh": "三种釉色", "en": "Three glazes", "materials": ["shelf.jpg"]}],
+  "motto": {"zh": ["慢慢做，", "慢慢喝。"], "en": "Made slowly. Best enjoyed the same way."},
+  "contacts": [["STUDIO", "工作室", "Aurel Studio", "placeholder brand · demo"]]
+}
