@@ -1,0 +1,53 @@
+{
+ "_golden": "GOLDEN REFERENCE (arc problem-solution: software, SaaS, science, finance). Study it, then write YOUR product's film from YOUR docs. Do not copy its lines, its numbers or its product. It is not buildable (no materials). Every _why says what a top crew did and why.",
+ "_facts": "The docs this film was written from (fictional product): Margin — invoicing for freelance translators. Drop in the source file and Margin counts the words (DOCX, PDF, XLIFF) and prices the job at your rate per word. Invoices in 31 currencies. Reminds the client on day 14 and day 30 if unpaid. From source file to sent invoice takes under a minute (timed on 50 real jobs). Exports a year of invoices as one CSV for your tax return. 9 euros a month. Made by two translators in Lisbon.",
+ "_anchors": {
+  "proposition": "Translators should spend their evenings on words, not on invoices.",
+  "concept": "The last page — the job ends with an invoice nobody wants to write",
+  "hook": "The translation took a week. The invoice took the evening.",
+  "hero": "Finish the work. Not the paperwork.",
+  "last": "The translation takes a week. The invoice takes a minute.",
+  "_why": "Hook, hero and last line are written FIRST and say the concept three times in three ways. The last line calls back to the hook word for word, with one change: that change is the product."
+ },
+ "name": "margin-film", "genre": "software-saas", "style": "keynote-light", "motion": "cinematic-3d", "cinema": "auto",
+ "music": {"generate": {"mood": "auto"}},
+ "voice": {"engine": "kokoro", "voice": "am_michael", "lang": "a"},
+ "brand": {
+  "name": "Margin", "logo": "materials/logo.png",
+  "positioningZh": "给自由译者的开票工具", "positioningEn": "INVOICING FOR FREELANCE TRANSLATORS",
+  "taglineZh": "收尾的事，交给 Margin", "taglineEn": "Finish the work. Not the paperwork.",
+  "motto": ["一周译完，", "一分钟开票。", "The translation takes a week. The invoice takes a minute."],
+  "contacts": [["WEB", "网站", "margin.example", "9 € / month"]], "chips": ["macOS", "Windows", "Web"]
+ },
+ "scenes": [
+  {"type": "cover", "bars": 3, "media": "materials/word-count.png",
+   "_why": "Contrast hook: two true sentences, the second one hurts. Spoken over the real screen, blurred.",
+   "say": [{"en": "The translation took a week. The invoice took the evening.", "zh": "译稿花了一周，开票花了一个晚上。", "at": 0.6}]},
+  {"type": "pain", "bars": 3,
+   "_why": "The old way in four concrete chores, not 'it is hard'. Each item is a thing the audience has done.",
+   "items": [["数字数", "Counting words"], ["换算汇率", "Converting currencies"], ["催款邮件", "Chasing payment"], ["报税表格", "Tax spreadsheets"]],
+   "say": [{"en": "Counting words, converting currencies, chasing payment.", "zh": "数字数、换汇率、催款。"}]},
+  {"type": "feature", "bars": 4, "media": "materials/word-count.png", "base": [1920, 1080],
+   "_why": "ONE thing per feature, said as what happens, with the real number from the screen. The title names the result, the points name where to look, and the rects point at them.",
+   "title": {"zh": "拖进来，就有报价", "en": "Drop the file. Get the price."},
+   "points": [{"zh": "自动计字", "en": "Words counted", "rect": [212, 180, 640, 260]}, {"zh": "按你的单价", "en": "At your rate", "rect": [1010, 180, 520, 260]}],
+   "say": [{"en": "Drop in the source file. Margin counts the words and prices them at your rate.", "zh": "拖入原文，Margin 数好字数，按你的单价报价。"}]},
+  {"type": "feature", "bars": 4, "media": "materials/reminder.png", "base": [1920, 1080],
+   "_why": "The second proof is a feeling the audience knows (the awkward reminder), carried by a fact (day 14, day 30). Short sentences; a pause after 'Politely.'",
+   "title": {"zh": "催款，不用你开口", "en": "Reminders you don't have to send"},
+   "points": [{"zh": "第 14 天提醒", "en": "Day 14", "rect": [300, 320, 560, 140]}, {"zh": "第 30 天再提醒", "en": "Day 30", "rect": [300, 480, 560, 140]}],
+   "say": [{"en": "On day fourteen, Margin reminds them. Politely. Again on day thirty.", "cap": "On day 14, Margin reminds them. Politely. Again on day 30.", "zh": "第 14 天，Margin 替你提醒；第 30 天，再提醒一次。"}]},
+  {"type": "statement", "bars": 2,
+   "_why": "The breath: no picture, one line, no new fact. It names the feeling under the proposition. Two dense beats, then one calm beat.",
+   "zh": "晚上，是留给文字的。", "en": "Evenings are for words."},
+  {"type": "numbers", "bars": 2,
+   "_why": "Only numbers that are in the docs. Three at most; the voice says none of them (the screen does).",
+   "stats": [{"value": 31, "zh": "种货币", "en": "currencies"}, {"value": 1, "zh": "个 CSV 报税", "en": "CSV for your taxes"}, {"value": 9, "suffix": "€", "zh": "每月", "en": "a month"}]},
+  {"type": "finale", "bars": 4, "media": ["materials/word-count.png", "materials/reminder.png", "materials/currencies.png", "materials/export.png"],
+   "_why": "The hero at ~65 %: the tagline, spoken once, after the music's half-beat of silence. It is the proposition in five words.",
+   "say": [{"id": "tagline", "en": "Margin. Finish the work. Not the paperwork.", "zh": "Margin：收尾的事，交给它。", "at": 1.2}]},
+  {"type": "endcard", "bars": "rest",
+   "_why": "Callback: the hook's sentence again, with the product's change in it. Logistics (price, site) live in the contacts, never in the last line.",
+   "say": [{"id": "motto", "en": "The translation takes a week. The invoice takes a minute.", "zh": "一周译完，一分钟开票。", "at": 0.6}]}
+ ]
+}

@@ -17,6 +17,12 @@ CLICHES_EN = ['revolutionary', 'revolutionize', 'game-changing', 'game changer',
               'redefine', 'elevate your', 'supercharge', 'magic', 'effortless', 'blazing fast']
 CLICHES_ZH = ['颠覆', '赋能', '极致', '一站式', '革命性', '全方位', '打造', '黑科技', '重新定义', '无与伦比', '震撼', '史诗级', '遥遥领先', '引领', '领先的',
               '前所未有', '划时代', '最强', '顶级', '完美', '闭环', '抓手', '降本增效', '全链路', '智慧化']
+# vague words: not banned, but each one is a line that could sell any product. Three or more in a film fail check_treatment.
+VAGUE_EN = ['experience', 'discover', 'journey', 'unlock', 'elevate', 'transform', 'embrace', 'beautiful', 'amazing', 'perfect', 'powerful',
+            'easy', 'easily', 'simple', 'simply', 'intuitive', 'solution', 'premium', 'quality', 'crafted for', 'designed for you', 'next level',
+            'more than just', 'whether you', 'imagine', 'say goodbye', "in today's", 'the art of', 'your way', 'everything you need', 'built for',
+            'peace of mind', 'made for you', 'reimagine', 'boost', 'enhance', 'streamline', 'stunning', 'incredible', 'unique experience']
+VAGUE_ZH = ['体验', '品质', '轻松', '简单', '高效', '强大', '尽享', '开启', '专属', '匠心', '美好', '畅享', '全新', '升级', '智能', '便捷', '品味生活', '理想']
 SUPERLATIVE = re.compile(r"(\bthe (best|fastest|only|most \w+)\b|#1|\bnumber one\b|\bworld'?s (best|first|fastest|only)\b|\bunbeatable\b)", re.I)
 zhlen = lambda s: sum(1 for ch in s or '' if '　' <= ch <= '鿿' or '＀' <= ch <= '￯')
 
@@ -32,6 +38,16 @@ def walk(o, path=''):
             yield from walk(v, f'{path}[{i}]')
     elif isinstance(o, str):
         yield path, o
+
+
+def vague(spec):
+    """(path, word) for every vague word in the copy (see VAGUE_EN / VAGUE_ZH)."""
+    out = []
+    for path, s in walk(spec):
+        low = s.lower()
+        out += [(path, w) for w in VAGUE_EN if re.search(r'(?<![a-z])' + re.escape(w) + r'(?![a-z])', low)]
+        out += [(path, w) for w in VAGUE_ZH if w in s]
+    return out
 
 
 def lint(spec):
@@ -53,6 +69,9 @@ def lint(spec):
             out.append((path, f'on-screen label {zhlen(s)} 字', '≤ 12 汉字 for titles and labels'))
         if last == 'en' and ('title' in path or 'points' in path) and len(s) > 42:
             out.append((path, f'on-screen label {len(s)} chars', '≤ 42 characters'))
+        if path.split('.')[0] != 'brand' or last in ('motto',):
+            for w in [w for w in VAGUE_EN if re.search(r'(?<![a-z])' + re.escape(w) + r'(?![a-z])', low)] + [w for w in VAGUE_ZH if w in s]:
+                out.append((path, f'vague "{w}"', 'name the thing itself: a noun or a number from the docs (what, how many, where)'))
         if '!' in s or '！' in s:
             out.append((path, 'exclamation mark', 'premium copy rarely shouts — remove it'))
     return out

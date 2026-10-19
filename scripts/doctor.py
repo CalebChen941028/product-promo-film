@@ -46,8 +46,17 @@ need(bool(pw), f'playwright ({pw or "missing"})', f'cd "{SKILL}" && npm i playwr
 if platform.system() == 'Linux':
     fc = subprocess.run(['fc-list', ':lang=zh'], capture_output=True, text=True).stdout if shutil.which('fc-list') else ''
     need(bool(fc.strip()), 'CJK font installed', 'sudo apt install fonts-noto-cjk   (Chinese text needs it)')
-kp = os.environ.get('KOKORO_PYTHON')
-need(bool(kp and Path(kp).exists()), 'Kokoro TTS python (KOKORO_PYTHON)', 'optional — see references/audio.md "Kokoro setup"; or use "voice": {"engine": "none"|"files"}', required=False)
+kp = next((c for c in [os.environ.get('KOKORO_PYTHON'), '~/.venvs/kokoro/bin/python'] if c and Path(os.path.expanduser(c)).exists()), None)
+need(bool(kp), f'Kokoro TTS python ({kp or "KOKORO_PYTHON or ~/.venvs/kokoro"})', 'optional — ask the user before installing (references/audio.md "Kokoro setup"); or use "voice": {"engine": "none"|"files"}', required=False)
+if kp:
+    sys.path.insert(0, str(SKILL / 'scripts'))
+    try:
+        from make_film import kokoro_cached
+        model, voices = kokoro_cached()
+        need(model, 'Kokoro model downloaded', 'it downloads on first use (≈ 330 MB): ask the user first', required=False)
+        need(bool(voices), f'Kokoro voices downloaded ({", ".join(voices) or "none"})', 'each voice is ≈ 0.5 MB: ask the user first; use a downloaded one when you cannot ask', required=False)
+    except Exception:
+        pass
 need(Path(os.path.expanduser('~/.cache/kes/phontab')).exists(), 'espeak-ng data at ~/.cache/kes', 'optional — cp -R <tts-venv>/lib/python3.*/site-packages/espeakng_loader/espeak-ng-data ~/.cache/kes', required=False)
 
 for label, _, _ in ok:

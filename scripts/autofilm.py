@@ -27,6 +27,7 @@ SKILL = HERE.parent
 sys.path.insert(0, str(HERE))
 import genres as G  # noqa: E402
 import make_film as MF  # noqa: E402
+import suggest_rects as SR  # noqa: E402
 
 ap = argparse.ArgumentParser()
 ap.add_argument('materials'); ap.add_argument('--out'); ap.add_argument('--brief'); ap.add_argument('--genre'); ap.add_argument('--style'); ap.add_argument('--motion')
@@ -71,6 +72,19 @@ def guess_name():
     m = re.search(r'^#\s+(.+)$', docs, re.M)
     return (m.group(1).strip() if m else src.name.replace('-', ' ').replace('_', ' ').title())[:40]
 
+def doc_facts(limit=10):
+    """The docs' own bullet points and first paragraph: what the copywriter may say."""
+    out = []
+    for p in sorted(src.rglob('*')):
+        if p.suffix.lower() not in ('.md', '.txt') or not p.is_file(): continue
+        for line in p.read_text(errors='ignore').splitlines():
+            t = line.strip()
+            if t.startswith(('- ', '* ', '• ')): out.append(t[2:].strip())
+            elif t and not t.startswith(('#', '(', '[', '!')) and len(out) < 1: out.append(t)
+    return out[:limit]
+
+
+FACTS = doc_facts()
 P = brief.get('product', {})
 name = P.get('name') or guess_name()
 features = brief.get('features') or []
@@ -126,7 +140,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         if bg:
             sc.update({'media': path_of(bg[0]), 'base': bg[0].get('base', [1920, 1080])})
             if bg[0].get('role') == 'photo': sc['frame'] = 'photo'
-        sc['say'] = [{'en': TODO('hook line, spoken (≤ 10 words)'), 'zh': TODO('开场钩子（≤ 20 字）'), 'at': 0.6}]
+        sc['say'] = [{'en': TODO('hook line = treatment §3 Hook line: a tension, a question or a physical detail (≤ 12 words)'), 'zh': TODO('开场钩子（≤ 20 字）'), 'at': 0.6}]
     elif t == 'pain':
         sc['say'] = [{'en': txt('pain', 'en', 'the tension, one sentence'), 'zh': txt('pain', 'zh', '痛点一句话')}]
     elif t == 'statement':
@@ -145,7 +159,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         if not its: continue
         sc.update({'media': [path_of(i) for i in its] if len(its) > 1 else path_of(its[0]), 'base': its[0]['base'],
                    'title': {'zh': (P.get('tagline') or {}).get('zh') if fill and (P.get('tagline') or {}).get('zh') else TODO('揭晓标题（≤ 10 字）'), 'en': name}})
-        sc['say'] = [{'en': TODO('the reveal line'), 'zh': TODO('揭晓旁白')}]
+        sc['say'] = [{'en': TODO('the reveal line: the name + one fact from the docs (≤ 12 words)'), 'zh': TODO('揭晓旁白')}]
     elif t == 'feature':
         for k, f in enumerate(features[:4]):
             mats_f = [m for m in match(f.get('materials')) if m['file'] not in used] or take(['desktop', 'photo', 'cutout', 'phone'], used, 1)
@@ -155,8 +169,15 @@ for beat in G.GENRES['arcs'][genre['arc']]:
             fs = {'type': 'feature', 'bars': beat['bars'], 'media': path_of(m0), 'base': m0.get('base', [1920, 1080]),
                   'title': {'zh': f['zh'] if fill and 'TODO' not in f.get('zh', 'TODO') else TODO('功能标题（≤ 12 字）'), 'en': f['en'] if fill and 'TODO' not in f.get('en', 'TODO') else TODO('feature title (≤ 42 chars)')},
                   'points': [{'zh': TODO('要点（≤ 12 字）'), 'en': TODO('point')} for _ in range(2)],
-                  'say': [{'en': TODO('what this lets you do, spoken'), 'zh': TODO('旁白中文字幕')}]}
+                  'say': [{'en': TODO('one fact from the docs, said as what it means for the viewer (not a spec list)'), 'zh': TODO('旁白中文字幕')}]}
             if not is_ui: fs['frame'] = 'photo'
+            elif m0['kind'] == 'image':   # screens: pre-suggest the highlight boxes (check them: suggest_rects.py --preview)
+                try:
+                    _, rects = SR.suggest(src / m0['file'], fs['base'], 2)
+                    for pt, rc in zip(fs['points'], rects): pt['rect'] = rc
+                    if rects: fs['_rects'] = 'auto-suggested by suggest_rects.py: match each point to the region it names (preview: python3 scripts/suggest_rects.py <image> --preview .)'
+                except Exception as e:
+                    print(f'  (no rect suggestion for {m0["file"]}: {e})')
             if k == 0 and t == 'feature' and genre['arc'] == 'problem-solution': fs['chapter'] = ['01', TODO('章节'), TODO('CHAPTER')]
             scenes.append(fs)
         continue
@@ -191,10 +212,16 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         wall = [path_of(i) for i in items if i['kind'] == 'image' and i.get('role') in ('desktop', 'photo', 'cutout', 'figure', 'phone')][:8]
         if not wall: continue
         sc['media'] = wall
-        sc['say'] = [{'id': 'tagline', 'en': TODO('tagline, spoken'), 'zh': TODO('口号'), 'at': 1.2}]
+        sc['say'] = [{'id': 'tagline', 'en': TODO('hero line = treatment §3 Hero line: the name + the tagline'), 'zh': TODO('口号'), 'at': 1.2}]
     elif t == 'endcard':
-        sc['say'] = [{'id': 'motto', 'en': TODO('the closing line'), 'zh': TODO('收尾一句'), 'at': 0.6}]
+        sc['say'] = [{'id': 'motto', 'en': TODO('last line = treatment §3 Last line: a callback to the hook, not logistics'), 'zh': TODO('收尾一句'), 'at': 0.6}]
     scenes.append(sc)
+
+# breathing: never three proof beats in a row — a one-line statement after the second (crew.md §6)
+for k in range(len(scenes) - 2):
+    if all(x['type'] == 'feature' for x in scenes[k:k + 3]):
+        scenes.insert(k + 2, {'type': 'statement', 'bars': 2, 'zh': TODO('一口气：点出感受，不加新事实（≤ 16 字）'), 'en': TODO('a breath between proofs: the feeling, no new fact')})
+        break
 
 # hero moment: the finale (make_film.py defaults to it); duration budget
 music = None
@@ -204,22 +231,30 @@ if music is None: music = {'generate': {'mood': 'auto'}}
 bpm = genre['music']['bpm']; bar_s = 240 / bpm
 target = a.seconds or {'problem-solution': 100, 'reveal': 80, 'sensory': 75, 'human-story': 90, 'hype': 70}[genre['arc']]
 optional = ['quote', 'lineup', 'gallery', 'carousel', 'phone', 'photo', 'clip', 'compare', 'detail', 'statement']
-while sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s + MF.REST_BARS * bar_s > target + bar_s * 2:
+while sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s + MF.rest_bars(bpm) * bar_s > target + bar_s * 2:
     drop = next((s for t in optional for s in scenes if s['type'] == t), None)
     feats = [s for s in scenes if s['type'] == 'feature']
     if drop is None and len(feats) > 2: drop = feats[-1]
     if drop is None: break
     scenes.remove(drop)
 
-voice = {'engine': 'none'}
+voice = {'engine': 'none', '_note': 'no Kokoro found (references/audio.md "Kokoro setup" — ask the user before installing): captions only'}
+kpy = MF.kokoro_python()
 if voice_files: voice = {'engine': 'files', 'files': {}, '_how': 'map each say id to one of: ' + ', '.join(v['file'] for v in voice_files)}
-elif a.voice in ('auto', 'kokoro') and (os.environ.get('KOKORO_PYTHON') or a.voice == 'kokoro'):
-    voice = {'engine': 'kokoro', 'voice': genre['voice'], 'lang': 'a', 'python': os.environ.get('KOKORO_PYTHON', '~/.venvs/kokoro/bin/python'), 'espeak_data': '~/.cache/kes'}
+elif a.voice in ('auto', 'kokoro') and (kpy or a.voice == 'kokoro'):
+    model, cached = MF.kokoro_cached()
+    want = genre['voice']
+    pick = want if want in cached else (cached[0] if cached else want)
+    voice = {'engine': 'kokoro', 'voice': pick, 'lang': 'a', 'python': kpy or '~/.venvs/kokoro/bin/python', 'espeak_data': '~/.cache/kes'}
+    if pick != want:
+        voice['_note'] = f'the genre suggests {want}; {pick} is used because it is already downloaded. {want} is a ≈ 0.5 MB download: ask the user first, then set "allow_download": true'
+    elif not model or want not in cached:
+        voice['_note'] = 'the Kokoro model or voice is not downloaded yet: ask the user first, then set "allow_download": true'
 
 film = {
     '_how': 'Drafted by autofilm.py. The crew (references/crew.md) replaces every TODO, then: python3 <skill>/scripts/make_film.py film.json --stage check',
     'name': re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-') + '-film', 'out': 'film_out',
-    'genre': gid, 'style': style, 'motion': motion, 'cinema': 'auto', 'music': music, 'voice': voice,
+    'materials': rel(src), 'genre': gid, 'style': style, 'motion': motion, 'cinema': 'auto', 'music': music, 'voice': voice,
     'brand': {'name': name, 'nameAccent': P.get('nameAccent', ''), 'logo': path_of(logo) if logo else TODO('transparent PNG logo path'),
               'positioningZh': (P.get('positioning') or {}).get('zh') or TODO('一句话定位'), 'positioningEn': (P.get('positioning') or {}).get('en') or TODO('ONE-LINE POSITIONING'),
               'taglineZh': (P.get('tagline') or {}).get('zh') or TODO('口号'), 'taglineEn': (P.get('tagline') or {}).get('en') or TODO('TAGLINE'),
@@ -228,15 +263,18 @@ film = {
     'scenes': scenes,
 }
 json.dump(film, open(proj / 'film.json', 'w'), ensure_ascii=False, indent=1)
-if not brief_path:
-    shutil.copy(SKILL / 'templates' / 'brief.example.json', proj / 'brief.json')
+if not brief_path:   # a brief for THIS product from its docs (never another product's example)
+    json.dump({'_how': 'Drafted by autofilm.py from the docs. Fill what is missing from the user\'s docs; every claim must be checkable. Field guide: templates/brief.example.json',
+               'product': {'name': name, 'positioning': {'zh': '', 'en': ''}, 'tagline': {'zh': '', 'en': ''}},
+               'genre': gid, 'facts': FACTS, 'features': [], 'contacts': []}, open(proj / 'brief.json', 'w'), ensure_ascii=False, indent=1)
 
 # 4 · treatment scaffold for the crew --------------------------------------------------------------------
 tpl = (SKILL / 'templates' / 'treatment.template.md').read_text()
-beats = '\n'.join(f"| {i + 1} | `{s['type']}` | {s['bars'] if s['bars'] != 'rest' else MF.REST_BARS} | {next((b['role'] for b in G.GENRES['arcs'][genre['arc']] if b['type'] == s['type']), '')} | |" for i, s in enumerate(scenes))
+beats = '\n'.join(f"| {i + 1} | `{s['type']}` | {s['bars'] if s['bars'] != 'rest' else MF.rest_bars(bpm)} | {next((b['role'] for b in G.GENRES['arcs'][genre['arc']] if b['type'] == s['type']), '')} | |" for i, s in enumerate(scenes))
 fills = {'{{PRODUCT}}': name, '{{GENRE}}': f"{gid} — {genre['en']} / {genre['zh']}", '{{STYLE}}': style, '{{MOTION}}': motion, '{{ARC}}': genre['arc'],
          '{{MUSIC}}': music.get('file') or f"composed: {genre['music']['mood']} ~{bpm} BPM (original, royalty-free)", '{{TONE}}': genre['tone'],
-         '{{MATERIALS}}': ', '.join(f'{k} {v}' for k, v in sorted(mats.items()) if v), '{{BEATS}}': beats, '{{SECONDS}}': f'{target:.0f}'}
+         '{{MATERIALS}}': ', '.join(f'{k} {v}' for k, v in sorted(mats.items()) if v), '{{BEATS}}': beats, '{{SECONDS}}': f'{target:.0f}',
+         '{{GOLDEN}}': f"templates/golden/{genre['arc']}.json", '{{FACTS}}': ' · '.join(FACTS) or '(no docs — ask the user for a README or brief)'}
 for k, v in fills.items(): tpl = tpl.replace(k, str(v))
 (proj / 'treatment.md').write_text(tpl)
 
@@ -244,6 +282,8 @@ todo = sum(1 for _ in MF._strings(film) if 'TODO' in _[1])
 print(f"\n== draft ready → {proj}")
 print(f"genre   {gid} ({genre['en']})" + (f"   ⚠ close call with {ranked[1]['genre']} — confirm with the user" if close else ''))
 print(f"look    {style} · motion {motion} · arc {genre['arc']} · music {music.get('file') or 'composed ' + genre['music']['mood']}")
-print(f"scenes  {len(scenes)} ({', '.join(s['type'] for s in scenes)}) ≈ {sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s + MF.REST_BARS * bar_s:.0f} s")
+print(f"scenes  {len(scenes)} ({', '.join(s['type'] for s in scenes)}) ≈ {sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s + MF.rest_bars(bpm) * bar_s:.0f} s")
 print(f"copy    {todo} TODO fields — the crew writes them (references/crew.md), starting with treatment.md")
-print("next    1) run the crew: fill treatment.md   2) replace every TODO in film.json   3) python3 scripts/make_film.py film.json --stage check")
+print(f"voice   {voice['engine']}" + (f" {voice.get('voice')}" if voice['engine'] == 'kokoro' else '') + (f"  ({voice['_note']})" if voice.get('_note') else ''))
+print(f"study   {SKILL / 'templates' / 'golden' / (genre['arc'] + '.json')} and references/copy-bank.md before writing a word")
+print("next    1) run the crew: fill treatment.md (anchor lines first)   2) replace every TODO in film.json   3) python3 scripts/make_film.py film.json --stage check")

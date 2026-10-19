@@ -28,7 +28,7 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
    - Voice: Kokoro (Apache-2.0) or the user's recordings; never OS voices.
    - Ask before downloading any model or voice. Say the name, source and size.
 4. **Secrets.** Never type a user's API key into an app or config.
-5. **Gates.** Do not build before `check_treatment.py` passes, and do not render before QA has 0 errors.
+5. **Gates (enforced).** `make_film.py` refuses to build until `check_treatment.py` passes, and refuses to render until QA has 0 errors on the latest build. Generated files are fingerprinted: a hand edit in `film_out/` stops the pipeline.
 6. **Restraint.** Calm, professional, premium: effects are felt, not seen, and the film has one hero moment (`references/director.md`).
 
 ### Steps (do them in order)
@@ -42,20 +42,24 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
 3. **Confirm with the user.** Ask only what matters:
    - the genre and look, if autofilm printed **CLOSE CALL**;
    - their own music, or the composed underscore;
-   - voice-over language and voice (`kokoro` voices download once: ask first);
+   - voice-over language and voice (autofilm picks a voice that is already downloaded; any other voice is a download: ask first);
    - contacts for the end card.
-4. **Crew.** Read `references/crew.md` and play each role in order, filling `treatment.md`: producer → strategist → creative director (3 concepts, choose 1, hook, hero) → copywriter → art director → motion/editor → composer → brand guardian → design critic. Then run `python3 scripts/check_treatment.py treatment.md` until it passes. A low taste score means redo, not re-score.
+
+   **Cannot ask** (a batch run, a sub-agent, the user is away)? Do not stop and do not download. Keep autofilm's genre, look, composed music and voice, take contacts from the docs (or leave them empty), and list every assumption in the report.
+4. **Crew.** First study the golden film for your arc (`templates/golden/<arc>.json`, autofilm prints which; every scene has a `_why`) and `references/copy-bank.md`. Learn the moves; never copy their lines. Then read `references/crew.md` and play each role in order, filling `treatment.md`: producer → strategist → creative director (3 concepts, choose 1, then the **three anchor lines**: hook, hero, last) → copywriter (a full script, one bullet per scene) → art director → motion/editor → composer → brand guardian → design critic. Then run `python3 scripts/check_treatment.py treatment.md` until it passes. A low taste score means redo, not re-score.
 5. **Write the film.**
    - Copy the treatment's words into `film.json` and replace every `TODO`.
-   - For screen points, measure `rect`s with `python3 scripts/grid_overlay.py` (base coordinates). Photos need none.
+   - Use the anchor lines exactly as written: hook → cover, hero → finale, last → endcard.
+   - Screen points come with suggested `rect`s. Check them: `python3 scripts/suggest_rects.py <screenshot> --preview .` draws numbered boxes; give each point the box it talks about. Real photos (`"frame": "photo"`) need none. Never put `"frame": "photo"` on a screenshot to silence a warning.
    - Scene types and fields are in `references/film-spec.md`.
-   - Then run `python3 scripts/check_treatment.py treatment.md film.json`.
+   - Then run `python3 scripts/check_treatment.py treatment.md film.json`. It checks that the film says what the treatment says, that proof lines carry facts from the docs, and it caps any taste score the film does not earn.
 6. **Direct.** Do the director's pass (`references/director.md` §5). Defaults already set the colour script, hits, cuts, light and sound. Change a beat only on purpose.
 7. **Check.** Run `python3 scripts/make_film.py film.json --stage check` until there is no ERROR. Fix copy warnings from the lint too.
 8. **Build + voice + QA.** Run `--stage build`, then `--stage vo`, then `--stage qa`. QA must have 0 errors. If you can view images, read `film_out/qa/sheet*.png` and fix anything ugly in `film.json`.
 9. **Render.** Optional quick look: `--stage render --draft`, then `--stage finish --draft`. Final: `--stage render`, then `--stage finish`. Motion blur is applied only to frames that move.
 10. **Report** to the user:
     - the file paths and the chosen concept;
+    - every assumption you made without asking;
     - what is demo, placeholder or composed;
     - what you could not verify (you cannot hear the mix);
     - what they must still supply.
@@ -74,6 +78,7 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
 - Composed music on its own: `python3 scripts/make_music.py --list`.
 - Tune the cinema layer: `"cinema": {...}` (`references/film-spec.md`).
 - Custom JS scenes: `templates/library.js`, `patterns.js`, `engine.js`.
+- Golden films, one per story arc (copy and structure to learn from, not buildable): `templates/golden/`.
 - Worked examples:
   - `examples/demo/`: software, the user's track;
   - `examples/product-demo/`: a physical product, composed music, full crew treatment;
@@ -99,7 +104,7 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
    - 配音用 Kokoro（Apache-2.0）或用户录音，不用系统语音。
    - 下载任何模型或音色前先说明名称、来源、大小并征得同意。
 4. **密钥**：不替用户把 API Key 填进应用或配置。
-5. **关卡**：`check_treatment.py` 不通过不构建，QA 不是 0 错误不渲染。
+5. **关卡（强制）**：`check_treatment.py` 不通过，`make_film.py` 拒绝构建；最近一次构建的 QA 不是 0 错误，拒绝渲染。生成文件带指纹，手改 `film_out/` 会让流程停下。
 6. **克制**：平静、专业、高级；效果“感受得到，看不出来”，全片只有一个高潮（`references/director.md`）。
 
 ### 步骤（按顺序）
@@ -113,20 +118,24 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
 3. **与用户确认**（只问关键的）：
    - 输出 **CLOSE CALL** 时确认类型与风格；
    - 用他们自己的音乐还是原创配乐；
-   - 旁白语言与音色（kokoro 音色需下载一次，先征得同意）；
+   - 旁白语言与音色（autofilm 会选已下载的音色；换其他音色需要下载，先征得同意）；
    - 结尾页联系方式。
-4. **团队创作**：读 `references/crew.md`，按顺序扮演各角色填写 `treatment.md`：制片 → 策略 → 创意总监（三个概念、选一个、开场钩子、高潮）→ 文案 → 美术指导 → 动效与剪辑 → 作曲 → 品牌把关 → 设计评审。然后运行 `python3 scripts/check_treatment.py treatment.md` 直到通过。品味分低就重做，不要改分数。
+
+   **无法询问**（批处理、子智能体、用户不在）时：不要停下，也不要下载。沿用 autofilm 选定的类型、风格、原创配乐和音色，联系方式取自文档（没有就留空），并在汇报里列出每一个假设。
+4. **团队创作**：先读本叙事结构的范例片（`templates/golden/<结构>.json`，autofilm 会打印是哪一个；每个场景都有 `_why`）和 `references/copy-bank.md`，学手法，不抄句子。再读 `references/crew.md`，按顺序扮演各角色填写 `treatment.md`：制片 → 策略 → 创意总监（三个概念、选一个，再写**三句锚点**：开场句、高潮句、收尾句）→ 文案（完整脚本，每个场景一条）→ 美术指导 → 动效与剪辑 → 作曲 → 品牌把关 → 设计评审。然后运行 `python3 scripts/check_treatment.py treatment.md` 直到通过。品味分低就重做，不要改分数。
 5. **写入影片**：
    - 把方案中的文字写进 `film.json`，替换所有 `TODO`。
-   - 界面截图的要点用 `scripts/grid_overlay.py` 量 `rect`（base 坐标），照片不需要。
+   - 三句锚点原样使用：开场句 → cover，高潮句 → finale，收尾句 → endcard。
+   - 界面截图的要点已预填建议的 `rect`。用 `python3 scripts/suggest_rects.py <截图> --preview .` 画出编号框核对，每个要点对应它所说的那个框；真实照片（`"frame": "photo"`）不需要。不要给截图加 `"frame": "photo"` 来消除警告。
    - 场景类型与字段见 `references/film-spec.md`。
-   - 然后运行 `check_treatment.py treatment.md film.json`。
+   - 然后运行 `check_treatment.py treatment.md film.json`：它检查片子说的是否就是方案里写的、证据句是否带有文档里的事实，并会给片子撑不起的品味分封顶。
 6. **导演检查**：按 `references/director.md` 第 5 节检查；默认值已设好色彩脚本、击点、转场、光效和声音，只有刻意为之才改。
 7. **检查**：`python3 scripts/make_film.py film.json --stage check` 直到没有 ERROR，文案检查的提示也要处理。
 8. **构建 + 配音 + QA**：依次运行 `--stage build`、`--stage vo`、`--stage qa`，QA 必须 0 错误；能看图就看 `film_out/qa/sheet*.png`，不满意就改 `film.json`。
 9. **渲染**：可选快速预览 `--stage render --draft`，再 `--stage finish --draft`；终版运行 `--stage render`，再 `--stage finish`（运动模糊只用于运动的帧）。
 10. **汇报**：
     - 文件路径与选定的创意；
+    - 未经询问而做的每一个假设；
     - 哪些是演示、占位或原创配乐；
     - 哪些没法验证（你听不到混音）；
     - 用户还需补充什么。
@@ -145,6 +154,7 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
 - 单独生成原创配乐：`python3 scripts/make_music.py --list`。
 - 调整电影层：`"cinema": {...}`（见 `references/film-spec.md`）。
 - 自写 JS 场景：`templates/library.js`、`patterns.js`、`engine.js`。
+- 范例片（每种叙事结构一部，学文案和结构，不可直接构建）：`templates/golden/`。
 - 实战案例：
   - `examples/demo/`：软件，使用用户音乐；
   - `examples/product-demo/`：实物产品，原创配乐，含完整团队方案；

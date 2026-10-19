@@ -9,14 +9,17 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | --- | --- | --- | --- |
 | `name` | string | yes | output file prefix |
 | `out` | string | no | working folder (default `film_out`) |
+| `materials` | path | no | the materials folder (autofilm writes it); `check_treatment.py` reads the docs there to check that proof lines carry facts |
+| `treatment` | path / `"skip"` | no | the crew's treatment (default `treatment.md`); the build refuses to start until it passes `check_treatment.py`. `"skip"` only for a throwaway test cut |
 | `genre` | string | no | product type from `templates/genres.json` (`python3 scripts/genres.py --list`); sets the defaults for style, motion and composed music |
 | `style` | string | yes | look: `midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`, or `auto` (from the genre) |
 | `motion` | string | no | motion language: `cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`; empty = the style's default |
 | `music.file` | path | no | the user's track (mp3/wav/m4a…). Without it, an original underscore is composed bar-for-bar from the scenes |
-| `music.generate` | object | no | `{"mood": "auto"\|"cinematic-pulse"\|"minimal-electronic"\|"warm-piano"\|"bright-pop"\|"luxe-lounge"\|"ambient-air"\|"warm-acoustic", "bpm": 98, "seed": 3}`. The end card (`"rest"`) is then 5 bars |
+| `music.generate` | object | no | `{"mood": "auto"\|"cinematic-pulse"\|"minimal-electronic"\|"warm-piano"\|"bright-pop"\|"luxe-lounge"\|"ambient-air"\|"warm-acoustic", "bpm": 98, "seed": 3}`. The end card (`"rest"`) is then about 8 s (3–4 bars) plus a ring-out bar |
 | `music.extend` | object | no | `{"from_bar": A, "to_bar": B, "times": 1}` repeats bars A–B once (a chorus) to lengthen the film |
 | `voice.engine` | `kokoro` / `files` / `none` | no | TTS, the user's recordings (`"files": {"<say id>": "rec.wav"}`), or captions only |
-| `voice.voice` / `lang` / `python` / `espeak_data` | — | for kokoro | e.g. `am_michael`, `a`, path to a Python with kokoro, short copy of espeak-ng-data |
+| `voice.voice` / `lang` / `python` / `espeak_data` | — | for kokoro | e.g. `am_michael`, `a`, path to a Python with kokoro (default `$KOKORO_PYTHON` or `~/.venvs/kokoro`), short copy of espeak-ng-data |
+| `voice.allow_download` | bool | no | default false: the vo stage runs offline and stops if the model or voice is not downloaded. Set true only after the user agreed to the download |
 | `brand` | object | yes | see below |
 | `scenes` | list | yes | in playing order; first `cover`, last `endcard` with `"bars": "rest"` |
 | `tools.ffmpeg` / `tools.node_modules` / `tools.workers` | — | no | override tool discovery / render workers |
@@ -72,7 +75,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `quote` | 2 | `zh`, `en?`, `who`, `role?` | a **real**, approved testimonial; large and quiet |
 
 ### Coordinates
-`base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units. Measure with `scripts/grid_overlay.py` (grid labels are base units for 1920×1080 captures) or `scripts/modal_bbox.py` for dialogs.
+`base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units. `scripts/suggest_rects.py <image> --preview .` suggests numbered rects (cards, panels, charts, tables) in base units for any image size; autofilm pre-fills feature points with them. Measure by hand with `scripts/grid_overlay.py` (grid labels are base units for 1920×1080 captures) or `scripts/modal_bbox.py` for dialogs.
 
 ## 中文
 
@@ -81,14 +84,17 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | --- | --- | --- | --- |
 | `name` | 字符串 | 是 | 输出文件名前缀 |
 | `out` | 字符串 | 否 | 工作目录（默认 `film_out`） |
+| `materials` | 路径 | 否 | 素材文件夹（autofilm 自动写入）；`check_treatment.py` 读取其中文档，核对证据句是否带有事实 |
+| `treatment` | 路径 / `"skip"` | 否 | 团队创意方案（默认 `treatment.md`）；未通过 `check_treatment.py` 时拒绝构建。`"skip"` 仅用于一次性测试片 |
 | `genre` | 字符串 | 否 | 产品类型（`templates/genres.json`，`python3 scripts/genres.py --list`），决定风格、动效、原创配乐的默认值 |
 | `style` | 字符串 | 是 | 视觉风格：`midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`，或 `auto`（按类型） |
 | `motion` | 字符串 | 否 | 动效语言：`cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`；留空则用风格默认值 |
 | `music.file` | 路径 | 否 | 用户提供的音乐；不提供时按场景逐小节原创一段配乐 |
-| `music.generate` | 对象 | 否 | `{"mood": "auto" 或 情绪名, "bpm": 98, "seed": 3}`；此时结尾页（`"rest"`）为 5 小节 |
+| `music.generate` | 对象 | 否 | `{"mood": "auto" 或 情绪名, "bpm": 98, "seed": 3}`；此时结尾页（`"rest"`）约 8 秒（3–4 小节），另加一小节余音 |
 | `music.extend` | 对象 | 否 | `{"from_bar": A, "to_bar": B, "times": 1}`：把第 A–B 小节（通常是副歌）重复一遍来加长 |
 | `voice.engine` | `kokoro` / `files` / `none` | 否 | 合成配音、用户录音（`"files": {"<say id>": "rec.wav"}`）、或只要字幕 |
-| `voice.voice` / `lang` / `python` / `espeak_data` | — | 用 kokoro 时 | 如 `am_michael`、`a`、装了 kokoro 的 Python 路径、espeak-ng 数据的短路径副本 |
+| `voice.voice` / `lang` / `python` / `espeak_data` | — | 用 kokoro 时 | 如 `am_michael`、`a`、装了 kokoro 的 Python 路径（默认 `$KOKORO_PYTHON` 或 `~/.venvs/kokoro`）、espeak-ng 数据的短路径副本 |
+| `voice.allow_download` | 布尔 | 否 | 默认 false：配音阶段离线运行，模型或音色未下载时停止。只有用户同意下载后才设为 true |
 | `brand` | 对象 | 是 | 见下 |
 | `scenes` | 列表 | 是 | 按播放顺序；第一个是 `cover`，最后一个是 `"bars": "rest"` 的 `endcard` |
 | `tools.*` | — | 否 | 手动指定 ffmpeg、node_modules、渲染进程数 |
@@ -144,4 +150,4 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `quote` | 2 | `zh`、`en?`、`who`、`role?` | **真实**且经授权的用户评价，大字、安静 |
 
 ### 坐标
-`base` 是图片的坐标空间：1920×1080 窗口的 2 倍截图用 `[1920, 1080]`（默认）；`intake.py` 会为每张图给出建议的 `base`。`rect` / `crop` / `focus` 都是 base 单位下的 `[x, y, 宽, 高]`。用 `scripts/grid_overlay.py` 量取（网格刻度即 1920×1080 截图的 base 单位），弹窗可用 `scripts/modal_bbox.py` 自动求框。
+`base` 是图片的坐标空间：1920×1080 窗口的 2 倍截图用 `[1920, 1080]`（默认）；`intake.py` 会为每张图给出建议的 `base`。`rect` / `crop` / `focus` 都是 base 单位下的 `[x, y, 宽, 高]`。`scripts/suggest_rects.py <图片> --preview .` 会自动给出编号的建议框（卡片、面板、图表、表格），适用于任意尺寸，单位为 base；autofilm 会用它预填功能要点。也可用 `scripts/grid_overlay.py` 手动量取（网格刻度即 1920×1080 截图的 base 单位），弹窗可用 `scripts/modal_bbox.py` 自动求框。

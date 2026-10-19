@@ -1,0 +1,53 @@
+{
+ "_golden": "GOLDEN REFERENCE (arc reveal: consumer electronics, hardware, mobility, industrial). Study it, then write YOUR product's film from YOUR docs. Do not copy its lines, its numbers or its product. It is not buildable (no materials). Every _why says what a top crew did and why.",
+ "_facts": "The docs this film was written from (fictional product): Halden H1 desk lamp. The colour temperature follows the time of day, from 6500 K at noon to 2700 K after sunset. CRI 97 LED. One machined aluminium dial for brightness; no app needed. 9 W. Arm and base turned from one aluminium bar in Bergen. Two finishes: raw aluminium and graphite.",
+ "_anchors": {
+  "proposition": "Your desk light should follow the day outside, not fight it.",
+  "concept": "Four o'clock — the hour daylight turns warm, and the lamp turns with it",
+  "hook": "At four o'clock, the light outside turns warm.",
+  "hero": "Halden. Light that keeps the time.",
+  "last": "Four o'clock. Every day.",
+  "_why": "The concept is one ordinary, true moment (an hour of the day) instead of a list of specs. The hook names the moment, the hero line names the product's part in it, the last line returns to the moment."
+ },
+ "name": "halden-film", "genre": "consumer-electronics", "style": "keynote-light", "motion": "cinematic-3d", "cinema": "auto",
+ "music": {"generate": {"mood": "auto"}},
+ "voice": {"engine": "kokoro", "voice": "am_michael", "lang": "a"},
+ "brand": {
+  "name": "Halden", "nameAccent": "H1", "logo": "materials/logo.png",
+  "positioningZh": "跟着时间变色的台灯", "positioningEn": "A DESK LAMP THAT FOLLOWS THE DAY",
+  "taglineZh": "光，跟着时间走", "taglineEn": "Light that keeps the time.",
+  "motto": ["下午四点，", "光会变暖。", "Four o'clock. Every day."],
+  "contacts": [["WEB", "网站", "halden.example", "Raw aluminium · Graphite"]], "chips": ["CRI 97", "2700–6500 K"]
+ },
+ "scenes": [
+  {"type": "cover", "bars": 3, "media": "materials/desk-afternoon.jpg", "frame": "photo",
+   "_why": "Detail before the whole: the cover is the warm afternoon light on a desk, not the lamp. The line is a true observation the audience recognises.",
+   "say": [{"en": "At four o'clock, the light outside turns warm.", "zh": "下午四点，窗外的光开始变暖。", "at": 0.6}]},
+  {"type": "detail", "bars": 3, "media": "materials/dial-macro.jpg",
+   "_why": "The tease: the knurled dial in macro, no voice. Texture makes the viewer lean in before the reveal.",
+   "crops": [{"rect": [600, 300, 700, 400]}, {"rect": [900, 420, 600, 340]}]},
+  {"type": "hero", "bars": 4, "media": ["materials/h1-raw.png"],
+   "_why": "The reveal line names the product and its one behaviour. Nothing else. The cut-out stands on the stage; the light does the work.",
+   "title": {"zh": "Halden H1", "en": "Halden H1"},
+   "say": [{"en": "Halden H1 turns with it.", "zh": "Halden H1 也随之变暖。", "at": 1.0}]},
+  {"type": "feature", "bars": 4, "media": "materials/kelvin-noon-dusk.jpg", "frame": "photo",
+   "_why": "The proof is the range in kelvin, said as what you see (noon white → evening amber). Numbers on screen, words in the voice.",
+   "title": {"zh": "正午到日落", "en": "From noon to sunset"},
+   "points": [{"zh": "正午 6500 K", "en": "6500 K at noon"}, {"zh": "日落后 2700 K", "en": "2700 K after sunset"}],
+   "say": [{"en": "Clear white at noon. Amber after sunset. It changes on its own.", "zh": "正午清白，日落后琥珀色；它自己会变。"}]},
+  {"type": "feature", "bars": 4, "media": "materials/arm-machining.jpg", "frame": "photo",
+   "_why": "Craft + origin, one fact with a place in it. Places and materials are concrete; 'premium build' is not.",
+   "title": {"zh": "一整根铝材", "en": "One bar of aluminium"},
+   "points": [{"zh": "卑尔根车削", "en": "Turned in Bergen"}, {"zh": "一个旋钮，无需 App", "en": "One dial. No app."}],
+   "say": [{"en": "Arm and base, turned from one bar of aluminium in Bergen. One dial. No app.", "zh": "灯臂与底座，在卑尔根由一整根铝材车削而成；一个旋钮，无需 App。"}]},
+  {"type": "lineup", "bars": 3,
+   "_why": "The range without voice: two finishes, two words. The viewer gets a few seconds just to look.",
+   "items": [{"media": "materials/h1-raw.png", "zh": "原铝", "en": "Raw aluminium"}, {"media": "materials/h1-graphite.png", "zh": "石墨", "en": "Graphite"}]},
+  {"type": "finale", "bars": 4, "media": ["materials/desk-afternoon.jpg", "materials/dial-macro.jpg", "materials/h1-raw.png", "materials/h1-graphite.png", "materials/kelvin-noon-dusk.jpg"],
+   "_why": "Hero at ~65 %, after the silent lineup. The tagline is the proposition in four words.",
+   "say": [{"id": "tagline", "en": "Halden. Light that keeps the time.", "zh": "Halden：光，跟着时间走。", "at": 1.2}]},
+  {"type": "endcard", "bars": "rest",
+   "_why": "Callback to the hook's hour. Three words, and the specs stay in the chips.",
+   "say": [{"id": "motto", "en": "Four o'clock. Every day.", "zh": "下午四点，每一天。", "at": 0.6}]}
+ ]
+}

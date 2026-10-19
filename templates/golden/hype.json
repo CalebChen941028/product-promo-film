@@ -1,0 +1,50 @@
+{
+ "_golden": "GOLDEN REFERENCE (arc hype: developer tools, AI, consumer apps, games, events). Study it, then write YOUR product's film from YOUR docs. Do not copy its lines, its numbers or its product. It is not buildable (no materials). Every _why says what a top crew did and why. Hype here means momentum, not shouting: short lines, real output, one number.",
+ "_facts": "The docs this film was written from (fictional product): Relay, a command-line tool. Give it a failing test (the demo repository has 2,000 files); it shrinks the codebase to the smallest set of files that still fails. On our benchmark of 200 real bugs, the median reproduction was 3 files. Runs locally; your code is not uploaded. Works with pytest and Jest. Open source, MIT licence.",
+ "_anchors": {
+  "proposition": "A bug is easy to fix once you can see it alone.",
+  "concept": "Three files — the whole bug, small enough to read",
+  "hook": "One failing test. Two thousand files. Which three matter?",
+  "hero": "Relay. The bug, alone.",
+  "last": "Three files. Read them before lunch.",
+  "_why": "A question the audience has asked themselves is the hook; the benchmark number is the hero's proof; the last line turns the number into the viewer's afternoon."
+ },
+ "name": "relay-film", "genre": "developer-ai", "style": "midnight-tech", "motion": "kinetic-launch", "cinema": "auto",
+ "music": {"generate": {"mood": "auto"}},
+ "voice": {"engine": "kokoro", "voice": "am_michael", "lang": "a"},
+ "brand": {
+  "name": "Relay", "logo": "materials/logo.png",
+  "positioningZh": "把失败的测试缩成最小复现", "positioningEn": "FAILING TEST IN, SMALLEST REPRO OUT",
+  "taglineZh": "只剩下那个 bug", "taglineEn": "The bug, alone.",
+  "motto": ["三个文件，", "午饭前读完。", "Three files. Read them before lunch."],
+  "contacts": [["GITHUB", "开源", "github.com/relay-example", "MIT"]], "chips": ["pytest", "Jest", "Local"]
+ },
+ "scenes": [
+  {"type": "cover", "bars": 3, "media": "materials/terminal-fail.png",
+   "_why": "A question the viewer has asked at 11 pm. Numbers make it concrete; the 'two thousand' is the repo in the capture.",
+   "say": [{"en": "One failing test. Two thousand files. Which three matter?", "cap": "One failing test. 2,000 files. Which three matter?", "zh": "一个失败的测试，两千个文件；到底是哪三个？", "at": 0.5}]},
+  {"type": "clip", "bars": 3, "media": "build/clips/relay-run.webm",
+   "_why": "Show it running, real speed, no voice over the first bar: the terminal is the proof.",
+   "title": {"zh": "relay 运行中", "en": "relay, running"},
+   "say": [{"en": "Give Relay the test. It removes files until the failure is all that's left.", "zh": "把测试交给 Relay，它一路删文件，直到只剩下失败本身。", "at": 1.0}]},
+  {"type": "feature", "bars": 4, "media": "materials/terminal-result.png", "base": [1920, 1080],
+   "_why": "The result screen with rects on the two lines that matter. One fact per point.",
+   "title": {"zh": "最小复现", "en": "The smallest repro"},
+   "points": [{"zh": "仍然失败", "en": "Still fails", "rect": [140, 610, 900, 70]}, {"zh": "只剩 3 个文件", "en": "3 files left", "rect": [140, 700, 640, 160]}],
+   "say": [{"en": "Same failure. Three files.", "cap": "Same failure. 3 files.", "zh": "同样的失败，只剩三个文件。"}]},
+  {"type": "numbers", "bars": 2,
+   "_why": "The one benchmark number, with its sample size, exactly as the docs say it.",
+   "stats": [{"value": 200, "zh": "个真实 bug", "en": "real bugs"}, {"value": 3, "zh": "个文件（中位数）", "en": "files, median"}]},
+  {"type": "feature", "bars": 4, "media": "materials/terminal-local.png", "base": [1920, 1080],
+   "_why": "The objection answered in one line: privacy, said as a fact, not as 'secure'.",
+   "title": {"zh": "在本机运行", "en": "Runs on your machine"},
+   "points": [{"zh": "代码不上传", "en": "No upload", "rect": [140, 300, 820, 120]}, {"zh": "pytest 与 Jest", "en": "pytest and Jest", "rect": [140, 460, 820, 120]}],
+   "say": [{"en": "It runs on your machine. Your code stays there.", "zh": "在你的电脑上运行，代码不离开本机。"}]},
+  {"type": "finale", "bars": 4, "media": ["materials/terminal-fail.png", "materials/terminal-result.png", "materials/terminal-local.png"],
+   "_why": "Hero at ~65 %: three words after the whip cut.",
+   "say": [{"id": "tagline", "en": "Relay. The bug, alone.", "zh": "Relay：只剩下那个 bug。", "at": 1.2}]},
+  {"type": "endcard", "bars": "rest",
+   "_why": "Callback to the 'three' of the hook, landing on the viewer's day.",
+   "say": [{"id": "motto", "en": "Three files. Read them before lunch.", "zh": "三个文件，午饭前读完。", "at": 0.6}]}
+ ]
+}

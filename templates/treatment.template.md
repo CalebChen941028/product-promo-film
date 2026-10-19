@@ -12,6 +12,8 @@
 - Materials · 素材: {{MATERIALS}}
 - Target length · 目标时长: ~{{SECONDS}} s
 - Tone for this genre · 本类型的语气: {{TONE}}
+- Study first · 先读: `{{GOLDEN}}` (a top film in this arc, every scene with a `_why`) and `references/copy-bank.md` — learn the moves, never copy the lines
+- Facts to use · 可用事实: {{FACTS}}
 
 ## 1. Producer · 制片
 - Audience & where it plays · 受众与投放渠道: <write: who watches, on which platform, sound on or off>
@@ -31,11 +33,14 @@
 - Chosen · 选定: <write: A, B or C — and why it is the most surprising AND the most true>
 - Hook (0–3 s) · 开场钩子: <write: what we see and hear in the first three seconds>
 - Hero moment · 高潮时刻: <write: the one image the audience remembers, and where it lands (≈ 60–70 %)>
+- Hook line · 开场句: <write: the spoken line of the cover — the concept as a tension, a question or a physical detail>
+- Hero line · 高潮句: <write: the finale line — the proposition in ≤ 6 words, with the name>
+- Last line · 收尾句: <write: the end-card line — a callback that echoes a word or image of the hook>
 - Title · 片名: <write: working title>
 
 ## 4. Copywriter · 文案
 - Tagline · 口号: <write: zh ≤ 12 字 / en ≤ 8 words — say both>
-- Voice-over · 旁白 (one line per beat, ~2.5 words/s): <write: beat → line, in film order>
+- Voice-over · 旁白 (one line per beat, ~2.5 words/s): <write: one bullet per scene in film order, e.g.  - cover → "the hook line" — every proof line carries one fact from the docs; a scene with no voice says (no voice: why)>
 - On-screen words · 画面文字: <write: every title/label, ≤ 12 字 / ≤ 42 chars; nothing that the image already says>
 - Banned words checked · 已排除空话: <write: yes — ran lint_copy.py, 0 clichés>
 

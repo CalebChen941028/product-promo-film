@@ -1,0 +1,48 @@
+{
+ "_golden": "GOLDEN REFERENCE (arc sensory: food & drink, fashion & beauty, travel, hospitality, home). Study it, then write YOUR product's film from YOUR docs. Do not copy its lines, its numbers or its product. It is not buildable (no materials). Every _why says what a top crew did and why. Another sensory example, built and rendered: examples/product-demo/ (Aurel).",
+ "_facts": "The docs this film was written from (fictional product): Saltwick smoked sea salt. Raked by hand from the tide pools of one bay on the Yorkshire coast. Harvested only April to September, when the sun dries the pools. Smoked over oak for 48 hours. Sold in a 120 g tin. Two people, one bay.",
+ "_anchors": {
+  "proposition": "A pinch of salt can carry a whole coastline.",
+  "concept": "One bay — every flake starts as a wave in the same small bay",
+  "hook": "Every flake starts as a wave.",
+  "hero": "Saltwick. One bay. One pinch.",
+  "last": "From one bay, to your table.",
+  "_why": "A sensory film sells a place and a texture, not features. The concept is the origin (one bay); the hook makes it physical (a wave); the last line brings the bay to the viewer."
+ },
+ "name": "saltwick-film", "genre": "food-beverage", "style": "natural-fresh", "motion": "gentle-story", "cinema": "auto",
+ "music": {"generate": {"mood": "auto"}},
+ "voice": {"engine": "kokoro", "voice": "am_michael", "lang": "a"},
+ "brand": {
+  "name": "Saltwick", "logo": "materials/logo.png",
+  "positioningZh": "手耙烟熏海盐", "positioningEn": "HAND-RAKED SMOKED SEA SALT",
+  "taglineZh": "一湾海，一撮盐", "taglineEn": "One bay. One pinch.",
+  "motto": ["从一湾海，", "到你的餐桌。", "From one bay, to your table."],
+  "contacts": [["SHOP", "购买", "saltwick.example", "120 g tin"]], "chips": ["Yorkshire", "April–September"]
+ },
+ "scenes": [
+  {"type": "cover", "bars": 3, "media": "materials/bay-low-tide.jpg", "frame": "photo",
+   "_why": "Macro-to-place: the voice says something physical and true before we know the product.",
+   "say": [{"en": "Every flake starts as a wave.", "zh": "每一片盐，都从一道浪开始。", "at": 0.6}]},
+  {"type": "photo", "bars": 3, "media": "materials/bay-low-tide.jpg",
+   "_why": "Mood with a fact in it: the name of the place and the season. A place you can find on a map beats 'pristine nature'.",
+   "title": {"zh": "约克郡海岸", "en": "The Yorkshire coast"},
+   "say": [{"en": "In one bay on the Yorkshire coast, the sun dries the tide pools from April to September.", "cap": "In one bay on the Yorkshire coast, the sun dries the tide pools, April to September.", "zh": "约克郡海岸的一湾海水，四到九月，阳光晒干潮池。"}]},
+  {"type": "detail", "bars": 3, "media": "materials/flakes-macro.jpg",
+   "_why": "Texture beat with no voice: the music and the picture carry it. A calm beat after the first line of facts.",
+   "crops": [{"rect": [500, 260, 800, 460]}]},
+  {"type": "hero", "bars": 4, "media": ["materials/tin.png"],
+   "_why": "The reveal names the craft in three short verbs-and-nouns. No adjectives.",
+   "title": {"zh": "Saltwick", "en": "Saltwick"},
+   "say": [{"en": "Raked by hand. Smoked over oak for forty-eight hours.", "cap": "Raked by hand. Smoked over oak for 48 hours.", "zh": "手工耙取，橡木烟熏 48 小时。", "at": 1.0}]},
+  {"type": "photo", "bars": 3, "media": "materials/plate.jpg",
+   "_why": "In life: one plate, one pinch. The line is an instruction, not a claim, so it needs no proof.",
+   "title": {"zh": "最后一步", "en": "The last thing on the plate"},
+   "say": [{"en": "Add it last. A pinch is enough.", "zh": "最后撒上，一小撮就够。"}]},
+  {"type": "finale", "bars": 4, "media": ["materials/bay-low-tide.jpg", "materials/flakes-macro.jpg", "materials/tin.png", "materials/plate.jpg"],
+   "_why": "Hero at ~65 %: the tagline is the concept in four words.",
+   "say": [{"id": "tagline", "en": "Saltwick. One bay. One pinch.", "zh": "Saltwick：一湾海，一撮盐。", "at": 1.2}]},
+  {"type": "endcard", "bars": "rest",
+   "_why": "The callback brings the hook's place to the viewer's table: the film ends on the audience, not on the tin.",
+   "say": [{"id": "motto", "en": "From one bay, to your table.", "zh": "从一湾海，到你的餐桌。", "at": 0.6}]}
+ ]
+}

@@ -5,7 +5,7 @@ English first, 中文在后。A top film is made by a team, so play each role in
 ## English
 
 ### How to run the crew
-1. Read the facts (§0 of the treatment), the materials (look at the images if you can) and the brief.
+1. Read the facts (§0 of the treatment), the materials (look at the images if you can) and the brief. Then study the golden film for your arc (`templates/golden/<arc>.json`, named in §0) and `references/copy-bank.md`: they show what each role's output looks like at the top level.
 2. Play the roles **in order**, one at a time. Write only that role's section, and stay inside its job.
 3. Then play the **design critic**. Score honestly. If the average is < 4 or any score is < 3, go back to the weakest role and redo that part. Never inflate a score.
 4. The copywriter copies the final words into `film.json` and replaces every `TODO`. Run `lint_copy.py`.
@@ -25,7 +25,7 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - The proposition must be **specific, true, and about the audience's life**, not about the product's features.
 
 ### 3. Creative director: the idea people remember
-- **Job:** three *different* concepts (not three wordings of one). Choose the one that is the most surprising **and** the most true. Write the hook (0–3 s) and the hero moment.
+- **Job:** three *different* concepts (not three wordings of one). Choose the one that is the most surprising **and** the most true. Write the hook (0–3 s) and the hero moment. Then write the **three anchor lines** — hook line (cover), hero line (finale), last line (end card) — each saying the chosen concept in a different way, the last one a callback to the first. A concept that does not reach these three lines is not chosen; it is decoration.
 - **Hook patterns that work:**
   - **macro detail:** texture before the whole;
   - **contrast cut:** old vs new in one cut;
@@ -42,9 +42,10 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **Reject:** "fast, easy, powerful" concepts; anything that could be any brand's ad.
 
 ### 4. Copywriter: fewer, truer words
-- **Job:** the tagline (zh ≤ 12 字, en ≤ 8 words; format `中文 / English`), one VO line per beat, every on-screen word.
+- **Job:** the tagline (zh ≤ 12 字, en ≤ 8 words; format `中文 / English`), the full script — one bullet per scene in film order (`- cover → "line"`; a silent scene says why) — and every on-screen word. film.json's lines are copied from this script, never written somewhere else.
 - **Rules:**
   - Verbs and nouns, not adjectives.
+  - Every proof line (feature, hero, numbers…) carries one fact from the docs: a number, a material, a place, a feature by name. Say what it means for the viewer; never read a spec list aloud.
   - Numbers only if checkable.
   - Never repeat on screen what the voice says.
   - Spoken English runs at about 2.5 words per second.
@@ -78,7 +79,7 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **Sign-off** is required before the build.
 
 ### 9. Design critic: the taste review
-Score each criterion 1–5:
+Score each criterion 1–5. `check_treatment.py` cross-checks the scores against the film and caps what it can measure: specific copy (share of lines with a fact), one idea (the concept reaches the copy), image choice (one image per beat, highlight boxes on screens), rhythm (no three identical beats in a row), restraint (one hero) and the ending (a callback, not logistics). A score above its cap fails the build. Fix the film; never the score.
 
 | Criterion | 1 | 3 | 5 |
 | --- | --- | --- | --- |
@@ -94,7 +95,7 @@ Score each criterion 1–5:
 ## 中文
 
 ### 怎么运行团队
-1. 读事实（treatment 第 0 节）、素材（能看图就看）和 brief。
+1. 读事实（treatment 第 0 节）、素材（能看图就看）和 brief；再读本叙事结构的范例片（`templates/golden/<结构>.json`，第 0 节写明）和 `references/copy-bank.md`，看清每个角色在顶级水准下交出什么。
 2. **按顺序**逐个扮演角色，每次只写该角色的那一节，不越界。
 3. 再扮演**设计评审**，诚实打分：平均分低于 4 或任一项低于 3，就回到最弱的环节重做；绝不虚高打分。
 4. 文案把最终文字写进 `film.json`，替换所有 `TODO`，运行 `lint_copy.py`。
@@ -114,7 +115,7 @@ Score each criterion 1–5:
 - 主张必须**具体、真实、关于受众的生活**，而不是罗列产品功能。
 
 ### 3. 创意总监：让人记住的创意
-- **职责**：三个**真正不同**的创意（不是一个创意的三种说法），选出最出人意料**且**最真实的那个；写出开场钩子（0–3 秒）和高潮时刻。
+- **职责**：三个**真正不同**的创意（不是一个创意的三种说法），选出最出人意料**且**最真实的那个；写出开场钩子（0–3 秒）和高潮时刻；再写**三句锚点**——开场句（封面）、高潮句（finale）、收尾句（结尾页），各用不同方式说出选定的创意，收尾句呼应开场句。没有落到这三句里的创意，只是装饰。
 - **有效的开场方式**：
   - **微距细节**：先质感，后全貌；
   - **对比切**：新旧一刀切开；
@@ -131,9 +132,10 @@ Score each criterion 1–5:
 - **否决**：“快、简单、强大”式创意；任何换个品牌也能用的广告。
 
 ### 4. 文案：更少、更真的字
-- **职责**：口号（中文 ≤ 12 字、英文 ≤ 8 词，格式 `中文 / English`）、每个拍点一句旁白、所有画面文字。
+- **职责**：口号（中文 ≤ 12 字、英文 ≤ 8 词，格式 `中文 / English`）、完整脚本（按片序每个场景一条：`- cover → "台词"`；无旁白的场景写明原因）、所有画面文字。film.json 的台词从这份脚本照抄，不在别处另写。
 - **规则**：
   - 多用动词和名词，少用形容词。
+  - 每句证据（feature、hero、numbers 等）都带一个文档里的事实：数字、材料、地点、功能名；讲它对观众意味着什么，不要念规格清单。
   - 只写可核实的数字。
   - 画面文字不重复旁白。
   - 英文语速约每秒 2.5 个词。
@@ -167,4 +169,4 @@ Score each criterion 1–5:
 - 构建前必须**签字**。
 
 ### 9. 设计评审：品味评分
-每项 1–5 分（评分标准见上方英文表格）：一个核心概念、三秒抓人、具体真实的文案、画面质量与选择、克制、节奏、高潮、结尾记忆点。平均 ≥ 4 且每项 ≥ 3 才能构建。
+`check_treatment.py` 会用片子本身交叉核对并给可测的分数封顶：文案具体度（带事实的句子比例）、核心概念（创意是否进入文案）、画面选择（一图一拍点、截图有高亮框）、节奏（不连续三个相同拍点）、克制（只有一个高潮）、结尾（首尾呼应而不是营业信息）。分数超过上限就不能构建：改片子，不改分数。每项 1–5 分（评分标准见上方英文表格）：一个核心概念、三秒抓人、具体真实的文案、画面质量与选择、克制、节奏、高潮、结尾记忆点。平均 ≥ 4 且每项 ≥ 3 才能构建。

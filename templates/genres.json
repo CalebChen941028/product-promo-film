@@ -561,7 +561,24 @@
     "real estate",
     "space",
     "vacation",
-    "living"
+    "living",
+    "cabin",
+    "lodge",
+    "retreat",
+    "stay",
+    "nights",
+    "guest",
+    "inn",
+    "villa",
+    "glamping",
+    "campsite",
+    "sauna",
+    "booking",
+    "小屋",
+    "木屋",
+    "客栈",
+    "营地",
+    "入住"
    ],
    "signals": {
     "photo": 4

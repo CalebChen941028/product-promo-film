@@ -44,8 +44,9 @@ def probe(path):
     return {'duration': round(dur, 2) if dur else None, 'size': [int(v.group(1)), int(v.group(2))] if v else None, 'fps': float(fps.group(1)) if fps else None}
 
 
-def look(im):
-    """'photo' (natural image), 'ui' (screen/flat graphic) or 'cutout' (object on transparency), from pixel statistics."""
+def look(im, jpeg=False):
+    """'photo' (natural image), 'ui' (screen/flat graphic) or 'cutout' (object on transparency), from pixel statistics.
+    Screens are lossless and mostly pixel-identical (> 95 %); a JPEG between the extremes is a photo or an illustration."""
     import numpy as np
     a = np.asarray(im.convert('RGBA'))
     alpha = a[..., 3]
@@ -56,6 +57,8 @@ def look(im):
     d = np.abs(np.diff(c, axis=1)).sum(axis=2)
     same, edges = (d == 0).mean(), (d > 60).mean()     # screens: pixel-identical areas + sharp text edges; photos: neither
     if same < 0.25: return 'photo'
+    if same > 0.95: return 'ui'
+    if jpeg: return 'photo'
     if same > 0.9 or (same > 0.6 and edges > 0.004): return 'ui'
     return 'ui' if edges > 0.015 else 'photo'
 
@@ -67,7 +70,7 @@ for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswi
         im = Image.open(f); w, h = im.size
         alpha = im.mode in ('RGBA', 'LA') and im.getextrema()[-1][0] < 250
         ar = w / h
-        kind = look(im)
+        kind = look(im, ext in ('.jpg', '.jpeg'))
         hint = f.stem.lower()
         if re.search(r'screen|screenshot|截图|界面|\bui\b|dashboard', hint): kind = 'ui'
         elif re.search(r'photo|lifestyle|shot|scene|product|实拍|照片|场景', hint) and kind != 'cutout': kind = 'photo'

@@ -6,3 +6,6 @@ build/
 *.list.txt
 .DS_Store
 *.local.json
+evals/*/materials/*
+!evals/*/materials/README.md
+evals/runs/

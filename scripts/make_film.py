@@ -39,7 +39,12 @@ TYPES = {
     'lineup': (2, ['items'], {'items': 6}), 'quote': (2, ['zh', 'who'], {}),
 }
 GENRES = json.load(open(Path(__file__).resolve().parent.parent / 'templates' / 'genres.json'))['genres']
-REST_BARS = 5   # end card length when the music is composed for the film
+REST_BARS = 5   # legacy constant; use rest_bars(bpm)
+
+
+def rest_bars(bpm):
+    """End-card length when the music is composed: about 8 s (3–4 bars), plus one ring-out bar. Longer is dead air."""
+    return max(3, round(8 / (240 / float(bpm or 100))))
 MOODS = ['cold', 'neutral', 'peak', 'warm', 'night']
 CUT_TYPES = ['style', 'whip', 'push']
 LOOKS = ['teal-night', 'clean-bright', 'bleach-print', 'pastel-glow', 'neon-night', 'warm-print', 'noir-gold', 'sunlit', 'teal-orange', 'none']
@@ -141,6 +146,58 @@ def find_playwright(spec):
     return None
 
 
+KOKORO_REPO = Path(os.path.expanduser(os.environ.get('HF_HOME', '~/.cache/huggingface'))) / 'hub' / 'models--hexgrad--Kokoro-82M'
+
+
+def kokoro_python(v=None):
+    """A Python with kokoro installed: voice.python, $KOKORO_PYTHON, or the standard ~/.venvs/kokoro."""
+    for c in [(v or {}).get('python'), os.environ.get('KOKORO_PYTHON'), '~/.venvs/kokoro/bin/python']:
+        if c and Path(os.path.expanduser(c)).exists(): return c
+    return None
+
+
+def kokoro_cached():
+    """(model downloaded?, [voices already downloaded]) — nothing is downloaded by asking."""
+    snaps = list((KOKORO_REPO / 'snapshots').glob('*')) if KOKORO_REPO.exists() else []
+    model = any((d / 'kokoro-v1_0.pth').exists() for d in snaps)
+    voices = sorted({f.stem for d in snaps for f in (d / 'voices').glob('*.pt')})
+    return model, voices
+
+
+def film_hashes(film):
+    """Fingerprints of the files build writes into film_out/film (vo_timing.js is the vo stage's)."""
+    import hashlib
+    return {f.name: hashlib.sha1(f.read_bytes()).hexdigest()[:16] for f in sorted(film.glob('*.js')) if f.name != 'vo_timing.js'} | \
+           {f.name: hashlib.sha1(f.read_bytes()).hexdigest()[:16] for f in film.glob('*.html')}
+
+
+def guard_generated(out):
+    """Stop if someone hand-edited the generated film page: film.json is the only source."""
+    b = json.load(open(out / 'build.json'))
+    if not b.get('hashes'): return
+    now = film_hashes(out / 'film')
+    edited = [k for k, h in b['hashes'].items() if now.get(k) != h]
+    if edited:
+        sys.exit(f"ERROR film_out/film/{edited[0]} was edited by hand ({len(edited)} file(s)).\n  FIX: never edit generated files — put the change in film.json "
+                 f"(references/film-spec.md), then rerun --stage build. Hand edits are lost on every build.")
+
+
+def treatment_gate(spec, spec_path):
+    """Hard gate before build: the crew's treatment must pass check_treatment.py against this film.json."""
+    t = spec.get('treatment', 'treatment.md')
+    if t == 'skip':
+        print('WARN  "treatment": "skip" — the crew was skipped. Say so in the report: this is a test cut, not a crew-approved film.'); return
+    tp = (spec_path.parent / t)
+    if not tp.exists():
+        sys.exit(f'ERROR no treatment at {tp} — the crew has not run.\n  FIX: autofilm.py writes treatment.md; play the crew (references/crew.md) to fill it, '
+                 f'then rerun. (Only for a throwaway test cut: "treatment": "skip" in film.json.)')
+    r = subprocess.run([sys.executable, HERE / 'check_treatment.py', tp, spec_path], capture_output=True, text=True)
+    print(r.stdout.strip())
+    if r.returncode != 0:
+        sys.exit('Build blocked: check_treatment.py must pass first (SKILL.md hard rule 5). Do what each FIX says — '
+                 'redo the weak part of the treatment or the copy; never inflate a score — then rerun.')
+
+
 def run(cmd, **kw):
     print('  $', ' '.join(str(c) for c in cmd)[:220])
     r = subprocess.run([str(c) for c in cmd], **kw)
@@ -196,6 +253,11 @@ def check(spec, base_dir):
         warn('first scene is not a cover', 'put {"type": "cover", "bars": 3} first — the cover frame is also the poster')
     if scenes and scenes[-1].get('type') != 'endcard':
         warn('last scene is not an endcard', 'end with {"type": "endcard", "bars": "rest"}')
+    roles = {}   # intake's role per material (desktop/phone/photo/cutout…), when autofilm/intake ran
+    man = base_dir / 'build' / 'manifest.json'
+    if man.exists():
+        m = json.load(open(man))
+        roles = {str((Path(m['materials']) / it['file']).resolve()): it.get('role') for it in m.get('items', [])}
     for i, sc in enumerate(scenes):
         t, where = sc.get('type'), f'scenes[{i}] ({sc.get("type")})'
         if t not in TYPES:
@@ -229,11 +291,14 @@ def check(spec, base_dir):
             elif t == 'clip' and not m.endswith('.webm'):
                 err(f'{where}: clip must be .webm (Chromium cannot decode H.264)', 'run intake.py — it converts videos to build/clips/*.webm')
         basewh = sc.get('base', [1920, 1080])
+        if t == 'feature' and sc.get('frame') == 'photo' and isinstance(sc.get('media'), str) and roles.get(str((base_dir / sc['media']).resolve())) in ('desktop', 'phone', 'figure'):
+            err(f'{where}: "frame": "photo" on a screenshot ({sc["media"]})', 'screens get highlight boxes, not a photo frame: remove "frame" and give each point a rect '
+                f'(python3 {HERE / "suggest_rects.py"} {sc["media"]} --preview . suggests them)')
         for j, p in enumerate(sc.get('points', [])):
             r = p.get('rect')
             if r is None:
                 if sc.get('frame') != 'photo':
-                    warn(f'{where}.points[{j}]: no rect → no highlight box', 'for screens, measure the region with grid_overlay.py (base coordinates); photos ("frame": "photo") need none')
+                    warn(f'{where}.points[{j}]: no rect → no highlight box', f'python3 {HERE / "suggest_rects.py"} {sc.get("media")} --preview . → copy the numbered rect this point talks about; real photos ("frame": "photo") need none')
             elif len(r) != 4:
                 err(f'{where}.points[{j}]: rect must be [x,y,w,h]', 'measure it with grid_overlay.py on the screenshot (base coordinates)')
             elif r[0] < 0 or r[1] < 0 or r[0] + r[2] > basewh[0] + 1 or r[1] + r[3] > basewh[1] + 1:
@@ -267,7 +332,7 @@ def compose_music(spec, wav, grid_path):
     energy, hero, b = [], None, 0
     scenes = spec['scenes']; total = sum(sc['bars'] for sc in scenes if sc.get('bars') != 'rest')
     for i, sc in enumerate(scenes):
-        nb = REST_BARS if sc.get('bars') == 'rest' else int(sc['bars'])
+        nb = rest_bars(bpm or make_music.MOODS[mood]['bpm']) if sc.get('bars') == 'rest' else int(sc['bars'])
         e = sc.get('energy', ENERGY.get(sc['type'], 1))
         if sc['type'] == 'feature' and 'energy' not in sc and b > total * 0.45: e = 2      # second half of the story lifts
         if (sc['type'] == 'finale' or sc.get('hit') == 'hero') and hero is None: hero = b
@@ -309,7 +374,7 @@ def build(spec, base_dir, out):
     if not rest and total_bars - fixed > 6:
         print(f'WARN  {total_bars - fixed} bars of music left unused — set the last scene to "bars": "rest"')
     each_rest = (total_bars - fixed) // max(1, len(rest))
-    if grid.get('generated'): each_rest = REST_BARS
+    if grid.get('generated'): each_rest = rest_bars(grid['bpm'])
     # hi-energy bars → chorus ranges (background pulse)
     his = [bb['hi'] for bb in grid['bars']]
     q = sorted(his)[int(len(his) * 0.66)] if his else 1
@@ -396,7 +461,8 @@ def build(spec, base_dir, out):
     if not (film / 'vo_timing.js').exists():  # captions-only placeholder until the vo stage runs
         est = [{'id': l['id'], 's': G + BAR * l['bar'], 'e': G + BAR * l['bar'] + len(l['en'].split()) / 2.5, 'zh': l['zh'], 'en': l.get('cap', l['en'])} for l in lines]
         (film / 'vo_timing.js').write_text('const VO = ' + json.dumps(est, ensure_ascii=False) + ';\nwindow.VO = VO;\n')
-    json.dump({'G': G, 'BAR': BAR, 'DUR': dur, 'music': str(final_wav), 'bars_used': b0, 'bars_total': total_bars, 'cinema': cin}, open(out / 'build.json', 'w'), indent=1)
+    json.dump({'G': G, 'BAR': BAR, 'DUR': dur, 'music': str(final_wav), 'bars_used': b0, 'bars_total': total_bars, 'cinema': cin,
+               'hashes': film_hashes(film)}, open(out / 'build.json', 'w'), indent=1)
     nm = find_playwright(spec)
     link = out / 'node_modules'
     if not link.exists(): link.symlink_to(nm)
@@ -501,16 +567,27 @@ def vo(spec, base_dir, out):
         json.dump(timing, open(vod / 'vo_timing.json', 'w'), ensure_ascii=False, indent=1)
         (out / 'film' / 'vo_timing.js').write_text('const VO = ' + json.dumps(timing, ensure_ascii=False) + ';\nwindow.VO = VO;\n')
         return
-    py = v.get('python') or os.environ.get('KOKORO_PYTHON')
-    if not py or not Path(os.path.expanduser(py)).exists():
-        sys.exit('ERROR voice.python (a Python with kokoro installed) not set.\n  FIX: follow references/audio.md "Kokoro setup", then set "voice": {"python": "/path/to/tts/bin/python"} — or "engine": "none" for captions only.')
+    py = kokoro_python(v)
+    if not py:
+        sys.exit('ERROR no Python with kokoro found (voice.python, $KOKORO_PYTHON, ~/.venvs/kokoro).\n  FIX: ask the user before installing (≈ 650 MB, references/audio.md "Kokoro setup") — or set "voice": {"engine": "none"} for captions only.')
+    model, cached = kokoro_cached()
+    want = v.get('voice', 'am_michael')
+    if not v.get('allow_download') and (not model or want not in cached):
+        what = 'the Kokoro model (≈ 330 MB)' if not model else f'the voice {want} (≈ 0.5 MB)'
+        sys.exit(f'ERROR {what} is not downloaded, and downloads need the user\'s OK (SKILL.md hard rule 3).\n'
+                 f'  FIX: use a voice that is already here: {cached or "none"} (set "voice": {{"voice": "{cached[0] if cached else "…"}"}}), '
+                 f'or ask the user — name it, source huggingface.co/hexgrad/Kokoro-82M, size — and only after a yes set "allow_download": true. '
+                 f'Captions only: "engine": "none".')
     env = dict(os.environ, HF_HUB_DISABLE_XET='1', KOKORO_ESPEAK_DATA=os.path.expanduser(v.get('espeak_data', '~/.cache/kes')))
+    if not v.get('allow_download'): env['HF_HUB_OFFLINE'] = '1'
+    guard_generated(out)
     run([os.path.expanduser(py), HERE / 'make_vo.py', '--narration', out / 'narration.json', '--out', out / 'vo', '--js', out / 'film' / 'vo_timing.js',
          '--grid', b['G'], '--bar', b['BAR'], '--voice', v.get('voice', 'am_michael'), '--lang', v.get('lang', 'a')], env=env)
 
 
 # ---------------------------------------------------------------- qa
 def qa(spec, out):
+    guard_generated(out)
     q = out / 'qa'; q.mkdir(exist_ok=True)
     r = subprocess.run(['node', out / 'tools' / 'qa_check.mjs', out / 'film' / 'film.html', q], cwd=out)
     rep = json.load(open(q / 'qa_report.json'))
@@ -524,7 +601,12 @@ def qa(spec, out):
 
 # ---------------------------------------------------------------- render + finish
 def render(spec, out, draft=False):
-    b = json.load(open(out / 'build.json'))
+    guard_generated(out)
+    rep, bj = out / 'qa' / 'qa_report.json', out / 'build.json'
+    if not rep.exists() or rep.stat().st_mtime < bj.stat().st_mtime or json.load(open(rep))['errors']:
+        sys.exit('ERROR QA has not passed on this build (run --stage qa after the last build; it must report 0 errors).\n'
+                 '  FIX: python3 scripts/make_film.py film.json --stage qa — fix every QA error in film.json, rebuild, re-run qa, then render.')
+    b = json.load(open(bj))
     ff = find_ffmpeg(spec)
     workers = str(spec.get('tools', {}).get('workers', max(2, min(6, (os.cpu_count() or 4) - 2))))
     cin = b.get('cinema', {'on': False})
@@ -568,6 +650,10 @@ def finish(spec, out, draft=False):
     from PIL import Image
     Image.open(cover).convert('RGB').resize((1280, 720), Image.LANCZOS).save(fin / f'{name}-cover-1280.jpg', quality=92)
     tj = vodir / 'vo_timing.json'
+    if not tj.exists() and (out / 'narration.json').exists():   # captions only: SRT from the estimated timing (as on screen)
+        vodir.mkdir(exist_ok=True); tj = vodir / 'captions_timing.json'
+        json.dump([{'id': l['id'], 's': b['G'] + b['BAR'] * l['bar'], 'e': b['G'] + b['BAR'] * l['bar'] + len(l['en'].split()) / 2.5,
+                    'zh': l['zh'], 'en': l.get('cap', l['en'])} for l in json.load(open(out / 'narration.json'))], open(tj, 'w'), ensure_ascii=False, indent=1)
     if tj.exists():
         run([sys.executable, HERE / 'make_srt.py', tj, fin, name])
     print(f'DONE → {mp4}\nTell the user: what is demo/simulated, what you could not verify (you cannot hear the audio), and what they must supply.')
@@ -591,6 +677,8 @@ if __name__ == '__main__':
           f'music {"file" if (spec.get("music") or {}).get("file") else "composed " + music_mood(spec)[0]})')
     order = ['build', 'vo', 'qa', 'render', 'finish']
     stages = order if a.stage == 'all' else ([] if a.stage == 'check' else [a.stage])
+    if 'build' in stages:
+        treatment_gate(spec, spec_path)
     for st in stages:
         print(f'== {st}')
         {'build': lambda: build(spec, base, out), 'vo': lambda: vo(spec, base, out), 'qa': lambda: qa(spec, out),

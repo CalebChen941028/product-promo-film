@@ -8,11 +8,11 @@ When the user asks for a promo, launch, ad, brand or explainer film for **any pr
 
 1. `python3 scripts/doctor.py` → fix every MISS.
 2. `python3 scripts/autofilm.py <materials folder> --out <project>` → the genre, look, motion, arc and music (the user's track, or composed) are chosen, and drafts are written: `film.json` with TODO copy, plus `treatment.md`.
-3. Confirm with the user: the genre on a CLOSE CALL, music, voice, contacts.
-4. Play the crew in `references/crew.md` to fill `treatment.md`. Then `python3 scripts/check_treatment.py treatment.md` must pass.
+3. Confirm with the user: the genre on a CLOSE CALL, music, voice, contacts. If you cannot ask, keep autofilm's choices, download nothing, and list your assumptions in the report.
+4. Study `templates/golden/<arc>.json` and `references/copy-bank.md`, then play the crew in `references/crew.md` to fill `treatment.md` (three anchor lines first). Then `python3 scripts/check_treatment.py treatment.md` must pass.
 5. Write the copy into `film.json` (replace every TODO) and re-check with `check_treatment.py treatment.md film.json`.
 6. Do the director's pass (`references/director.md` §5).
-7. `python3 scripts/make_film.py film.json --stage check`, then `build` → `vo` → `qa` (0 errors) → `render` → `finish`. Use `--draft` for a quick look.
+7. `python3 scripts/make_film.py film.json --stage check`, then `build` → `vo` → `qa` (0 errors) → `render` → `finish`. Use `--draft` for a quick look. The build and render gates are enforced; never edit `film_out/`.
 8. Report the files, the concept, what is placeholder or composed, and what the user must still supply.
 
 Rules:
@@ -27,11 +27,11 @@ Rules:
 
 1. `python3 scripts/doctor.py`，修好所有 MISS。
 2. `python3 scripts/autofilm.py <素材文件夹> --out <项目目录>`：自动选定类型、风格、动效、叙事结构与音乐（用户的曲子或原创），并写出草稿：文案为 TODO 的 `film.json`，以及 `treatment.md`。
-3. 与用户确认：CLOSE CALL 时确认类型，以及音乐、配音、联系方式。
-4. 按 `references/crew.md` 扮演团队填写 `treatment.md`，`check_treatment.py treatment.md` 必须通过。
+3. 与用户确认：CLOSE CALL 时确认类型，以及音乐、配音、联系方式。无法询问时沿用 autofilm 的选择、不下载任何东西，并在汇报里列出假设。
+4. 先读 `templates/golden/<结构>.json` 与 `references/copy-bank.md`，再按 `references/crew.md` 扮演团队填写 `treatment.md`（先写三句锚点），`check_treatment.py treatment.md` 必须通过。
 5. 把文案写进 `film.json`（替换所有 TODO），再用 `check_treatment.py treatment.md film.json` 检查。
 6. 做导演检查（`references/director.md` 第 5 节）。
-7. 运行 `make_film.py film.json --stage check`，再依次 `build` → `vo` → `qa`（0 错误）→ `render` → `finish`；`--draft` 可快速预览。
+7. 运行 `make_film.py film.json --stage check`，再依次 `build` → `vo` → `qa`（0 错误）→ `render` → `finish`；`--draft` 可快速预览。构建与渲染关卡是强制的；不要手改 `film_out/`。
 8. 汇报文件、创意概念、哪些是占位或原创配乐、用户还需补充什么。
 
 规则：

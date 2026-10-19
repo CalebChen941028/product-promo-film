@@ -1,0 +1,45 @@
+{
+ "_golden": "GOLDEN REFERENCE (arc human-story: health, care, education, kids & family, brand & mission). Study it, then write YOUR product's film from YOUR docs. Do not copy its lines, its numbers or its product. It is not buildable (no materials). Every _why says what a top crew did and why.",
+ "_facts": "The docs this film was written from (fictional service): Northside Physio, Leeds. Open until 9 pm on weekdays. First assessment: 45 minutes. You see the same physiotherapist every visit. Three physiotherapists. Book online or by phone. Most physio clinics in Leeds close by 5 pm (our survey of 20 clinics, 2026). Approved quote from a patient, Sam (permission on file): 'I booked after work and kept the job.'",
+ "_anchors": {
+  "proposition": "Care should fit around the work that hurts you.",
+  "concept": "After five — the clinic opens its doors when office hours close",
+  "hook": "Your back hurts from work. Most clinics in Leeds close at five.",
+  "hero": "Northside. Open after work.",
+  "last": "Come after five. We're here until nine.",
+  "_why": "A human truth (the timing problem) is the tension; the service is the release. The real quote is the proof, used only because it is approved. The last line repeats the hook's hour and resolves it."
+ },
+ "name": "northside-film", "genre": "health-wellness", "style": "keynote-light", "motion": "gentle-story", "cinema": "auto",
+ "music": {"generate": {"mood": "auto"}},
+ "voice": {"engine": "kokoro", "voice": "am_michael", "lang": "a"},
+ "brand": {
+  "name": "Northside", "nameAccent": "Physio", "logo": "materials/logo.png",
+  "positioningZh": "下班后也能看的理疗诊所", "positioningEn": "PHYSIOTHERAPY AFTER WORK",
+  "taglineZh": "下班后，我们还在", "taglineEn": "Open after work.",
+  "motto": ["五点以后来，", "我们开到九点。", "Come after five. We're here until nine."],
+  "contacts": [["BOOK", "预约", "northside.example", "Leeds"]], "chips": ["Weekdays until 9 pm"]
+ },
+ "scenes": [
+  {"type": "cover", "bars": 3, "media": "materials/desk-evening.jpg", "frame": "photo",
+   "_why": "Two short true sentences make the tension in under 3 s; the second is from the clinic's own survey (see _facts), so it can be said. No product yet.",
+   "say": [{"en": "Your back hurts from work. Most clinics in Leeds close at five.", "zh": "腰是上班累坏的，利兹的诊所却大多五点关门。", "at": 0.5}]},
+  {"type": "photo", "bars": 3, "media": "materials/street-dusk.jpg",
+   "_why": "A person and a place at the hour that matters. The title is the time on the clock, not a slogan.",
+   "title": {"zh": "晚上七点", "en": "7 pm"},
+   "say": [{"en": "At Northside in Leeds, the lights are still on.", "zh": "在利兹的 Northside，灯还亮着。"}]},
+  {"type": "feature", "bars": 4, "media": "materials/treatment-room.jpg", "frame": "photo",
+   "_why": "How it helps, in two facts a patient cares about. 'The same physio every visit' is a promise people feel; 'personalised care' is not.",
+   "title": {"zh": "同一位理疗师", "en": "The same physio, every visit"},
+   "points": [{"zh": "首诊 45 分钟", "en": "45-minute first assessment"}, {"zh": "工作日开到 21 点", "en": "Weekdays until 9 pm"}],
+   "say": [{"en": "A forty-five minute first assessment, and the same physio every time you come back.", "cap": "A 45-minute first assessment, and the same physio every time you come back.", "zh": "首诊 45 分钟；之后每次，都是同一位理疗师。"}]},
+  {"type": "quote", "bars": 3,
+   "_why": "A real voice, only because it is real and approved (see _facts). Never invent one: without an approved quote, drop this scene.",
+   "zh": "下班后预约，工作也保住了。", "en": "I booked after work and kept the job.", "who": "Sam", "role": "patient"},
+  {"type": "finale", "bars": 4, "media": ["materials/desk-evening.jpg", "materials/street-dusk.jpg", "materials/treatment-room.jpg"],
+   "_why": "Hero at ~65 %, the proposition in three words, after the quiet quote.",
+   "say": [{"id": "tagline", "en": "Northside. Open after work.", "zh": "Northside：下班后，我们还在。", "at": 1.2}]},
+  {"type": "endcard", "bars": "rest",
+   "_why": "The callback answers the hook's 'five' with 'nine'. The booking details are in the contacts.",
+   "say": [{"id": "motto", "en": "Come after five. We're here until nine.", "zh": "五点以后来，我们开到九点。", "at": 0.6}]}
+ ]
+}

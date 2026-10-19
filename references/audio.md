@@ -19,7 +19,7 @@ uv pip install -p ~/.venvs/kokoro/bin/python kokoro soundfile
 uv pip install -p ~/.venvs/kokoro/bin/python "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl"
 mkdir -p ~/.cache && cp -R ~/.venvs/kokoro/lib/python3.12/site-packages/espeakng_loader/espeak-ng-data ~/.cache/kes
 ```
-Then in film.json: `"voice": {"engine": "kokoro", "python": "~/.venvs/kokoro/bin/python", "voice": "am_michael"}`. First run downloads the model (set `HF_HUB_DISABLE_XET=1` if Hugging Face transfers fail).
+Then in film.json: `"voice": {"engine": "kokoro", "python": "~/.venvs/kokoro/bin/python", "voice": "am_michael"}`. The vo stage runs offline: if the model (≈ 330 MB) or the voice (≈ 0.5 MB each) is not downloaded yet, it stops and names the voices that are. After the user agrees, add `"allow_download": true` for one run (set `HF_HUB_DISABLE_XET=1` if Hugging Face transfers fail). autofilm and doctor find `~/.venvs/kokoro` on their own and prefer a voice that is already downloaded.
 Voices: `am_michael` deep US male (trailer), `af_heart` warm US female, `bf_emma` British female, `bm_george` British male. `lang`: `a` US English, `b` British, `z` Mandarin, `j` Japanese.
 
 Writing for the ear: ~2.5 words/s; one sentence per line; numbers as words in `en` ("three hundred"), digits in `cap` ("300"). Lines that do not fit are sped up to 1.12× max; if a line still says `OVER`, shorten it.
@@ -74,6 +74,7 @@ Listen to a mood on its own: `python3 scripts/make_music.py --mood warm-piano --
 为什么不用系统语音：Apple / Windows 语音仅限个人非商业用途，且不装高级语音包时很机械。
 
 **Kokoro 安装**（先征得用户同意；下载约 650 MB：PyPI 的 `kokoro` + PyTorch、Hugging Face 的 `hexgrad/Kokoro-82M`、GitHub 的 spaCy `en_core_web_sm`）：命令见上方英文代码块。之后在 film.json 写 `"voice": {"engine": "kokoro", "python": "~/.venvs/kokoro/bin/python", "voice": "am_michael"}`。首次运行会下载模型；Hugging Face 传输失败时设置 `HF_HUB_DISABLE_XET=1`。
+配音阶段离线运行：模型（约 330 MB）或音色（每个约 0.5 MB）尚未下载时会停下，并列出已下载的音色；用户同意后，加 `"allow_download": true` 运行一次。autofilm 与 doctor 会自动找到 `~/.venvs/kokoro`，并优先选用已下载的音色。
 音色：`am_michael` 低沉美式男声（预告片风格）、`af_heart` 温暖美式女声、`bf_emma` 英式女声、`bm_george` 英式男声。`lang`：`a` 美式英语、`b` 英式、`z` 普通话、`j` 日语。
 
 写给耳朵听：约每秒 2.5 个词；每行一句；`en` 里数字写成单词，`cap` 里写阿拉伯数字。放不下的句子最多提速到 1.12 倍，仍显示 `OVER` 就删字。
