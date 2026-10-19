@@ -1,6 +1,7 @@
-"""Mix music + voice-over, duck the music under speech, fade out, soft-limit.
+"""Mix music + voice-over + sound design, duck music and effects under speech, fade out, soft-limit.
 
-Usage: python mix_audio.py music_48k.wav vo_dir/ out.wav --duration 206 [--ffmpeg ffmpeg] [--duck 0.72] [--speech-rms 0.14]
+Usage: python mix_audio.py music_48k.wav vo_dir/|- out.wav --duration 206 [--sfx sfx.wav] [--ffmpeg ffmpeg] [--duck 0.72] [--speech-rms 0.14]
+  vo_dir "-" = no voice-over. --sfx: the sound-design bus from sfx.py (ducked half as much as the music).
 
 Targets that worked: speech RMS ≈ -17 dBFS (0.14), music ducked ≈ 11 dB (gain 1 − 0.72) under speech,
 → speech sits ~ +10 dB over the music (median). Normalising VO by PEAK instead of RMS left speech at only
@@ -21,6 +22,7 @@ ap.add_argument('--ffmpeg', default='ffmpeg')
 ap.add_argument('--duck', type=float, default=0.72)
 ap.add_argument('--speech-rms', type=float, default=0.14)
 ap.add_argument('--fade', type=float, default=2.5)
+ap.add_argument('--sfx')
 a = ap.parse_args()
 SR = 48000
 
@@ -39,7 +41,8 @@ music = music[:n]
 if music.shape[1] == 1:
     music = np.repeat(music, 2, axis=1)
 vo = np.zeros(n)
-for item in json.loads((Path(a.vo_dir) / 'vo_timing.json').read_text()):
+items = json.loads((Path(a.vo_dir) / 'vo_timing.json').read_text()) if a.vo_dir != '-' else []
+for item in items:
     src, tmp = Path(a.vo_dir) / f"{item['id']}.wav", Path(a.vo_dir) / f"{item['id']}_48k.wav"
     subprocess.run([a.ffmpeg, '-y', '-loglevel', 'error', '-i', str(src), '-ar', str(SR), '-ac', '1', str(tmp)], check=True)
     clip = read(tmp)[:, 0]
@@ -55,6 +58,10 @@ for i in range(0, n, 64):
     g = min(1.0, g + att) if active[i] else max(0.0, g - rel)
     duck[i:i + 64] = g
 mix = music * (1 - a.duck * duck)[:, None] * 0.82 + vo[:, None]
+if a.sfx:
+    fx = read(a.sfx)[:n]
+    fx = np.vstack([fx, np.zeros((n - len(fx), 2))]) if len(fx) < n else fx
+    mix += fx * (1 - a.duck * 0.5 * duck)[:, None]
 mix *= np.clip((a.duration - np.arange(n) / SR) / a.fade, 0, 1)[:, None]
 peak = np.abs(mix).max()
 if peak > 0.97:

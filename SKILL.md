@@ -1,6 +1,6 @@
 ---
 name: product-promo-film
-description: Make a commercial-grade product promo film (1–4 min, 1080p, landscape) from a product's REAL UI and the user's materials — screenshots, screen recordings, logo, music — with 6 visual styles × 6 theme-driven motion languages, beat-synced cuts, natural English voice-over (local Kokoro TTS), bilingual captions, cover poster and SRT. Declarative film.json + one command (make_film.py) with automatic layout QA, so any capable agent gets a polished result. Use for promo / launch / ad / explainer videos, 宣传片, 产品视频, product films.
+description: Make a commercial-grade product promo film (1–4 min, 1080p, landscape) from a product's REAL UI and the user's materials — screenshots, screen recordings, logo, music — with 6 visual styles × 6 theme-driven motion languages, a director's cinema layer (colour script, LUT grade, motion blur, lens + light effects, synthesised sound design), beat-synced cuts, natural English voice-over (local Kokoro TTS), bilingual captions, cover poster and SRT. Declarative film.json + one command (make_film.py) with automatic layout QA, so any capable agent gets a polished result. Use for promo / launch / ad / explainer videos, 宣传片, 产品视频, product films.
 ---
 
 # Product Promo Film · 软件产品宣传片
@@ -14,7 +14,7 @@ description: Make a commercial-grade product promo film (1–4 min, 1080p, lands
 ### What you deliver
 | File | Spec |
 | --- | --- |
-| `final/<name>-1080p.mp4` | H.264 1920×1080 30 fps, AAC 48 kHz, −14 LUFS |
+| `final/<name>-1080p.mp4` | H.264 1920×1080 30 fps, AAC 48 kHz, −14 LUFS; graded, motion-blurred, with sound design |
 | `final/<name>-cover-4k.png`, `-cover-1280.jpg` | poster = the cover frame |
 | `final/<name>.bilingual/zh/en.srt` | captions aligned to the voice-over |
 | `film.json` | the editable source of the whole film |
@@ -34,18 +34,21 @@ description: Make a commercial-grade product promo film (1–4 min, 1080p, lands
 4. **Pick look + motion by theme** — `python3 scripts/recommend_style.py brief.json --grid build/grid.json` (run `scripts/beat_grid.py <music> --out build/grid.json` first). Show the top 3 to the user; use their choice. Tables: `references/styles.md`, `references/motion.md`.
 5. **Plan bars** — `python3 scripts/plan_storyboard.py build/grid.json brief.json --out storyboard.md` gives music sections and a scene draft. Total scene bars must fit the music; if not, extend the music (`"music": {"extend": {...}}`, see `references/audio.md`) or cut scenes.
 6. **Write film.json** — copy `templates/film.example.json` (or `examples/demo/film.json`). One entry per scene from the library: `cover · pain · feature · carousel · numbers · gallery · clip · phone · compare · statement · finale · endcard`. Each needs `bars` and its fields (`references/film-spec.md`). Narration goes in each scene's `say` list (`en` spoken, `zh` caption, optional `cap` for on-screen digits). Rects for `feature.points`: measure with `python3 scripts/grid_overlay.py grids/ <image>` (base coordinates).
-7. **Check** — `python3 scripts/make_film.py film.json --stage check`. Repeat until no ERROR.
-8. **Build + voice + QA** — `python3 scripts/make_film.py film.json --stage build`, then `--stage vo`, then `--stage qa`. QA must report 0 errors. If you can view images, read `film_out/qa/sheet*.png` and fix anything ugly via film.json.
-9. **Render + finish** — `python3 scripts/make_film.py film.json --stage render`, then `--stage finish`. (A 3-minute film takes ~10–30 min.)
-10. **Report** to the user: file paths; what is demo/simulated; what you could not verify (you cannot hear the mix); what they must supply (download link, QR code).
+7. **Direct** — read `references/director.md` §5 and do the director's pass in film.json. Defaults already give a colour script, hits, camera cuts, light and sound design (`"cinema": "auto"`). Defaults are deliberately restrained: calm, professional, premium. Only add `"hit"`, `"mood"` or `"cut"` on a scene to change a beat on purpose. Keep exactly one hero moment, and never turn effects up just to be noticed.
+8. **Check** — `python3 scripts/make_film.py film.json --stage check`. Repeat until no ERROR.
+9. **Build + voice + QA** — `python3 scripts/make_film.py film.json --stage build`, then `--stage vo`, then `--stage qa`. QA must report 0 errors. If you can view images, read `film_out/qa/sheet*.png` and fix anything ugly via film.json. Optional quick look: `python3 scripts/make_film.py film.json --stage render --draft` then `--stage finish --draft`.
+10. **Render + finish** — `python3 scripts/make_film.py film.json --stage render`, then `--stage finish`. Final quality renders 4 motion-blur samples per frame, about 4× the draft time: roughly 20–40 min for 3 minutes.
+11. **Report** to the user: file paths; what is demo/simulated; what you could not verify (you cannot hear the mix); what they must supply (download link, QR code).
 
 ### Quality bar (why the defaults look good — keep them)
 - Cuts land on bar lines; one idea per bar; text ≤ 14 Chinese characters per on-screen label, captions ≤ 30.
 - Speech sits ~10 dB above the music (mix_audio.py). Natural voice speed 1.0 (max 1.12).
 - Windows ≤ 1400 px wide and centred; the chapter label (top-left) and captions (bottom 250 px) stay clear — QA enforces this.
 - Max 4 points per feature scene, max 6 comparison rows; prefer two scenes over one crowded scene.
+- One hero moment, one accent colour at a time, a camera cut only where the story turns, and sound only where the picture moves (`references/director.md`).
 
 ### Going further (optional)
+- Tune the cinema layer: `"cinema": {"grade": "teal-orange", "grade_strength": 0.5, "motion_blur": 4, "bloom": 0.2, "grain": 0.3, "sfx_gain_db": -3, "lens": {"shake": 0}}`, or `"cinema": "off"` (`references/film-spec.md`).
 - Custom scenes in JS: `templates/scenes.example.js`, `templates/library.js`, `templates/patterns.js`, engine API at the top of `templates/engine.js`.
 - Capturing a running web app with Playwright, mock local AI for filming: `references/capture.md`.
 - Worked production example (3:26 film, hand-written scenes): `examples/medstat-pilot/`.
@@ -75,18 +78,21 @@ description: Make a commercial-grade product promo film (1–4 min, 1080p, lands
 4. **按主题选风格与动效**：先 `scripts/beat_grid.py <音乐> --out build/grid.json`，再 `python3 scripts/recommend_style.py brief.json --grid build/grid.json`，把前三名给用户选。对照表见 `references/styles.md`、`references/motion.md`。
 5. **排小节**：`python3 scripts/plan_storyboard.py build/grid.json brief.json --out storyboard.md`，得到音乐段落与场景草稿；场景小节总数要放得进音乐，放不下就延长音乐或删场景。
 6. **写 film.json**：复制 `templates/film.example.json`（或 `examples/demo/film.json`）。每个场景从场景库里选类型：`cover · pain · feature · carousel · numbers · gallery · clip · phone · compare · statement · finale · endcard`，填 `bars` 和字段（`references/film-spec.md`）。旁白写在场景的 `say` 里（`en` 念出来，`zh` 字幕，`cap` 可选，用来在画面上显示数字）。`feature.points` 的坐标用 `scripts/grid_overlay.py` 量（base 坐标）。
-7. **检查**：`python3 scripts/make_film.py film.json --stage check`，直到没有 ERROR。
-8. **构建 + 配音 + QA**：依次 `--stage build`、`--stage vo`、`--stage qa`，QA 必须 0 个错误；能看图就看 `film_out/qa/sheet*.png`，不满意就改 film.json。
-9. **渲染 + 收尾**：`--stage render`，再 `--stage finish`（3 分钟成片约 10–30 分钟）。
-10. **汇报**：文件路径；哪些是演示 / 模拟内容；哪些没法验证（你听不到声音）；用户还需要补什么（下载链接、二维码等）。
+7. **导演检查**：读 `references/director.md` 第 5 节，在 film.json 里完成导演检查。默认（`"cinema": "auto"`）已有色彩脚本、击点、镜头转场、光效和声音设计；默认值刻意克制：平静、专业、高级。只有要刻意改变某个拍点时，才在场景上加 `"hit"`、`"mood"` 或 `"cut"`；全片只保留一个高潮，不要为了“显眼”而加强效果。
+8. **检查**：`python3 scripts/make_film.py film.json --stage check`，直到没有 ERROR。
+9. **构建 + 配音 + QA**：依次 `--stage build`、`--stage vo`、`--stage qa`，QA 必须 0 个错误；能看图就看 `film_out/qa/sheet*.png`，不满意就改 film.json。可选快速预览：`--stage render --draft`，再 `--stage finish --draft`。
+10. **渲染 + 收尾**：`--stage render`，再 `--stage finish`。终版每帧 4 次运动模糊采样，耗时约为草稿的 4 倍：3 分钟成片约 20–40 分钟。
+11. **汇报**：文件路径；哪些是演示 / 模拟内容；哪些没法验证（你听不到声音）；用户还需要补什么（下载链接、二维码等）。
 
 ### 质量底线（默认值就是这样调出来的，别改坏）
 - 切点在小节线上，一个小节一个意思；画面标签不超过 14 个汉字，字幕不超过 30 个汉字。
 - 人声比音乐高约 10 dB；语速 1.0（最多 1.12）。
 - 窗口宽度不超过 1400 px 并居中；左上章节标签与底部 250 px 字幕区不被遮挡（QA 会检查）。
 - 每个功能场景最多 4 个要点，对比表最多 6 行；宁可拆成两个场景，也不要挤在一起。
+- 只有一个高潮；同一时间只有一种强调色；只在故事转折处用镜头转场；画面动才有声音（`references/director.md`）。
 
 ### 进阶（可选）
+- 调整电影层：`"cinema": {"grade": "teal-orange", "grade_strength": 0.5, "motion_blur": 4, "bloom": 0.2, "grain": 0.3, "sfx_gain_db": -3, "lens": {"shake": 0}}`，或 `"cinema": "off"`（见 `references/film-spec.md`）。
 - 自写 JS 场景：`templates/scenes.example.js`、`library.js`、`patterns.js`，引擎 API 见 `engine.js` 开头。
 - 用 Playwright 采集运行中的 Web 应用、用本地 mock 模型拍 AI 功能：`references/capture.md`。
 - 完整实战（3:26 成片，手写场景）：`examples/medstat-pilot/`。

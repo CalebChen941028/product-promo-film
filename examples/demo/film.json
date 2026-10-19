@@ -3,6 +3,7 @@
   "out": "film_out",
   "style": "midnight-tech",
   "motion": "",
+  "cinema": "auto",
   "music": { "file": "demo-music.m4a" },
   "voice": { "engine": "kokoro", "voice": "am_michael", "lang": "a", "python": "~/.venvs/kokoro/bin/python", "espeak_data": "~/.cache/kes" },
   "brand": {

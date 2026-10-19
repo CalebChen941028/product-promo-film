@@ -35,6 +35,15 @@ User recordings instead: `"voice": {"engine": "files", "files": {"<say id>": "re
 | final loudness | −14 LUFS, true peak −1 dB (applied at mux) |
 You cannot hear the result: say so, and ask the user to listen.
 
+### Sound design (sfx.py, synthesised, royalty-free)
+`build` writes `film_out/audio/sfx_cues.json` from the scenes; `finish` synthesises it into a bus and mixes it under the music, ducked under speech.
+- **Where:** camera cuts and hits only; the one hero moment gets an impact plus a riser; the logo gets a soft shimmer or chime; counters get ticks. About 10 cues a minute.
+- **Level:** peaks −27 to −9 dBFS before the mix, plus `cinema.sfx_gain_db` (default −2). Raise it only if the user asks.
+- **Palette:** follows the motion language (`references/director.md` §3). Listen to every sound: `python3 scripts/sfx.py --demo sfx_demo.wav`.
+- **Off:** `"cinema": {"sfx": "off"}`.
+
+
+
 ## 中文
 
 ### 音乐
@@ -54,3 +63,10 @@ You cannot hear the result: say so, and ask the user to listen.
 
 ### 混音目标
 见上方英文表格：人声按 RMS 归一到约 −17 dBFS；有人声时音乐闪避约 −11 dB；人声比音乐高约 10 dB（中位数）；成片 −14 LUFS、真峰值 −1 dB。你听不到声音，要如实说明并请用户试听。
+
+### 声音设计（sfx.py，程序合成，无版权问题）
+`build` 根据场景写出 `film_out/audio/sfx_cues.json`，`finish` 将其合成为音效总线，压在音乐之下，并在人声处自动避让。
+- **位置**：只在镜头转场和击点处；唯一的高潮有一次重击加上升音；Logo 有轻柔的闪光音或钟声；数字有轻点声。约每分钟 10 个。
+- **电平**：混音前峰值 −27 到 −9 dBFS，再加 `cinema.sfx_gain_db`（默认 −2）。只有用户要求时才调高。
+- **音色**：随动效语言变化（`references/director.md` 第 3 节）。试听全部音效：`python3 scripts/sfx.py --demo sfx_demo.wav`。
+- **关闭**：`"cinema": {"sfx": "off"}`。

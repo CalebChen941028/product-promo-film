@@ -13,6 +13,26 @@
   #bg .bg-base { inset: 0; }
   #bg .glow, #bg .blob, #bg .ink { left: 50%; top: 50%; border-radius: 50%; }
   #pulse, #flash { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+  #scenes { position: absolute; inset: 0; transform-origin: 50% 50%; }
+  /* cinema layer (cinema.js): grade tint, edge depth of field, light rays, light leak, anamorphic flare, glints, bokeh */
+  #grade { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light; opacity: 0; }
+  #dof { position: absolute; inset: 0; pointer-events: none;
+         -webkit-mask-image: radial-gradient(ellipse at 50% 50%, transparent 68%, #000 100%); mask-image: radial-gradient(ellipse at 50% 50%, transparent 68%, #000 100%); }
+  #rays { position: absolute; left: 50%; top: 50%; width: 1700px; height: 1700px; pointer-events: none; opacity: 0; filter: blur(7px);
+          background: repeating-conic-gradient(from 0deg, transparent 0deg 7deg, color-mix(in srgb, var(--accent) 55%, white) 8deg 9.5deg, transparent 10.5deg 19deg);
+          -webkit-mask-image: radial-gradient(circle, #000 0%, rgba(0,0,0,0.5) 25%, transparent 62%); mask-image: radial-gradient(circle, #000 0%, rgba(0,0,0,0.5) 25%, transparent 62%); }
+  #leak { position: absolute; left: 50%; top: 50%; width: 1500px; height: 1300px; pointer-events: none; opacity: 0; border-radius: 50%;
+          background: radial-gradient(closest-side, rgba(255,186,110,0.9), rgba(255,110,120,0.45) 45%, transparent 100%); filter: blur(30px); }
+  #flare { position: absolute; inset: 0; pointer-events: none; opacity: 0; transform-origin: 50% 50%; }
+  #flare .streak { position: absolute; left: -10%; right: -10%; top: 50%; height: 5px; margin-top: -2px; filter: blur(1.5px);
+                   background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 70%, white) 30%, #fff 50%, color-mix(in srgb, var(--accent) 70%, white) 70%, transparent);
+                   box-shadow: 0 0 24px 6px color-mix(in srgb, var(--accent) 45%, transparent); }
+  #flare .core { position: absolute; left: 50%; top: 50%; width: 900px; height: 900px; margin: -450px 0 0 -450px; border-radius: 50%;
+                 background: radial-gradient(closest-side, rgba(255,255,255,0.35), color-mix(in srgb, var(--accent) 18%, transparent) 40%, transparent); }
+  .glint { position: absolute; inset: 0; pointer-events: none; opacity: 0; z-index: 5;
+           background: linear-gradient(105deg, transparent 38%, rgba(255,255,255,0.0) 42%, rgba(255,255,255,0.26) 50%, rgba(255,255,255,0) 58%, transparent 62%); }
+  #bg .bokeh { position: absolute; inset: 0; }
+  #bg .bokeh i { position: absolute; left: 50%; top: 50%; border-radius: 50%; display: block; }
   .scene { position: absolute; inset: 0; perspective: 2400px; perspective-origin: 50% 45%; display: none; transform-origin: 50% 50%; }
   .abs { position: absolute; left: 50%; top: 50%; transform-style: preserve-3d; will-change: transform, opacity; }
   .win { overflow: hidden; }
@@ -58,6 +78,7 @@
 </div>
 <script src="vo_timing.js"></script>
 <script src="engine.js"></script>
+<script src="cinema.js"></script>
 <script src="patterns.js"></script>
 <script src="library.js"></script>
 <script src="scenes.js"></script>

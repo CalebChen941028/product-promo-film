@@ -21,6 +21,9 @@ English first, 中文在后。
 | Highlight box misses the target | rect measured in the wrong space | rects are in `base` units; measure on `grid_overlay.py` output |
 | Dialog won't close during capture | app ignores Escape | new browser context per scenario, or click its close button |
 | User pasted a real API key | — | do not enter it anywhere; suggest revoking it; use the local/mock route |
+| Final render is slow | motion blur renders 4 samples per frame | use `--draft` while iterating; `"cinema": {"motion_blur": 2}` for a faster final |
+| An effect looks flashy / cheap | an effect is noticeable on its own | lower it: `cinema.lens` (e.g. `{"flare": 0, "shake": 0}`), `bloom`, `grain`, `sfx_gain_db: -6`; or `"cinema": "off"` |
+| UI colours look wrong after grading | the LUT is too strong for the product's brand colours | `"grade_strength": 0.3` or `"grade": "none"` |
 
 ## 中文
 
@@ -41,3 +44,6 @@ English first, 中文在后。
 | 高亮框没对准 | 坐标量错了空间 | rect 用 `base` 单位，在 `grid_overlay.py` 的网格图上量 |
 | 采集时弹窗关不掉 | 应用不响应 Escape | 每个场景开新的浏览器上下文，或点关闭按钮 |
 | 用户在对话里发了真实 API Key | — | 不要填写到任何地方，建议对方吊销，改走本地 / mock 路线 |
+| 终版渲染很慢 | 运动模糊每帧渲染 4 次 | 调试时用 `--draft`；或 `"cinema": {"motion_blur": 2}` 加快终版 |
+| 某个效果显得花哨 / 廉价 | 效果单独就能被注意到 | 调低：`cinema.lens`（如 `{"flare": 0, "shake": 0}`）、`bloom`、`grain`、`sfx_gain_db: -6`；或 `"cinema": "off"` |
+| 调色后界面颜色不对 | LUT 对品牌色太强 | `"grade_strength": 0.3` 或 `"grade": "none"` |

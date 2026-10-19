@@ -3,6 +3,7 @@
 Usage
   python make_film.py film.json                 # all stages
   python make_film.py film.json --stage check   # validate only (fast; run this after every edit of film.json)
+  python make_film.py film.json --draft         # fast preview: no motion blur, quick encode (look, then go final)
   stages: check build vo qa render finish  (each needs the previous ones; `all` runs them in order)
 
 Every problem is printed as  ERROR/WARN … followed by  FIX: …  — do exactly what FIX says, then rerun.
@@ -34,7 +35,36 @@ TYPES = {
     'gallery': (2, ['items'], {'items': 8}), 'clip': (2, ['media'], {}), 'phone': (2, ['media'], {}),
     'compare': (3, ['rows'], {'rows': 6}), 'statement': (1, ['zh'], {}), 'finale': (4, ['media'], {}), 'endcard': (4, [], {}),
 }
+MOODS = ['cold', 'neutral', 'peak', 'warm', 'night']
+CUT_TYPES = ['style', 'whip', 'push']
+LOOKS = ['teal-night', 'clean-bright', 'bleach-print', 'pastel-glow', 'neon-night', 'warm-print', 'teal-orange', 'none']
 errors, warns = [], []
+
+
+def style_profile(style):
+    """Read a style's defaults (motionDefault, grade, bloom, grain) from templates/styles/<id>.js."""
+    src = (TPL / 'styles' / f'{style}.js').read_text() if (TPL / 'styles' / f'{style}.js').exists() else ''
+    out = {}
+    for k in ('motionDefault', 'grade'):
+        m = re.search(k + r"\s*:\s*'([\w-]+)'", src); out[k] = m.group(1) if m else None
+    for k in ('bloom', 'grain', 'xf'):
+        m = re.search(k + r'\s*:\s*([\d.]+)', src); out[k] = float(m.group(1)) if m else 0.0
+    return out
+
+
+def cinema_spec(spec):
+    """film.json "cinema": "auto" (default) | "off" | {grade, grade_strength, bloom, grain, motion_blur, sfx, sfx_gain_db, lens}."""
+    c = spec.get('cinema', 'auto')
+    if c == 'off' or c is False:
+        return {'on': False}
+    c = {} if c in ('auto', True, None) else dict(c)
+    sp = style_profile(spec.get('style', 'midnight-tech'))
+    g = c.get('grade', 'auto')
+    return {'on': True, 'grade': sp['grade'] or 'none' if g == 'auto' else g, 'grade_strength': float(c.get('grade_strength', 0.5)),
+            'bloom': sp['bloom'] if c.get('bloom', 'auto') == 'auto' else float(c['bloom']),
+            'grain': sp['grain'] if c.get('grain', 'auto') == 'auto' else float(c['grain']),
+            'motion_blur': int(c.get('motion_blur', 4)), 'sfx': c.get('sfx', 'auto'), 'sfx_gain_db': float(c.get('sfx_gain_db', -2)),
+            'lens': c.get('lens', {}), 'motion': spec.get('motion') or sp['motionDefault'] or 'cinematic-3d'}
 
 
 def err(msg, fix): errors.append(f'ERROR {msg}\n  FIX: {fix}')
@@ -90,6 +120,18 @@ def check(spec, base_dir):
     mus = spec.get('music', {}).get('file')
     if not mus or not (base_dir / mus).exists():
         err(f'music.file not found: {mus}', 'add a licensed music file (the user provides it) and set music.file')
+    c = spec.get('cinema', 'auto')
+    if isinstance(c, dict):
+        if c.get('grade', 'auto') not in LOOKS + ['auto']:
+            err(f"cinema.grade '{c.get('grade')}' unknown", f'use auto or one of {LOOKS} (scripts/grade.py --list)')
+        if not 0 <= float(c.get('grade_strength', 0.6)) <= 1:
+            err('cinema.grade_strength must be 0–1', 'use 0.4–0.7; above 0.8 can hurt UI legibility')
+        if int(c.get('motion_blur', 4)) not in range(1, 9):
+            err('cinema.motion_blur must be 1–8 samples', 'use 4 (final) or 1 (off); --draft forces 1')
+        if c.get('sfx', 'auto') not in ('auto', 'off'):
+            err("cinema.sfx must be 'auto' or 'off'", 'sound design cues are generated from the scenes')
+    elif c not in ('auto', 'off', True, False, None):
+        err(f'cinema = {c!r}', 'use "auto" (default), "off", or an object — see references/director.md')
     scenes = spec.get('scenes', [])
     if not scenes:
         err('no scenes', 'start from templates/film.example.json')
@@ -102,6 +144,12 @@ def check(spec, base_dir):
         if t not in TYPES:
             err(f'{where}: unknown type', f'use one of {list(TYPES)}'); continue
         mn, req, lim = TYPES[t]
+        if sc.get('mood') and sc['mood'] not in MOODS:
+            err(f"{where}: mood '{sc['mood']}' unknown", f'use one of {MOODS} (colour script, references/director.md)')
+        if 'hit' in sc and sc['hit'] not in (True, False, 'hero'):
+            err(f"{where}: hit = {sc['hit']!r}", 'use true, false, or "hero" (the one biggest beat of the film)')
+        if sc.get('cut') and sc['cut'] not in CUT_TYPES:
+            err(f"{where}: cut '{sc['cut']}' unknown", f'use one of {CUT_TYPES}')
         bars = sc.get('bars')
         if bars != 'rest' and (not isinstance(bars, (int, float)) or bars < mn):
             err(f'{where}: bars={bars} (minimum {mn})', f'set "bars" to ≥ {mn} (1 bar = 4 beats; 120 BPM → 2 s)')
@@ -184,7 +232,7 @@ def build(spec, base_dir, out):
             if i - cur >= 4: chorus.append([cur, i])
             cur = None
     # copy engine + media, lay scenes on bars, collect narration
-    for f in ['film.html', 'engine.js', 'patterns.js', 'library.js']:
+    for f in ['film.html', 'engine.js', 'cinema.js', 'patterns.js', 'library.js']:
         shutil.copy(TPL / f, film / f)
     for f in (TPL / 'styles').glob('*'):
         shutil.copy(f, film / 'styles' / f.name)
@@ -210,11 +258,12 @@ def build(spec, base_dir, out):
             copied[p] = 'media/' + dst.name
         return copied[p]
     brand = dict(spec['brand']); brand['logo'] = media(brand['logo'])
-    lines, calls, chapters, b0 = [], [], [], 0
+    lines, calls, chapters, b0, segs = [], [], [], 0, []
     for i, sc in enumerate(spec['scenes']):
         nb = each_rest if sc.get('bars') == 'rest' else sc['bars']
         b1 = b0 + nb
-        o = {k: v for k, v in sc.items() if k not in ('type', 'bars', 'say', 'chapter')}
+        segs.append((sc, b0, b1))
+        o = {k: v for k, v in sc.items() if k not in ('type', 'bars', 'say', 'chapter', 'mood', 'cut', 'hit')}
         if isinstance(o.get('media'), list): o['media'] = [media(m) for m in o['media']]
         elif o.get('media'): o['media'] = media(o['media'])
         for p in o.get('panels', []): p['media'] = media(p['media'])
@@ -234,8 +283,12 @@ def build(spec, base_dir, out):
         if merged and merged[-1][2] == c[2] and merged[-1][1] == c[0]: merged[-1][1] = c[1]
         else: merged.append(c)
     onscreen = [l['id'] for l in lines if l['id'] in ('tagline', 'motto')]
+    cin = cinema_spec(spec)
+    cin_cfg, cues = direct(cin, segs, G, BAR, dur)
     cfg = {'STYLE': spec['style'], 'MOTION': spec.get('motion', ''), 'G': G, 'BAR': BAR, 'DUR': round(dur, 3), 'FADE_OUT': 2.6,
-           'CHORUS_BARS': chorus, 'CHAPTERS': merged, 'ONSCREEN': onscreen, 'SHOTS': 'media/', 'ASSETS': 'media/', 'BRAND': brand}
+           'CHORUS_BARS': chorus, 'CHAPTERS': merged, 'ONSCREEN': onscreen, 'SHOTS': 'media/', 'ASSETS': 'media/', 'BRAND': brand,
+           'CINEMA': cin_cfg}
+    json.dump(cues, open(aud / 'sfx_cues.json', 'w'), indent=1)
     (film / 'config.js').write_text('const CONFIG = ' + json.dumps(cfg, ensure_ascii=False, indent=1) + ';\nconst bar = (b) => CONFIG.G + CONFIG.BAR * b;\nObject.assign(window, { CONFIG, bar });\n')
     (film / 'scenes.js').write_text("'use strict';\n// generated by make_film.py from film.json — edit film.json, not this file\n" + '\n'.join(calls) + '\n')
     lines.sort(key=lambda l: l['bar'])
@@ -243,14 +296,87 @@ def build(spec, base_dir, out):
     if not (film / 'vo_timing.js').exists():  # captions-only placeholder until the vo stage runs
         est = [{'id': l['id'], 's': G + BAR * l['bar'], 'e': G + BAR * l['bar'] + len(l['en'].split()) / 2.5, 'zh': l['zh'], 'en': l.get('cap', l['en'])} for l in lines]
         (film / 'vo_timing.js').write_text('const VO = ' + json.dumps(est, ensure_ascii=False) + ';\nwindow.VO = VO;\n')
-    json.dump({'G': G, 'BAR': BAR, 'DUR': dur, 'music': str(final_wav), 'bars_used': b0, 'bars_total': total_bars}, open(out / 'build.json', 'w'), indent=1)
+    json.dump({'G': G, 'BAR': BAR, 'DUR': dur, 'music': str(final_wav), 'bars_used': b0, 'bars_total': total_bars, 'cinema': cin}, open(out / 'build.json', 'w'), indent=1)
     nm = find_playwright(spec)
     link = out / 'node_modules'
     if not link.exists(): link.symlink_to(nm)
     tools = out / 'tools'; tools.mkdir(exist_ok=True)   # node resolves 'playwright' from the script's folder upward
     for f in ['render.mjs', 'cover.mjs', 'qa_check.mjs']:
         shutil.copy(HERE / f, tools / f)
+    if cin['on']:
+        print(f"cinema: grade {cin['grade']} ×{cin['grade_strength']} · bloom {cin['bloom']} · grain {cin['grain']} · motion blur {cin['motion_blur']} · "
+              f"{len(cin_cfg['hits'])} hits · cuts {sum(c != 'style' for c in cin_cfg['cuts'])} camera · {len(cues)} sound cues")
     print(f'built {len(calls)} scenes on {b0} bars · music {dur:.1f} s · BPM {grid["bpm"]} · {len(lines)} narration lines → {film}/film.html')
+
+
+# ---------------------------------------------------------------- direction (colour script, hits, cuts, light, sound)
+AUTO_MOOD = {'pain': 'cold', 'numbers': 'peak', 'finale': 'peak', 'endcard': 'warm'}
+# sound palette per motion language: what a cut, a hit, a logo and a small item sound like
+PALETTE = {
+    'cinematic-3d':   {'cut': 'whoosh', 'hit': 'impact', 'logo': 'shimmer', 'item': 'tick', 'riser': True},
+    'precision-data': {'cut': 'paper',  'hit': 'thud',   'logo': 'chime',   'item': 'tick', 'riser': False},
+    'kinetic-launch': {'cut': 'whip',   'hit': 'impact', 'logo': 'shimmer', 'item': 'tick', 'riser': True},
+    'gentle-story':   {'cut': 'swell',  'hit': 'swell',  'logo': 'chime',   'item': None,   'riser': False},
+    'playful-pop':    {'cut': 'whip',   'hit': 'thud',   'logo': 'shimmer', 'item': 'pop',  'riser': False},
+    'editorial-type': {'cut': 'paper',  'hit': 'thud',   'logo': 'chime',   'item': 'type', 'riser': False},
+}
+
+
+def direct(cin, segs, G, BAR, dur):
+    """The director's pass: moods, hit points, camera cuts, light rays and the sound-design cue sheet."""
+    if not cin['on']:
+        return {'on': False}, []
+    T = lambda b: round(G + BAR * b, 4)
+    mo = cin['motion']; pal = PALETTE.get(mo, PALETTE['cinematic-3d'])
+    moods, hits, rays, cuts, cues = [], [], [], [], []
+    # restraint: ONE hero moment carries the flare, the impact and the riser; everything else stays quiet
+    types = [sc['type'] for sc, _, _ in segs]
+    hero_i = next((i for i, (sc, _, _) in enumerate(segs) if sc.get('hit') == 'hero'), None)
+    if hero_i is None and 'finale' in types and segs[types.index('finale')][0].get('hit', True) is not False:
+        hero_i = types.index('finale')
+    prev_ch = None
+    for i, (sc, b0, b1) in enumerate(segs):
+        t0, t1, typ = T(b0), (round(dur, 3) if i == len(segs) - 1 else T(b1)), sc['type']
+        moods.append([0 if i == 0 else t0, t1, sc.get('mood') or AUTO_MOOD.get(typ, 'neutral')])
+        auto_hit = typ in ('numbers', 'finale') or (i > 0 and segs[i - 1][0]['type'] == 'pain')
+        hit = bool(sc.get('hit', auto_hit)) and i > 0
+        hero = i == hero_i
+        if hit or hero: hits.append(t0)
+        ch = (sc.get('chapter') or [None])[0]
+        new_ch = bool(ch and ch != prev_ch)
+        if i == 0: cut = 'style'
+        elif sc.get('cut'): cut = sc['cut']
+        elif typ == 'endcard': cut = 'style'
+        elif mo == 'kinetic-launch': cut = 'whip' if (hero or new_ch) else 'style'
+        elif mo == 'cinematic-3d': cut = 'push' if (hero or (hit and segs[i - 1][0]['type'] == 'pain')) else 'style'
+        elif mo == 'playful-pop': cut = 'whip' if hero else 'style'
+        else: cut = 'style'
+        cuts.append(cut)
+        if ch: prev_ch = ch
+        if typ == 'cover': rays.append([t0, t1, -150, 0.7]); cues.append({'t': t0 + 0.3, 'kind': pal['logo'], 'gain_db': -4})
+        if hero: rays.append([t0, t1, -30, 1])
+        if typ == 'endcard': cues.append({'t': t0 + 0.1, 'kind': pal['logo'], 'gain_db': -8})
+        # sound only where the picture moves the camera or lands a hit — never a whoosh on every cut
+        if i > 0 and (cut != 'style' or hit or hero):
+            cues.append({'t': t0, 'kind': pal['cut'], 'gain_db': -2 if cut != 'style' else -6})
+        if hero:
+            cues.append({'t': t0, 'kind': pal['hit'], 'size': 1.2})
+            if pal['riser']:
+                cues.append({'t': t0, 'kind': 'riser', 'len': round(min(4.0, BAR * 2), 2), 'gain_db': -4})
+        elif hit:
+            cues.append({'t': t0, 'kind': 'thud' if pal['hit'] != 'swell' else 'swell', 'gain_db': -8})
+        if pal['item'] and typ == 'numbers':
+            cues += [{'t': t0 + 0.1 + k * 0.4, 'kind': pal['item'], 'gain_db': -4} for k in range(len(sc.get('stats', [])))]
+    if cin['sfx'] == 'off':
+        cues = []
+    seen, uniq = set(), []
+    for c in cues:   # one sound of a kind per moment
+        k = (round(c['t'], 2), c['kind'])
+        if k not in seen: seen.add(k); uniq.append(c)
+    cues = uniq
+    cfg = {'on': True, 'moods': moods, 'hits': hits, 'hero': T(segs[hero_i][1]) if hero_i is not None else None, 'rays': rays, 'cuts': cuts, 'cuts_t': [T(b0) for _, b0, _ in segs[1:]],
+           'lens': cin['lens'], 'mb': cin['motion_blur']}
+    return cfg, sorted(cues, key=lambda c: c['t'])
 
 
 # ---------------------------------------------------------------- vo
@@ -297,30 +423,50 @@ def qa(spec, out):
 
 
 # ---------------------------------------------------------------- render + finish
-def render(spec, out):
+def render(spec, out, draft=False):
     b = json.load(open(out / 'build.json'))
     ff = find_ffmpeg(spec)
     workers = str(spec.get('tools', {}).get('workers', max(2, min(6, (os.cpu_count() or 4) - 2))))
-    run(['node', out / 'tools' / 'render.mjs', 'video', out / 'film' / 'film.html', out / 'silent', ff, b['DUR'], workers], cwd=out)
+    cin = b.get('cinema', {'on': False})
+    samples = 1 if draft or not cin['on'] else cin['motion_blur']
+    if samples > 1:
+        print(f'  motion blur: {samples} samples (180° shutter) on frames that move; still frames render once. Use --draft for quick looks')
+    run(['node', out / 'tools' / 'render.mjs', 'video', out / 'film' / 'film.html', out / 'silent', ff, b['DUR'], workers, 30, samples], cwd=out)
 
 
-def finish(spec, out):
+def finish(spec, out, draft=False):
     b = json.load(open(out / 'build.json'))
     ff = find_ffmpeg(spec)
     fin = out / 'final'; fin.mkdir(exist_ok=True)
     name = spec.get('name', 'film')
     vodir = out / 'vo'
     mix = out / 'audio' / 'mix.wav'
-    if (vodir / 'vo_timing.json').exists():
-        run([sys.executable, HERE / 'mix_audio.py', b['music'], vodir, mix, '--duration', b['DUR'], '--ffmpeg', ff])
-    else:
-        run([ff, '-y', '-loglevel', 'error', '-i', b['music'], '-t', b['DUR'], '-af', f"afade=t=out:st={b['DUR'] - 2.5}:d=2.5", mix])
+    cin = b.get('cinema', {'on': False})
+    # sound design bus (synthesised from the cue sheet written by build)
+    sfx_args = []
+    cues = out / 'audio' / 'sfx_cues.json'
+    if cin['on'] and cues.exists() and json.load(open(cues)):
+        run([sys.executable, HERE / 'sfx.py', cues, out / 'audio' / 'sfx.wav', '--duration', b['DUR'], '--gain-db', cin.get('sfx_gain_db', 0)])
+        sfx_args = ['--sfx', out / 'audio' / 'sfx.wav']
+    run([sys.executable, HERE / 'mix_audio.py', b['music'], vodir if (vodir / 'vo_timing.json').exists() else '-', mix, '--duration', b['DUR'], '--ffmpeg', ff, *sfx_args])
     mp4 = fin / f'{name}-1080p.mp4'
-    run([ff, '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', out / 'silent.list.txt', '-i', mix, '-map', '0:v', '-map', '1:a', '-c:v', 'copy',
+    # picture finish: colour grade (LUT) + bloom + film grain, one re-encode
+    sys.path.insert(0, str(HERE)); import grade
+    if cin['on'] and (cin['grade'] != 'none' or cin['bloom'] > 0 or cin['grain'] > 0):
+        cube = grade.write_cube(cin['grade'], out / 'grade.cube', cin['grade_strength'])
+        vf = ['-filter_complex', grade.vf_chain(cube, cin['bloom'], 0 if draft else cin['grain']), '-map', '[v]',
+              '-c:v', 'libx264', '-preset', 'veryfast' if draft else 'slow', '-crf', '23' if draft else '17', '-pix_fmt', 'yuv420p']
+    else:
+        cube, vf = None, ['-map', '0:v', '-c:v', 'copy']
+    run([ff, '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', out / 'silent.list.txt', '-i', mix, *vf, '-map', '1:a',
          '-af', 'loudnorm=I=-14:TP=-1.0:LRA=11', '-ar', '48000', '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', '-shortest', mp4])
-    run(['node', out / 'tools' / 'cover.mjs', out / 'film' / 'film.html', fin / f'{name}-cover-4k.png', spec.get('cover_t', 4.2)], cwd=out)
+    cover = fin / f'{name}-cover-4k.png'
+    run(['node', out / 'tools' / 'cover.mjs', out / 'film' / 'film.html', cover, spec.get('cover_t', 4.2)], cwd=out)
+    if cube:
+        raw = out / 'cover-raw.png'; shutil.move(cover, raw)
+        run([ff, '-y', '-loglevel', 'error', '-i', raw, '-filter_complex', grade.vf_chain(cube, cin['bloom'], 0, still=True), '-map', '[v]', cover])
     from PIL import Image
-    Image.open(fin / f'{name}-cover-4k.png').convert('RGB').resize((1280, 720)).save(fin / f'{name}-cover-1280.jpg', quality=92)
+    Image.open(cover).convert('RGB').resize((1280, 720), Image.LANCZOS).save(fin / f'{name}-cover-1280.jpg', quality=92)
     tj = vodir / 'vo_timing.json'
     if tj.exists():
         run([sys.executable, HERE / 'make_srt.py', tj, fin, name])
@@ -330,6 +476,7 @@ def finish(spec, out):
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('spec'); ap.add_argument('--stage', default='all', choices=['all', 'check', 'build', 'vo', 'qa', 'render', 'finish'])
+    ap.add_argument('--draft', action='store_true', help='fast preview: no motion blur or grain, quick encode')
     a = ap.parse_args()
     spec_path = Path(a.spec).resolve()
     spec = json.load(open(spec_path))
@@ -346,4 +493,4 @@ if __name__ == '__main__':
     for st in stages:
         print(f'== {st}')
         {'build': lambda: build(spec, base, out), 'vo': lambda: vo(spec, base, out), 'qa': lambda: qa(spec, out),
-         'render': lambda: render(spec, out), 'finish': lambda: finish(spec, out)}[st]()
+         'render': lambda: render(spec, out, a.draft), 'finish': lambda: finish(spec, out, a.draft)}[st]()

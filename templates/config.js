@@ -23,6 +23,11 @@ const CONFIG = {
     contacts: [['DEVELOPER', '开发者', '姓名', 'email@example.com'], ['WECHAT', '公众号', '公众号名', 'Official account'], ['GITHUB', '主页', 'username', 'github.com/username']],
     chips: ['macOS · Apple silicon', 'Windows · x64', 'Beta'],
   },
+  // Cinema layer (cinema.js) for hand-written films; make_film.py fills this from film.json automatically.
+  // Times in seconds. moods: [from, to, 'cold'|'neutral'|'peak'|'warm'|'night']; hits: small kicks; hero: the ONE big beat;
+  // rays: [from, to, y, level]; cuts: per scene index 'style'|'whip'|'push'; mb: motion-blur samples used by render.
+  CINEMA: { on: true, moods: [[0, 6.5, 'neutral'], [6.5, 14.5, 'cold'], [14.5, 44.5, 'neutral'], [44.5, 52.5, 'peak'], [52.5, 56, 'warm']],
+            hits: [14.49], hero: 44.49, rays: [[0, 6.5, -150, 0.7], [44.5, 52.5, -30, 1]], cuts: [], cuts_t: [], mb: 1 },
   // Media used by the example scenes (paths relative to film.html). Replace with the user's materials.
   MEDIA: {
     ui: 'assets/ui-sample.png',                 // a 2× desktop capture (base 1920×1080)

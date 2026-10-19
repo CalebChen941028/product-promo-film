@@ -19,6 +19,19 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `scenes` | list | yes | in playing order; first `cover`, last `endcard` with `"bars": "rest"` |
 | `tools.ffmpeg` / `tools.node_modules` / `tools.workers` | — | no | override tool discovery / render workers |
 | `cover_t` | number | no | second used for the cover poster (default 4.2) |
+| `cinema` | `"auto"` / `"off"` / object | no | the director's cinema layer (default `"auto"` = on, all defaults from the style + motion). See below |
+
+### cinema (director's layer, `references/director.md`)
+| Key | Default | Meaning |
+| --- | --- | --- |
+| `grade` | style's look | LUT: `teal-night` `clean-bright` `bleach-print` `pastel-glow` `neon-night` `warm-print` `teal-orange` `none` |
+| `grade_strength` | 0.5 | 0–1 blend of the look; keep ≤ 0.7 so UI colours stay true |
+| `bloom` | style's value | 0–0.6 glow around bright areas |
+| `grain` | style's value | 0–1 film grain (luma, moving) |
+| `motion_blur` | 4 | samples per frame over a 180° shutter (1 = off). `--draft` forces 1 |
+| `sfx` | `auto` | synthesised sound design from the scenes; `off` = music + voice only |
+| `sfx_gain_db` | −2 | level of the sound design bus (−6 = quieter, 0 = louder) |
+| `lens` | by motion (restrained) | override `{shake, hz, dof, pull, glint, flare, kick, leak, bokeh}`; 0 = off. `leak` and `bokeh` are 0 by default — add them only for soft or playful briefs |
 
 ### brand
 `name`, `nameAccent` (second word in the accent colour), `logo` (transparent PNG), `positioningZh`, `positioningEn`, `taglineZh`, `taglineEn`, `motto` = [zh line 1, zh line 2 (accent), English line], `contacts` = list of [LABEL_EN, 中文标签, value, sub-line] (≤ 3 reads best), `chips` = platforms/status (last chip highlighted if it says Beta/Preview/内测).
@@ -30,6 +43,9 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `bars` | length in bars (number ≥ the type's minimum) or `"rest"` (only the last scene) |
 | `chapter` | optional `["01", "数据", "DATA"]` → top-left chapter label while the scene plays |
 | `say` | optional narration lines `[{en, zh, cap?, at?, id?}]`. `en` is spoken, `zh` is the Chinese caption, `cap` replaces the English caption (digits: "300 DPI"), `at` = start in bars from the scene start (default spread evenly from 0.3), `id` = `tagline`/`motto` to hide the caption because the text is already on screen |
+| `mood` | optional colour-script mood: `cold` `neutral` `peak` `warm` `night` (default by type: pain cold, numbers/finale peak, endcard warm) |
+| `cut` | optional cut INTO this scene: `style` (the style's transition), `whip` (pan + motion blur), `push` (camera flies through). Default by motion language |
+| `hit` | optional `true`/`false`/`"hero"`. A hit is a small camera kick plus a soft sound on the scene's first beat (default: the scene after `pain`, `numbers`). The one `"hero"` beat (default `finale`) also gets the flare, the impact and a riser |
 
 ### Scene types
 | type | min bars | fields | notes |
@@ -67,6 +83,19 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `scenes` | 列表 | 是 | 按播放顺序；第一个是 `cover`，最后一个是 `"bars": "rest"` 的 `endcard` |
 | `tools.*` | — | 否 | 手动指定 ffmpeg、node_modules、渲染进程数 |
 | `cover_t` | 数字 | 否 | 封面海报取第几秒（默认 4.2） |
+| `cinema` | `"auto"` / `"off"` / 对象 | 否 | 导演电影层（默认 `"auto"` 开启，参数取自风格与动效语言），见下 |
+
+### cinema（导演电影层，见 `references/director.md`）
+| 键 | 默认 | 含义 |
+| --- | --- | --- |
+| `grade` | 风格自带 | 调色 LUT：`teal-night` `clean-bright` `bleach-print` `pastel-glow` `neon-night` `warm-print` `teal-orange` `none` |
+| `grade_strength` | 0.5 | 调色强度 0–1；不超过 0.7 以保证界面色彩真实 |
+| `bloom` | 风格自带 | 0–0.6，亮部辉光 |
+| `grain` | 风格自带 | 0–1，胶片颗粒（亮度、动态） |
+| `motion_blur` | 4 | 每帧采样次数（180° 快门），1 为关闭；`--draft` 强制为 1 |
+| `sfx` | `auto` | 按场景自动合成声音设计；`off` 只保留音乐和人声 |
+| `sfx_gain_db` | −2 | 音效总线电平（−6 更轻，0 更响） |
+| `lens` | 随动效语言（克制） | 覆盖 `{shake, hz, dof, pull, glint, flare, kick, leak, bokeh}`，0 为关闭；`leak`、`bokeh` 默认 0，只在柔和或活泼的项目中再打开 |
 
 ### brand（品牌）
 `name`、`nameAccent`（强调色显示的第二个词）、`logo`（透明 PNG）、`positioningZh` / `positioningEn`（定位）、`taglineZh` / `taglineEn`（口号）、`motto` = [中文第一行, 中文第二行（强调色）, 英文一句]、`contacts` = [英文标签, 中文标签, 值, 副行] 的列表（3 组最好看）、`chips` = 平台 / 版本状态（最后一个若是 Beta / 内测 会高亮）。
@@ -78,6 +107,9 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `bars` | 小节数（不少于该类型最小值），或 `"rest"`（只能用在最后一个场景） |
 | `chapter` | 可选，`["01", "数据", "DATA"]`，场景播放时左上角显示章节 |
 | `say` | 可选旁白 `[{en, zh, cap?, at?, id?}]`：`en` 是念出来的英文，`zh` 是中文字幕，`cap` 替换英文字幕（用于显示数字），`at` 为相对场景起点的小节数（默认从 0.3 起均匀分布），`id` 写 `tagline` / `motto` 时隐藏字幕（画面上已有同一句） |
+| `mood` | 可选，色彩脚本情绪：`cold` `neutral` `peak` `warm` `night`（默认：痛点 cold，数字和高潮 peak，结尾 warm） |
+| `cut` | 可选，进入本场景的转场：`style`（风格自带）、`whip`（甩镜 + 运动模糊）、`push`（镜头推进穿越）；默认随动效语言 |
+| `hit` | 可选 `true`/`false`/`"hero"`：击点是场景第一拍的轻微镜头冲击加轻声音效（默认：痛点之后的场景、`numbers`）；唯一的 `"hero"` 高潮（默认 `finale`）另有镜头光晕、重击和上升音 |
 
 ### 场景类型
 | 类型 | 最少小节 | 字段 | 说明 |

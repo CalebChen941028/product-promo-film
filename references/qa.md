@@ -21,6 +21,9 @@ Rule: **0 errors before rendering.** Warnings are judgement calls.
 ### Visual (if you can read images)
 Open `film_out/qa/sheet*.png` (3×3 frames each). Check: the cover is complete; highlights sit on the right UI region (else fix the `rect`); nothing important under captions; transitions are not black; the end card is centred and correct (names, email, accounts).
 
+### Draft review (cinema layer)
+`make_film.py film.json --stage render --draft` then `--stage finish --draft` makes a fast preview (no motion blur or grain). Pull stills around every camera cut and hit (`render.mjs stills film/film.html out t-0.2 t t+0.3`). Check that the cut reads cleanly, the hero flare is not covering text, and the grade keeps the UI colours true. If any effect is noticeable on its own, lower it (`references/director.md` §5).
+
 ### Final file
 `ffprobe`/`ffmpeg -i final/*.mp4`: duration = music length, 1920×1080 30 fps, AAC 48 kHz. Pull a frame at each render-worker boundary to check for glitches. SRT lines match the voice-over.
 
@@ -42,6 +45,9 @@ Open `film_out/qa/sheet*.png` (3×3 frames each). Check: the cover is complete; 
 
 ### 目视检查（能看图时）
 打开 `film_out/qa/sheet*.png`（每张 3×3 帧），检查：封面完整；高亮框对准正确的界面区域（否则改 `rect`）；字幕下没有重要内容；转场没有黑帧；结尾页居中，姓名、邮箱、账号正确。
+
+### 草稿检查（电影层）
+`make_film.py film.json --stage render --draft`，再 `--stage finish --draft`，快速预览（无运动模糊和颗粒）。在每个镜头转场和击点前后截取静帧（`render.mjs stills film/film.html out t-0.2 t t+0.3`），确认转场干净、高潮光晕不遮挡文字、调色后界面颜色真实。任何效果如果单独就能被注意到，就调低（`references/director.md` 第 5 节）。
 
 ### 成片
 确认时长等于音乐长度、1920×1080 30fps、AAC 48kHz；在各渲染分段的交界处抽帧检查；SRT 与配音一致。

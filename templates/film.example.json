@@ -4,6 +4,7 @@
   "out": "film_out",
   "style": "midnight-tech",
   "motion": "",
+  "cinema": "auto",
   "music": {
     "file": "materials/music.mp3"
   },

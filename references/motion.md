@@ -19,6 +19,9 @@ English first, 中文在后。The motion language decides HOW things move — en
 - A scientific product with an emotional mission (e.g. patient care) → gentle-story for the story beats is wrong; keep precision-data and put the emotion in the narration and music.
 - The pairs in `references/styles.md` (default motion) are safe; cross pairs (e.g. keynote-light + precision-data) are fine when the theme asks for it.
 
+### Lens, cuts and sound
+Each motion language also sets a restrained lens (handheld drift, depth of field, focus pull, glints), where camera cuts happen, and the sound palette. See `references/director.md` §3.
+
 ### Engine API (custom scenes)
 `M.win(lt, dur, base)` big element entrance + drift · `M.enter` · `M.pop(lt, t0, base)` small items · `M.text(el, lt, t0, base)` any text block · `M.focus(lt, [[t, rect], …])` crop path · `M.camera` (applied by the engine) · `MO` (current language: `tilt`, `focus.dur`, `focus.ease` …) · `feature(start, end, opts)` the pattern above.
 
@@ -38,6 +41,9 @@ English first, 中文在后。The motion language decides HOW things move — en
 - 快歌（≥ 128 BPM）选 kinetic-launch 或 playful-pop；慢歌（≤ 95 BPM）选 gentle-story 或 precision-data。
 - 有情感使命的科学产品（如患者关怀），仍用 precision-data，把情感放在旁白和音乐里。
 - `references/styles.md` 中的默认搭配最稳；主题需要时也可以交叉搭配（如 keynote-light + precision-data）。
+
+### 镜头、转场与声音
+每种动效语言还决定一套克制的镜头特性（手持漂移、景深、对焦、高光）、镜头转场的位置和音效音色，见 `references/director.md` 第 3 节。
 
 ### 引擎 API（自写场景时）
 同上英文：`M.win`、`M.enter`、`M.pop`、`M.text`、`M.focus`、`M.camera`、`MO`、`feature(start, end, opts)`。

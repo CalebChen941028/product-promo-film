@@ -30,6 +30,8 @@ const eback = (t) => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow
 const esoft = (t) => 0.5 - 0.5 * Math.cos(Math.PI * clamp(t));
 const fade = (t, a, b, f = 0.4) => Math.min(prog(t, a, a + f), 1 - prog(t, b - f, b));
 const SH = CONFIG.SHOTS, AS = CONFIG.ASSETS;
+const FX = { init: [], scene: [], frame: [] };   // hooks for cinema.js (colour script, lens, light)
+const CUTS = (CONFIG.CINEMA && CONFIG.CINEMA.cuts) || [];  // per scene index: 'style' | 'whip' | 'push' (cut INTO that scene)
 const ST = Object.assign({ background: 'grid', transition: 'fade', chrome: 'mac-dark', pulse: 'glow', motionDefault: 'cinematic-3d', xf: 0.28 }, window.STYLE || {});
 
 function div(cls, parent, html) { const d = document.createElement('div'); if (cls) d.className = cls; if (html != null) d.innerHTML = html; if (parent) parent.appendChild(d); return d; }
@@ -161,6 +163,7 @@ function win(parent, { srcs, crop, w, base = [1920, 1080], chrome = 'auto', titl
   const W = { root, body, layers: [], base };
   for (const s of [].concat(srcs)) W.layers.push(typeof s === 'string' ? img(s, body, 'shot') : vid(s.video, body, 'shot'));
   W.ov = div('ov', body);
+  div('glint', root);   // light sweep (cinema.js)
   W.time = (sec) => W.layers.forEach((l) => { if (l.tagName === 'VIDEO') seekVideo(l, sec); });
   setCrop(W, crop || [0, 0, base[0], base[1]], w); showLayer(W, 0);
   return W;
@@ -267,7 +270,22 @@ const BG = {
 const SCENES = [];
 function scene(s, e, init, update) { SCENES.push({ s, e, init, update }); }
 
-function transitionFX(root, t, s, e, DUR) { // per-style look of a scene's in/out edge
+// camera cuts shared by all styles: a whip pan, or a push through the frame. p: 0→1 across the cut; inc = incoming
+function cutFX(root, kind, p, inc) {
+  let tf = '', o = 1, filter = '';
+  if (kind === 'whip') {
+    const e = eio(p); tf = `translateX(${inc ? (1 - e) * 1920 : -e * 1920}px)`;
+    const sp = Math.sin(Math.PI * p); if (sp > 0.05) filter = `blur(${(sp * (CONFIG.CINEMA && CONFIG.CINEMA.mb > 1 ? 4 : 10)).toFixed(1)}px)`;  // smooths the steps between motion-blur samples
+  } else {  // push
+    if (inc) { tf = `scale(${lerp(0.8, 1, eo(prog(p, 0.3, 1)))})`; o = prog(p, 0.35, 0.75); filter = `blur(${((1 - prog(p, 0.35, 0.9)) * 8).toFixed(1)}px)`; }
+    else { tf = `scale(${lerp(1, 1.7, Math.pow(p, 1.6))})`; o = 1 - prog(p, 0.3, 0.65); filter = `blur(${(prog(p, 0.2, 0.7) * 10).toFixed(1)}px)`; }
+  }
+  root.style.opacity = o; root.style.transform = tf; root.style.filter = filter; root.style.clipPath = '';
+}
+function transitionFX(root, t, s, e, DUR, kIn = 'style', kOut = 'style') { // per-style look of a scene's in/out edge
+  const w = ST.xf * 0.9;
+  if (s > 0 && kIn !== 'style' && t < s + w) return cutFX(root, kIn, prog(t, s - w, s + w), true);
+  if (e < DUR && kOut !== 'style' && t > e - w) return cutFX(root, kOut, prog(t, e - w, e + w), false);
   const xf = ST.xf, inP = s === 0 ? 1 : prog(t, s - xf, s + xf * 0.4), outP = e >= DUR ? 1 : 1 - prog(t, e - xf * 0.4, e + xf);
   let o = Math.min(inP, outP), tf = '', filter = '', clipPath = '';
   const edgeIn = 1 - inP, edgeOut = 1 - outP;
@@ -292,21 +310,25 @@ const FILM = {
     const bgUpdate = (BG[ST.background] || BG.grid)($('bg'));
     const host = $('scenes');
     for (const sc of SCENES) { sc.root = div('scene', host); sc.S = {}; sc.init(sc.root, sc.S); }
+    FX.init.forEach((f) => f());
     const chapter = $('chapter'), capzh = $('capzh'), capen = $('capen'), capband = $('capband'), flash = $('flash'), pulse = $('pulse');
     const cuts = SCENES.map((s) => s.s).filter((s) => s > 0);
     window.renderFrame = (t) => {
       PENDING.length = 0;
-      for (const sc of SCENES) {
+      for (let i = 0; i < SCENES.length; i++) {
+        const sc = SCENES[i];
         const vis = t >= sc.s - ST.xf && t < sc.e + ST.xf;
         sc.root.style.display = vis ? 'block' : 'none';
         if (!vis) continue;
-        transitionFX(sc.root, t, sc.s, sc.e, DUR);
+        transitionFX(sc.root, t, sc.s, sc.e, DUR, CUTS[i] || 'style', CUTS[i + 1] || 'style');
         const cam = M.camera(t, t - sc.s, sc.e - sc.s);
         if (cam) sc.root.style.transform = (sc.root.style.transform || '') + ' ' + cam;
         sc.update(sc.S, t - sc.s, sc.e - sc.s, t);
+        FX.scene.forEach((f) => f(sc, t, t - sc.s));
       }
       const ch = chapters.find(([a, b]) => t >= a && t < b);
       bgUpdate(t, ch);
+      FX.frame.forEach((f) => f(t));
       const beat = CONFIG.BAR / 4, ph = (((t - CONFIG.G) % beat) + beat) % beat, inCh = chorus.some(([a, b]) => t >= a && t < b);
       pulse.style.opacity = inCh && ST.pulse !== 'none' ? Math.exp(-ph * 9) * (ST.pulse === 'flash' ? 0.5 : 0.9) : 0;
       const near = cuts.reduce((m, c) => Math.min(m, Math.abs(t - c)), 99);
@@ -324,6 +346,16 @@ const FILM = {
       } else capzh.style.opacity = capen.style.opacity = capband.style.opacity = 0;
       $('fade').style.opacity = Math.max(1 - prog(t, 0, 0.9), prog(t, DUR - FADE_OUT, DUR));
       return PENDING.length ? Promise.all(PENDING) : undefined;
+    };
+    // Motion probe for the renderer: how far (px) anything on screen moves between t-dt and t+dt.
+    // render.mjs renders extra motion-blur samples only where this is ≥ ~1.5 px — holds and fades cost one sample.
+    const probeEls = () => [...host.querySelectorAll('[data-qa="media"], [data-qa="text"], .win, .pic')];
+    window.motionAt = async (t, dt) => {
+      const els = probeEls(), snap = () => els.map((e) => { const r = e.getBoundingClientRect(); return [r.left, r.top, r.right, r.bottom]; });
+      await window.renderFrame(Math.max(0, t - dt)); const a = snap();
+      await window.renderFrame(t + dt); const b = snap();
+      let m = 0; for (let i = 0; i < a.length; i++) for (let j = 0; j < 4; j++) m = Math.max(m, Math.abs(a[i][j] - b[i][j]));
+      return m;
     };
     window.ready = (async () => {
       await document.fonts.ready;

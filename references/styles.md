@@ -13,6 +13,18 @@ English first, 中文在后。A style = `styles/<id>.css` (colours, fonts, frame
 | `neon-cyber` | black + neon grid floor, scanlines, magenta/cyan glow, monospace labels | glitch RGB-split + flash · flash | kinetic-launch | dev/security/infra, gaming-adjacent, EDM/trap music |
 | `paper-academic` | warm paper with grain, serif display, ink-blue accent, hand-drawn ellipse highlights, footnote captions | page turn · none | precision-data | research, statistics, education, publishing |
 
+### Finish per style (applied after rendering; `cinema` in film.json overrides)
+| id | Grade (LUT) | Bloom | Grain |
+| --- | --- | --- | --- |
+| `midnight-tech` | teal-night: teal shadows, clean neutral-warm highlights | 0.14 | 0.18 |
+| `keynote-light` | clean-bright: neutral, slightly warm whites | 0.05 | 0.08 |
+| `editorial-mono` | bleach-print: lower saturation, print contrast | 0.04 | 0.30 |
+| `aurora-glass` | pastel-glow: lifted blacks, violet shadows | 0.18 | 0.15 |
+| `neon-cyber` | neon-night: deep blacks, magenta/cyan split | 0.24 | 0.20 |
+| `paper-academic` | warm-print: warm paper, soft contrast | 0.03 | 0.28 |
+
+All looks blend at 50 % by default, so the product's real UI colours stay true. Preview one on a still: `python3 scripts/grade.py teal-night look.cube --preview in.png out.png`.
+
 ### Changing the accent colour
 Each CSS file starts with `:root { --accent: … }`. Use the product logo's main colour; keep contrast ≥ 4.5:1 against the background for text. `--accent-2` is a secondary highlight.
 
@@ -29,6 +41,18 @@ Copy the closest pair of files, rename the id in both, change `:root` tokens and
 | `aurora-glass` | 流动彩色渐变、毛玻璃卡片、白字、胶囊字幕 | 缩放 · 辉光 | playful-pop | 消费 / 创作者 / AI 应用、社交平台首发 |
 | `neon-cyber` | 黑底霓虹网格地面、扫描线、品红青色辉光、等宽字体 | 故障 RGB 分离 + 闪白 · 闪光 | kinetic-launch | 开发 / 安全 / 基础设施、游戏相关、电子乐 |
 | `paper-academic` | 暖色纸张颗粒、衬线标题、墨蓝主色、手绘椭圆高亮、脚注式字幕 | 翻页 · 无 | precision-data | 科研、统计、教育、出版 |
+
+### 各风格的成片质感（渲染后施加，film.json 的 `cinema` 可覆盖）
+| id | 调色（LUT） | 辉光 | 颗粒 |
+| --- | --- | --- | --- |
+| `midnight-tech` | teal-night：青色暗部、干净偏暖的高光 | 0.14 | 0.18 |
+| `keynote-light` | clean-bright：中性、略暖的白 | 0.05 | 0.08 |
+| `editorial-mono` | bleach-print：低饱和、印刷感对比 | 0.04 | 0.30 |
+| `aurora-glass` | pastel-glow：抬升的黑、紫色暗部 | 0.18 | 0.15 |
+| `neon-cyber` | neon-night：深黑、品红 / 青色分离 | 0.24 | 0.20 |
+| `paper-academic` | warm-print：暖纸色、柔和对比 | 0.03 | 0.28 |
+
+默认按 50% 强度混合，保证产品真实界面颜色不失真。单帧预览：`python3 scripts/grade.py teal-night look.cube --preview in.png out.png`。
 
 ### 改主色
 每个 CSS 开头是 `:root { --accent: … }`，取产品 Logo 的主色；文字与背景对比度不低于 4.5:1。`--accent-2` 为辅助高亮色。
