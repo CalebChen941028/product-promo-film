@@ -137,11 +137,11 @@ Before → after, using the mean of the independent critics:
 | Larchwood | 3.38 | **3.50** (critic 9: 3.63) |
 | MedStat Pilot (real screens) | 2.96 | **3.33** (critic 9: 3.50) |
 
-**Reading:** this is the first round that moved every folder: all four improved, in 11 of 12 critic × folder pairs. The mean rose from 3.05 to 3.35, and the gap to the reference shrank to 0.1–0.2. Larchwood and MedStat each beat the reference for at least one critic. The varied shapes, the cut phone and survival detours, and the readable crops are what the critics named. **No film reached 4, so the target is still unmet.** Two caveats:
+**Reading:** this is the first round that moved every folder: all four improved, in 11 of 12 critic × folder pairs. The mean rose from 3.05 to 3.35, and the gap to the reference shrank to 0.1–0.2. Larchwood (critics 8 and 9) and Quartile (critic 8) beat the reference for at least one critic; MedStat tied it once. The varied shapes, the cut phone and survival detours, and the readable crops are what the critics named. **No film reached 4, so the target is still unmet.** Two caveats:
 - The reference here is a re-render, because I deleted the original render by mistake; its film.json and treatment are unchanged.
 - The first sampled frame of every sheet is the fade from black, so the critics read "blank, then …" as a weak hook. That artefact applies to all films equally and keeps hook scores at 2–3. The next measurement should sample from 1 s, or use the video.
 
-All four runs passed the gate with 0 QA errors, a voice and captions. One run raised a score after the gate blocked it, as in round 6.
+All four runs passed the gate with 0 QA errors, a voice and captions. Two runs were blocked at the gate and passed only after changing the film (Quartile restructured its rhythm and hero; MedStat cropped its carousel), which is the loop the gate is for.
 
 **Top remaining failure modes (round 7):**
 1. Empty texture beats: Haiku keeps the flat glaze and wood-plank crops even with a line. These need a stricter rule, such as "a texture must show a subject".
@@ -271,11 +271,11 @@ All four runs passed the gate with 0 QA errors, a voice and captions. One run ra
 - Larchwood：3.38 → **3.50**
 - MedStat Pilot（真实界面）：2.96 → **3.33**
 
-**解读**：这是第一轮让每个文件夹都提升的改动：4 个文件夹全部上升，12 组“评审 × 文件夹”中有 11 组上升；平均分从 3.05 升到 3.35，与参考片的差距缩小到 0.1–0.2。Larchwood 与 MedStat 都至少有一位评审打分高于参考片。评审提到的正是换形状的证据拍点、删掉的偏题场景（手机、生存曲线），以及可读的裁切。**仍没有一部片子达到 4，目标仍未达成。**两点说明：
+**解读**：这是第一轮让每个文件夹都提升的改动：4 个文件夹全部上升，12 组“评审 × 文件夹”中有 11 组上升；平均分从 3.05 升到 3.35，与参考片的差距缩小到 0.1–0.2。Larchwood（评审 8、9）与 Quartile（评审 8）至少有一位评审打分高于参考片；MedStat 有一次与参考片持平。评审提到的正是换形状的证据拍点、删掉的偏题场景（手机、生存曲线），以及可读的裁切。**仍没有一部片子达到 4，目标仍未达成。**两点说明：
 - 这里的参考片是重新渲染的版本，因为我误删了原渲染；它的 film.json 与方案没有改动。
 - 每张联系表的第一帧都是黑场淡入，评审会把“先是空白”读成弱开场。这一采样问题对所有片子相同，并把开场分压在 2–3。下次测量应从第 1 秒开始取帧，或直接看视频。
 
-4 部片子都通过关卡，QA 0 错误，都有配音和字幕。和第 6 轮一样，有一次运行在被关卡拦下后改了分数。
+4 部片子都通过关卡，QA 0 错误，都有配音和字幕。有两次运行被关卡拦下后，先改了片子才通过（Quartile 重排了节奏与高潮，MedStat 裁切了轮播），这正是关卡要起的作用。
 
 **仍未解决的主要问题（第 7 轮）：**
 1. 空洞的纹理拍点：即使配了旁白，Haiku 仍保留平涂的釉面和木板裁切，需要更严格的规则（例如“纹理必须有主体”）。
