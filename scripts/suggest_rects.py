@@ -67,6 +67,23 @@ def inside(a, b, tol=0.9):
     return ix * iy >= tol * (a[2] - a[0]) * (a[3] - a[1])
 
 
+def modal_crop(path, base=None):
+    """[x, y, w, h] (base units) of a bright dialog on a dimmed page, or None if the capture is not one."""
+    im = Image.open(path).convert('L')
+    bw, bh = base or default_base(*im.size)
+    H = max(1, round(W * im.size[1] / im.size[0]))
+    g = np.asarray(im.resize((W, H), Image.BILINEAR)).astype(float)
+    bright = g > 236
+    rows, cols = np.where(bright.mean(1) > 0.25)[0], np.where(bright.mean(0) > 0.25)[0]
+    if not (len(rows) and len(cols)): return None
+    y0, y1, x0, x1 = rows.min(), rows.max() + 1, cols.min(), cols.max() + 1
+    outside = np.concatenate([g[:y0].ravel(), g[y1:].ravel(), g[:, :x0].ravel(), g[:, x1:].ravel()])
+    if not (y0 > 0.02 * H and y1 < 0.98 * H and x0 > 0.02 * W and x1 < 0.98 * W): return None   # a dialog floats: margins on all sides
+    if (y1 - y0) * (x1 - x0) >= 0.8 * W * H or not len(outside) or outside.mean() >= g[y0:y1, x0:x1].mean() - 25: return None
+    sx, sy = bw / W, bh / H
+    return [round(x0 * sx), round(y0 * sy), round((x1 - x0) * sx), round((y1 - y0) * sy)]
+
+
 def suggest(path, base=None, n=4):
     im = Image.open(path).convert('L')
     bw, bh = base or default_base(*im.size)
@@ -77,7 +94,22 @@ def suggest(path, base=None, n=4):
     e[1:, :] = np.maximum(e[1:, :], np.abs(np.diff(g, axis=0)))
     edge = e > 3
     edge[:2, :] = edge[-2:, :] = False; edge[:, :2] = edge[:, -2:] = False   # screen border is not content
+    # a dialog on a dimmed page: only the dialog counts (the dimmed panels behind it are not what the point is about)
+    bright = g > 236
+    rows, cols = np.where(bright.mean(1) > 0.25)[0], np.where(bright.mean(0) > 0.25)[0]
+    if len(rows) and len(cols):
+        my0, my1, mx0, mx1 = rows.min(), rows.max() + 1, cols.min(), cols.max() + 1
+        inner = g[my0:my1, mx0:mx1].mean()
+        outside = np.concatenate([g[:my0].ravel(), g[my1:].ravel(), g[:, :mx0].ravel(), g[:, mx1:].ravel()])
+        floats = my0 > 0.02 * H and my1 < 0.98 * H and mx0 > 0.02 * W and mx1 < 0.98 * W   # a dialog has a margin on all four sides
+        if floats and (my1 - my0) * (mx1 - mx0) < 0.8 * W * H and len(outside) and outside.mean() < inner - 25:
+            m = np.zeros_like(edge); m[my0 + max(3, (my1 - my0) // 12):my1 - 3, mx0 + 3:mx1 - 3] = True; edge &= m   # skip the dialog's toolbar row
     area = W * H
+
+    def spread(x0, y0, x1, y1, k=6):
+        """Share of a k×k grid of cells in the box that hold any mark: a box around one icon in empty space scores low."""
+        ys, xs = np.linspace(y0, y1, k + 1).astype(int), np.linspace(x0, x1, k + 1).astype(int)
+        return np.mean([edge[ys[i]:max(ys[i] + 1, ys[i + 1]), xs[j]:max(xs[j] + 1, xs[j + 1])].any() for i in range(k) for j in range(k)])
 
     def pick(radii, lo, hi):
         cands = []
@@ -86,6 +118,7 @@ def suggest(path, base=None, n=4):
                 bw_, bh_ = x1 - x0, y1 - y0
                 fr = bw_ * bh_ / area
                 if not (lo <= fr <= hi) or bw_ < 24 or bh_ < 16 or bw_ / bh_ > 9 or bh_ / bw_ > 6: continue
+                if spread(x0, y0, x1, y1) < 0.45: continue
                 cands.append([x0, y0, x1, y1, edge[y0:y1, x0:x1].mean() * fr ** 0.35])
         cands.sort(key=lambda c: -c[4])
         out = []

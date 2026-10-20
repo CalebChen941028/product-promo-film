@@ -126,6 +126,34 @@ def need_ok(need):
     return False
 
 
+OUTPUT = re.compile(r'plot|chart|figure|graph|curve|forest|roc|km|result|report|export|output|summary|图|结果|报告', re.I)
+
+
+def screen_hero():
+    """Hero treatment for a screen-led film: real outputs carry the hero moment (templates/library.js screenHero).
+    result = one real result screen; rise = the one output that matters rises out of the UI; stack = a calm cascade of outputs."""
+    screens = pool['desktop'] + pool['figure']
+    crops = {i['file']: SR.modal_crop(src / i['file'], i.get('base')) for i in screens}
+    outs = sorted([i for i in screens if OUTPUT.search(i['file']) or crops[i['file']]], key=lambda i: crops[i['file']] is None)   # real figures (dialogs) first
+    want = {'science-data': 'rise', 'developer-ai': 'stack', 'mobile-consumer-app': 'stack', 'game-entertainment-event': 'stack'}.get(gid, 'result')
+    if want == 'stack' and len(outs) < 3: want = 'rise' if outs else 'result'
+    if want == 'rise' and not outs: want = 'result'
+    why = {'result': 'one real result screen, slow push', 'rise': 'the one output that matters rises out of the UI', 'stack': 'a calm cascade of real outputs'}[want]
+    h = {'hero': want, '_hero': f'{why} (autofilm, by genre and materials). Alternatives: result · rise · stack (references/film-spec.md → finale); pick the output the concept is about.'}
+    if want == 'stack':
+        h.update({'media': [path_of(i) for i in outs[:4]], 'bases': [i.get('base', [1920, 1080]) for i in outs[:4]], 'crops': [crops[i['file']] for i in outs[:4]]})
+    elif want == 'rise':
+        o = outs[0]; rest = [i for i in pool['desktop'] if i not in outs]
+        h.update({'image': path_of(o), 'base': o.get('base', [1920, 1080])})
+        if crops[o['file']]: h['crop'] = crops[o['file']]
+        if rest: h.update({'backdrop': path_of(rest[0]), 'backdropBase': rest[0].get('base', [1920, 1080])})
+    else:
+        pick = next((i for i in pool['desktop'] if re.search(r'result|dashboard|report|workspace|overview', i['file'], re.I)), None) or \
+            next((i for i in pool['desktop'] if i not in outs), None) or screens[0]
+        h.update({'image': path_of(pick), 'base': pick.get('base', [1920, 1080])})
+    return h
+
+
 # 3 · cast: arc beats → scenes ------------------------------------------------------------------------
 used, scenes, fill = set(), [], a.fill_copy
 logo = pool['logo'][0] if pool['logo'] else None
@@ -221,6 +249,8 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         first = scenes[0] if scenes and scenes[0]['type'] == 'cover' else None
         if first and first.get('frame') == 'photo' and genre['arc'] in ('sensory', 'human-story', 'reveal'):
             sc.update({'image': first['media'], 'base': first.get('base', [1920, 1080])})   # bookend: the cold-open photo returns for the hero
+        elif pool['desktop'] or pool['figure']:
+            sc.update(screen_hero())
         sc['say'] = [{'id': 'tagline', 'en': TODO('hero line = treatment §3 Hero line: the name + the tagline'), 'zh': TODO('口号'), 'at': 1.2}]
     elif t == 'endcard':
         sc['say'] = [{'id': 'motto', 'en': TODO('last line = treatment §3 Last line: a callback to the hook, not logistics'), 'zh': TODO('收尾一句'), 'at': 0.6}]

@@ -285,6 +285,9 @@ def check(spec, base_dir):
             v = sc.get(key)
             media += v if isinstance(v, list) else ([v] if v else [])
         if sc.get('image'): media.append(sc['image'])
+        if sc.get('backdrop'): media.append(sc['backdrop'])
+        if sc.get('hero') and sc['hero'] not in ('result', 'rise', 'stack', 'wall'):
+            err(f'{where}: hero = {sc["hero"]!r}', 'use "result" (one real screen), "rise" (one output rises out of the UI), "stack" (a cascade of outputs) or "wall"')
         media += [p.get('media') for p in sc.get('panels', [])] + [it.get('media') for it in sc.get('items', []) if isinstance(it, dict)]
         for m in filter(None, media):
             if not (base_dir / m).exists():
@@ -446,6 +449,7 @@ def build(spec, base_dir, out):
         if isinstance(o.get('media'), list): o['media'] = [media(m, tr) for m in o['media']]
         elif o.get('media'): o['media'] = media(o['media'], tr)
         if o.get('image'): o['image'] = media(o['image'])
+        if o.get('backdrop'): o['backdrop'] = media(o['backdrop'])
         for p in o.get('panels', []): p['media'] = media(p['media'])
         for it in o.get('items', []):
             if isinstance(it, dict) and it.get('media'): it['media'] = media(it['media'], tr)

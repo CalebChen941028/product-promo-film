@@ -159,8 +159,42 @@ const LIB = (() => {
   }
 
   // finale { media: [paths] } — tilted wall of real screens + name + tagline.
+  // Screen-led hero treatments (finale "hero": "result" | "rise" | "stack"): real outputs carry the hero moment, then
+  // settle up and back so the name and tagline land beneath them. One move each; light comes from the window glint.
+  //   result  one real result screen, near full-bleed, slow push            (software, finance: the work, done)
+  //   rise    the one output that matters (o.image, optional o.crop) rises out of the blurred UI (o.backdrop)   (science)
+  //   stack   up to 4 real outputs arrive one per beat in a calm cascade     (developer tools, apps: breadth of output)
+  function screenHero(start, end, o) {
+    const kind = o.hero, base = o.base || [1920, 1080];
+    scene(start, end, (R, S) => {
+      const bd = kind === 'rise' ? (o.backdrop || (o.media || [])[0]) : null;
+      if (bd) { S.bd = backdrop(R, bd, o.backdropBase || [1920, 1080]); S.bd.root.style.filter = 'blur(10px) saturate(0.8)'; qaIgnore(S.bd.root); }
+      const outs = kind === 'stack' ? (o.media || []).slice(0, 4) : [o.image || (o.media || [])[0]];
+      S.group = qaIgnore(div('abs', R)); Object.assign(S.group.style, { width: '0px', height: '0px' });
+      S.wins = outs.map((src, i) => {
+        const W = win(S.group, { srcs: src, base: kind === 'stack' ? (o.bases || [])[i] || base : base, crop: kind === 'stack' ? (o.crops || [])[i] || undefined : o.crop,
+          w: kind === 'result' ? 1560 : kind === 'rise' ? 1180 : 1000, chrome: kind === 'result' ? 'auto' : 'frame' });
+        return W;
+      });
+      S.hmax = Math.max(...S.wins.map((W, i) => W.h + (kind === 'stack' ? (S.wins.length - 1) * 46 : 0)));   // settle so the outputs end above the line
+      S.tag = textEl(R, `<div class="h-display" style="text-align:center">${nameHTML()}</div><div class="h-zh" style="text-align:center;margin-top:14px">${BR().taglineZh || ''}</div><div class="kicker" style="text-align:center;margin-top:10px">${BR().taglineEn || ''}</div>`, { whiteSpace: 'nowrap' });
+    }, (S, lt, d) => {
+      const n = S.wins.length, per = Math.min(0.9, (d * 0.45) / n), settle = esoft(prog(lt, d * 0.5, d * 0.5 + 1.2)), out = 1 - prog(lt, d - 0.7, d);
+      if (S.bd) { place(S.bd.root, { o: 0.55 * prog(lt, 0, 0.8) * out }); }
+      S.wins.forEach((W, i) => {
+        const a = esoft(prog(lt, 0.2 + i * per, 0.2 + i * per + 1.0));
+        const off = kind === 'stack' ? (i - (n - 1) / 2) : 0;
+        place(W.root, { x: off * 70, y: off * 46 + (kind === 'rise' ? lerp(140, 0, a) : lerp(30, 0, a)), z: kind === 'stack' ? i * 10 : 0,
+          s: (kind === 'result' ? lerp(0.97, 1.02, esoft(prog(lt, 0, d * 0.5))) : 1), o: a * out });
+      });
+      place(S.group, { y: lerp(0, -175, settle), s: lerp(1, Math.min(0.72, 460 / S.hmax), settle) });
+      M.text(S.tag, lt, d * 0.5 + 0.5, { y: 290, o: out });
+    });
+  }
+
   function finale(start, end, o) {
     const srcs = o.media || [];
+    if (['result', 'rise', 'stack'].includes(o.hero)) return screenHero(start, end, o);
     if (o.image) {   // bookend: the opening photograph returns full-bleed, lit, with the name and the tagline
       const base = o.base || [1920, 1080], from = fill169(base), to = zoomIn(from, 1.1, 0.5, 0.5);
       scene(start, end, (R, S) => {
