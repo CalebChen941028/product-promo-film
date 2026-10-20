@@ -1,4 +1,6 @@
 {
+ "treatment": "skip",
+ "_treatment": "engine and style showcase with the user's own track and the template placeholder screens; there is no product brief, so the crew is skipped and this is a test cut. For a crew-approved film, see examples/product-demo.",
   "name": "demo-film",
   "out": "film_out",
   "style": "midnight-tech",

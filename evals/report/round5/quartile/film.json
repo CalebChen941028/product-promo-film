@@ -1,0 +1,250 @@
+{
+ "_how": "Written by the crew from treatment.md (Quartile, demo evaluation).",
+ "name": "quartile-film",
+ "out": "film_out",
+ "materials": "../../materials/quartile",
+ "genre": "science-data",
+ "style": "paper-academic",
+ "motion": "precision-data",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "Quartile",
+  "nameAccent": "",
+  "logo": "../../materials/quartile/logo.png",
+  "positioningZh": "面向临床研究者的桌面统计工具",
+  "positioningEn": "DESKTOP STATISTICS FOR CLINICAL RESEARCHERS",
+  "taglineZh": "同样的分析，同样的结果",
+  "taglineEn": "Same analysis. Same answer.",
+  "motto": [
+   "再跑一次，",
+   "结果依然相同。",
+   "Run it again. Same script, same answer."
+  ],
+  "contacts": [],
+  "chips": [
+   "macOS",
+   "Windows",
+   "Demo screens"
+  ]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../../materials/quartile/forest-plot.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "say": [
+    {
+     "en": "Can you run that again?",
+     "zh": "能再跑一次吗？",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/quartile/forest-plot.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "title": {
+    "zh": "一张图，看懂合并结果",
+    "en": "Meta-analysis in one forest plot"
+   },
+   "points": [
+    {
+     "zh": "固定与随机效应",
+     "en": "Fixed and random effects",
+     "rect": [
+      581,
+      157,
+      425,
+      91
+     ]
+    },
+    {
+     "zh": "I² 异质性",
+     "en": "I² heterogeneity",
+     "rect": [
+      401,
+      397,
+      605,
+      91
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Pooled estimates from fixed and random effects, and how much the studies disagree.",
+     "zh": "固定与随机效应的合并结果，以及研究之间的分歧有多大。"
+    }
+   ],
+   "_rects": "auto-suggested by suggest_rects.py: match each point to the region it names (preview: python3 scripts/suggest_rects.py <image> --preview .)",
+   "chapter": [
+    "01",
+    "核验",
+    "VERIFY"
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/quartile/roc-curve.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "title": {
+    "zh": "诊断准确性，附区间",
+    "en": "Diagnostic accuracy, with its range"
+   },
+   "points": [
+    {
+     "zh": "AUC",
+     "en": "AUC",
+     "rect": [
+      982,
+      149,
+      627,
+      394
+     ]
+    },
+    {
+     "zh": "95% 置信区间",
+     "en": "95% confidence interval",
+     "rect": [
+      164,
+      565,
+      627,
+      394
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "The ROC curve gives the AUC, with its 95% confidence interval, so the claim has a range.",
+     "zh": "ROC 曲线给出 AUC 及其 95% 置信区间，结论有了范围。"
+    }
+   ],
+   "_rects": "auto-suggested by suggest_rects.py: match each point to the region it names (preview: python3 scripts/suggest_rects.py <image> --preview .)"
+  },
+  {
+   "type": "statement",
+   "bars": 2,
+   "zh": "结论，应该经得起重跑。",
+   "en": "Evidence should survive a rerun."
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/quartile/survival-curve.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "title": {
+    "zh": "生存曲线，附风险人数",
+    "en": "Survival curves, with numbers at risk"
+   },
+   "points": [
+    {
+     "zh": "Log-rank 检验",
+     "en": "Log-rank test",
+     "rect": [
+      588,
+      108,
+      627,
+      394
+     ]
+    },
+    {
+     "zh": "风险人数",
+     "en": "Numbers at risk",
+     "rect": [
+      1031,
+      486,
+      627,
+      394
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Kaplan–Meier curves, with the log-rank test and numbers at risk.",
+     "zh": "Kaplan–Meier 曲线，附 log-rank 检验与风险人数。"
+    }
+   ],
+   "_rects": "auto-suggested by suggest_rects.py: match each point to the region it names (preview: python3 scripts/suggest_rects.py <image> --preview .)"
+  },
+  {
+   "type": "clip",
+   "bars": 2,
+   "media": "build/clips/scroll-results.webm",
+   "title": {
+    "zh": "结果，一滑即见",
+    "en": "Results, one scroll away"
+   }
+  },
+  {
+   "type": "phone",
+   "bars": 3,
+   "media": "../../materials/quartile/phone-results.png",
+   "base": [
+    393,
+    852
+   ],
+   "title": {
+    "zh": "手机上，看保存的分析",
+    "en": "Your saved analyses, on your phone"
+   }
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/quartile/forest-plot.png",
+    "../../materials/quartile/phone-results.png",
+    "../../materials/quartile/roc-curve.png",
+    "../../materials/quartile/survival-curve.png",
+    "../../materials/quartile/workspace.png"
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Same analysis. Same answer.",
+     "zh": "同样的分析，同样的结果",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Run it again. Same script, same answer.",
+     "zh": "再跑一次，结果依然相同。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

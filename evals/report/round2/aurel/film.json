@@ -1,0 +1,161 @@
+{
+ "_how": "Crew-written film. Source: treatment.md. Edit film.json, never film_out/.",
+ "name": "aurel-stoneware-film",
+ "out": "film_out",
+ "materials": "../../materials/aurel",
+ "treatment": "treatment.md",
+ "genre": "food-beverage",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "warm-acoustic",
+   "bpm": 98
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "Aurel Stoneware",
+  "nameAccent": "",
+  "logo": "../../materials/aurel/logo.png",
+  "positioningZh": "手工陶杯，每只釉色都不同",
+  "positioningEn": "Hand-glazed stoneware mugs for slow coffee at home",
+  "taglineZh": "每一抹釉，都只此一次",
+  "taglineEn": "No two glazes are the same.",
+  "motto": [
+   "每一抹釉，都只此一次",
+   "手工上釉，只属于你",
+   "Glazed by hand. Yours alone."
+  ],
+  "contacts": [],
+  "chips": []
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../../materials/aurel/morning-table.jpg",
+   "base": [1920, 1280],
+   "frame": "photo",
+   "say": [
+    {
+     "en": "Glazed by hand. No two glazes are the same.",
+     "zh": "手工上釉，没有两只一样",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 3,
+   "media": "../../materials/aurel/glaze-detail.jpg",
+   "base": [1920, 1080]
+  },
+  {
+   "type": "hero",
+   "bars": 4,
+   "media": [
+    "../../materials/aurel/mug-clay.png",
+    "../../materials/aurel/mug-cream.png",
+    "../../materials/aurel/mug-sage.png"
+   ],
+   "base": [1200, 1000],
+   "title": {
+    "zh": "手作陶杯",
+    "en": "Aurel Stoneware"
+   },
+   "say": [
+    {
+     "en": "Thrown on the wheel. Fired twice.",
+     "zh": "拉坯成形，两次烧制"
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 4,
+   "media": "../../materials/aurel/shelf.jpg",
+   "base": [1920, 1080],
+   "title": {
+    "zh": "双层杯壁，温得更久",
+    "en": "Warm for longer"
+   },
+   "points": [
+    {
+     "zh": "350 ml，双层杯壁",
+     "en": "350 ml, double-thick wall"
+    },
+    {
+     "zh": "洗碗机可清洗",
+     "en": "Dishwasher safe"
+    }
+   ],
+   "say": [
+    {
+     "en": "Double-thick walls keep your coffee warm for longer.",
+     "zh": "双层杯壁，咖啡更久保温"
+    }
+   ],
+   "frame": "photo"
+  },
+  {
+   "type": "lineup",
+   "bars": 3,
+   "items": [
+    {
+     "media": "../../materials/aurel/mug-clay.png",
+     "zh": "土褐釉",
+     "en": "Clay"
+    },
+    {
+     "media": "../../materials/aurel/mug-cream.png",
+     "zh": "奶油釉",
+     "en": "Cream"
+    },
+    {
+     "media": "../../materials/aurel/mug-sage.png",
+     "zh": "鼠尾草绿釉",
+     "en": "Sage"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/aurel/glaze-detail.jpg",
+    "../../materials/aurel/morning-table.jpg",
+    "../../materials/aurel/mug-clay.png",
+    "../../materials/aurel/mug-cream.png",
+    "../../materials/aurel/mug-sage.png",
+    "../../materials/aurel/shelf.jpg"
+   ],
+   "say": [
+    {
+     "en": "Aurel. One glaze, one mug.",
+     "zh": "一抹釉，一只杯",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Glazed by hand. Yours alone.",
+     "zh": "手工上釉，只属于你",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

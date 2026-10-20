@@ -1,0 +1,112 @@
+{
+ "_how": "Written from treatment.md by the crew. Build: python3 <skill>/scripts/make_film.py film.json --stage check",
+ "name": "aurel-stoneware-film",
+ "out": "film_out",
+ "materials": "../../materials/aurel",
+ "treatment": "treatment.md",
+ "genre": "food-beverage",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "warm-acoustic",
+   "bpm": 98
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "Aurel Stoneware",
+  "nameAccent": "",
+  "logo": "../../materials/aurel/logo.png",
+  "positioningZh": "手作陶瓷马克杯",
+  "positioningEn": "HANDMADE STONEWARE MUGS",
+  "taglineZh": "没有两只一样",
+  "taglineEn": "No two alike",
+  "motto": [
+   "同样的早晨，",
+   "不一样的杯子。",
+   "The same morning. A different mug."
+  ],
+  "contacts": [],
+  "chips": ["Sage · Cream · Clay"]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../../materials/aurel/morning-table.jpg",
+   "base": [1920, 1280],
+   "frame": "photo",
+   "say": [
+    {"en": "No two glazes are the same.", "zh": "没有两只杯子的釉色一样。", "at": 0.6}
+   ]
+  },
+  {
+   "type": "photo",
+   "bars": 3,
+   "media": "../../materials/aurel/shelf.jpg",
+   "base": [1920, 1080],
+   "title": {"zh": "三种釉色，一排架子", "en": "Three glazes. One shelf."},
+   "say": [
+    {"en": "Made in a small studio, forty mugs a week.", "zh": "小工作室手作，每周四十只。", "at": 0.5}
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 2,
+   "media": "../../materials/aurel/glaze-detail.jpg",
+   "base": [1920, 1080]
+  },
+  {
+   "type": "hero",
+   "bars": 4,
+   "media": ["../../materials/aurel/mug-sage.png"],
+   "base": [1200, 1000],
+   "title": {"zh": "Aurel 陶瓷", "en": "Aurel Stoneware"},
+   "say": [
+    {"en": "Aurel. Thrown on the wheel. Glazed by hand. Fired twice.", "zh": "Aurel：轮制成型，手工施釉，两次烧制。", "at": 1.0}
+   ]
+  },
+  {
+   "type": "lineup",
+   "bars": 3,
+   "title": {"zh": "350 毫升，双层厚壁", "en": "350 ml, double-thick wall"},
+   "items": [
+    {"media": "../../materials/aurel/mug-clay.png", "zh": "陶土", "en": "Clay"},
+    {"media": "../../materials/aurel/mug-cream.png", "zh": "奶白", "en": "Cream"},
+    {"media": "../../materials/aurel/mug-sage.png", "zh": "鼠尾草", "en": "Sage"}
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/aurel/glaze-detail.jpg",
+    "../../materials/aurel/morning-table.jpg",
+    "../../materials/aurel/mug-clay.png",
+    "../../materials/aurel/mug-cream.png",
+    "../../materials/aurel/mug-sage.png",
+    "../../materials/aurel/shelf.jpg"
+   ],
+   "image": "../../materials/aurel/morning-table.jpg",
+   "base": [1920, 1280],
+   "say": [
+    {"id": "tagline", "en": "Aurel. No two alike.", "zh": "没有两只一样", "at": 1.2}
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {"id": "motto", "en": "The same morning. A different mug.", "zh": "同样的早晨，不一样的杯子。", "at": 0.6}
+   ]
+  }
+ ]
+}

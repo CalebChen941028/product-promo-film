@@ -1,0 +1,198 @@
+{
+ "_how": "Written from treatment.md by the crew. Demo product: placeholder brand and drawn images (labelled in the report).",
+ "name": "aurel-stoneware-film",
+ "out": "film_out",
+ "materials": "../../materials/aurel",
+ "genre": "food-beverage",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "warm-acoustic",
+   "bpm": 98
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes",
+  "_note": "am_michael is already downloaded. The genre suggests af_heart (about 0.5 MB): not used, not approved."
+ },
+ "brand": {
+  "name": "Aurel Stoneware",
+  "nameAccent": "",
+  "logo": "../../materials/aurel/logo.png",
+  "positioningZh": "手工陶瓷马克杯",
+  "positioningEn": "HANDMADE STONEWARE MUGS",
+  "taglineZh": "三种釉色，没有两件相同",
+  "taglineEn": "Three glazes. No two alike.",
+  "motto": [
+   "轮上成形，手工上釉，",
+   "两次烧成。",
+   "Thrown, glazed, fired twice."
+  ],
+  "contacts": [],
+  "chips": []
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../../materials/aurel/glaze-detail.jpg",
+   "base": [
+    1920,
+    1080
+   ],
+   "frame": "photo",
+   "say": [
+    {
+     "en": "No two glazes are the same.",
+     "zh": "没有两款釉色是一样的。",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "photo",
+   "bars": 3,
+   "media": "../../materials/aurel/morning-table.jpg",
+   "base": [
+    1920,
+    1280
+   ],
+   "title": {
+    "zh": "在家，慢慢喝",
+    "en": "Slow coffee, at home"
+   },
+   "say": [
+    {
+     "en": "Made for slow coffee and tea at home.",
+     "zh": "为在家慢慢喝的咖啡与茶而做。"
+    }
+   ]
+  },
+  {
+   "type": "hero",
+   "bars": 4,
+   "media": "../../materials/aurel/mug-sage.png",
+   "base": [
+    1200,
+    1000
+   ],
+   "title": {
+    "zh": "手工陶瓷马克杯",
+    "en": "Aurel Stoneware"
+   },
+   "say": [
+    {
+     "en": "Thrown on the wheel, glazed by hand, fired twice.",
+     "zh": "轮上拉坯，手工上釉，两次烧成。",
+     "at": 1.0
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/aurel/shelf.jpg",
+   "base": [
+    1920,
+    1080
+   ],
+   "frame": "photo",
+   "title": {
+    "zh": "350 ml，双层厚壁",
+    "en": "Double-thick wall, 350 ml"
+   },
+   "points": [
+    {
+     "zh": "双层厚壁，保温更久",
+     "en": "Keeps coffee warm longer"
+    },
+    {
+     "zh": "容量 350 ml",
+     "en": "350 ml"
+    },
+    {
+     "zh": "无铅、食品级釉料",
+     "en": "Lead-free, food-safe glaze"
+    },
+    {
+     "zh": "可用洗碗机清洗",
+     "en": "Dishwasher safe"
+    }
+   ],
+   "say": [
+    {
+     "en": "The double-thick wall keeps coffee warm for longer.",
+     "zh": "双层厚壁，让咖啡保温更久。"
+    }
+   ]
+  },
+  {
+   "type": "lineup",
+   "bars": 3,
+   "items": [
+    {
+     "media": "../../materials/aurel/mug-clay.png",
+     "zh": "陶土色",
+     "en": "Clay"
+    },
+    {
+     "media": "../../materials/aurel/mug-cream.png",
+     "zh": "奶白色",
+     "en": "Cream"
+    },
+    {
+     "media": "../../materials/aurel/mug-sage.png",
+     "zh": "鼠尾草绿",
+     "en": "Sage"
+    }
+   ],
+   "say": [
+    {
+     "en": "Sage, cream or clay.",
+     "zh": "鼠尾草绿、奶白或陶土色。",
+     "at": 0.6
+    }
+   ],
+   "hit": "hero"
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/aurel/glaze-detail.jpg",
+    "../../materials/aurel/morning-table.jpg",
+    "../../materials/aurel/mug-clay.png",
+    "../../materials/aurel/mug-cream.png",
+    "../../materials/aurel/mug-sage.png",
+    "../../materials/aurel/shelf.jpg"
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Aurel. Three glazes, no two alike.",
+     "zh": "三种釉色，没有两件相同",
+     "at": 1.2
+    }
+   ],
+   "hit": false
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Your glaze. No one else has the same.",
+     "zh": "你的那一款，别人没有。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

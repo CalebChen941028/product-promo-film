@@ -1,0 +1,79 @@
+{
+ "_how": "Written from treatment.md (Run It Again). Every spoken line is copied from treatment section 4. Screens are labelled placeholder wireframes.",
+ "name": "quartile-film",
+ "out": "film_out",
+ "materials": "../../materials/quartile",
+ "treatment": "treatment.md",
+ "genre": "science-data",
+ "style": "paper-academic",
+ "motion": "precision-data",
+ "cinema": "auto",
+ "music": {"generate": {"mood": "minimal-electronic"}},
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "Quartile",
+  "nameAccent": "",
+  "logo": "../../materials/quartile/logo.png",
+  "positioningZh": "给临床研究者的桌面统计软件",
+  "positioningEn": "DESKTOP STATISTICS FOR CLINICAL RESEARCHERS",
+  "taglineZh": "同样的数据，同样的结果",
+  "taglineEn": "Same data. Same answer.",
+  "motto": ["审稿人再跑一遍，", "结果一致。", "They run it again. It matches."],
+  "contacts": [],
+  "chips": ["macOS", "Windows"]
+ },
+ "scenes": [
+  {"type": "cover", "bars": 3,
+   "media": "../../materials/quartile/workspace.png", "base": [1920, 1080],
+   "say": [{"en": "The reviewer asks you to run it again.", "zh": "审稿人说：请再跑一遍。", "at": 0.6}]},
+  {"type": "feature", "bars": 4,
+   "media": "../../materials/quartile/survival-curve.png", "base": [1800, 1120],
+   "title": {"zh": "生存曲线，直接放进论文", "en": "Survival curves, ready for the paper"},
+   "points": [
+    {"zh": "Log-rank 检验", "en": "Log-rank test", "rect": [588, 108, 627, 394]},
+    {"zh": "风险人数表", "en": "Numbers at risk", "rect": [1031, 486, 627, 394]}
+   ],
+   "say": [{"en": "The log-rank test and the numbers at risk, already on the curve.", "zh": "对数秩检验和风险人数，已经画在曲线上。"}],
+   "chapter": ["01", "生存分析", "SURVIVAL"]},
+  {"type": "feature", "bars": 4,
+   "media": "../../materials/quartile/roc-curve.png", "base": [1800, 1120],
+   "title": {"zh": "ROC 曲线与 AUC", "en": "ROC curve, with its AUC"},
+   "points": [
+    {"zh": "AUC 与 95% 置信区间", "en": "AUC with 95% CI", "rect": [982, 149, 627, 394]},
+    {"zh": "参考对角线", "en": "Reference diagonal", "rect": [164, 565, 627, 394]}
+   ],
+   "say": [{"en": "The AUC comes with its 95% confidence interval, so a reader sees how sure you are.", "zh": "AUC 附带 95% 置信区间，读者一眼看出把握有多大。"}],
+   "chapter": ["02", "诊断试验", "DIAGNOSTIC"]},
+  {"type": "clip", "bars": 2,
+   "media": "../../materials/quartile/scroll-results.webm",
+   "title": {"zh": "每个结果，都可导出为 R 脚本", "en": "Every result exports as an R script"}},
+  {"type": "statement", "bars": 2,
+   "zh": "数字，要经得起再跑一次。", "en": "A number should survive a second run."},
+  {"type": "feature", "bars": 4,
+   "media": "../../materials/quartile/forest-plot.png", "base": [1800, 1120],
+   "title": {"zh": "荟萃分析森林图", "en": "Forest plot, fixed or random"},
+   "points": [
+    {"zh": "固定与随机效应", "en": "Fixed and random effects", "rect": [581, 157, 425, 91]},
+    {"zh": "I² 异质性", "en": "I² heterogeneity", "rect": [401, 397, 605, 91]}
+   ],
+   "say": [{"en": "Fixed or random effects, and I² for heterogeneity, on one figure.", "zh": "固定或随机效应，以及 I² 异质性，同在一张图上。"}],
+   "chapter": ["03", "荟萃分析", "META"]},
+  {"type": "finale", "bars": 4,
+   "media": [
+    "../../materials/quartile/forest-plot.png",
+    "../../materials/quartile/phone-results.png",
+    "../../materials/quartile/roc-curve.png",
+    "../../materials/quartile/survival-curve.png",
+    "../../materials/quartile/workspace.png"
+   ],
+   "say": [{"id": "tagline", "en": "Quartile. Same data. Same answer.", "zh": "Quartile：同样的数据，同样的结果。", "at": 1.2}]},
+  {"type": "endcard", "bars": "rest",
+   "say": [{"id": "motto", "en": "They run it again. It matches.", "zh": "审稿人再跑一遍，结果一致。", "at": 0.6}]}
+ ]
+}
