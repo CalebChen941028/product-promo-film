@@ -67,6 +67,11 @@ def inside(a, b, tol=0.9):
     return ix * iy >= tol * (a[2] - a[0]) * (a[3] - a[1])
 
 
+def is_chart(path, base=None):
+    """True when the image is a chart (sparse marks): it gets no highlight boxes."""
+    return not suggest(path, base, 2)[1]
+
+
 def modal_crop(path, base=None):
     """[x, y, w, h] (base units) of a bright dialog on a dimmed page, or None if the capture is not one."""
     im = Image.open(path).convert('L')
@@ -129,21 +134,8 @@ def suggest(path, base=None, n=4):
         return out
 
     picked = pick((2, 5), 0.015, 0.25)
-    if len(picked) < 2:   # a chart or a sparse screen: the windows where the marks are densest (never the whole plot)
-        ww, wh = int(W * 0.34), int(H * 0.34)
-        marks = edge.copy()
-        for k in (-1, 0, 1):   # drop axes and rules: rows/columns that are mostly one long line (and their neighbours)
-            marks[np.roll(edge.mean(1) > 0.35, k), :] = False; marks[:, np.roll(edge.mean(0) > 0.35, k)] = False
-        ii = np.pad(marks.astype(float).cumsum(0).cumsum(1), ((1, 0), (1, 0)))
-        dens = (ii[wh:, ww:] - ii[:-wh, ww:] - ii[wh:, :-ww] + ii[:-wh, :-ww])
-        for _ in range(n - len(picked)):
-            y, x = np.unravel_index(np.argmax(dens), dens.shape)
-            if dens[y, x] <= 0: break
-            sub = marks[y:y + wh, x:x + ww]   # shrink the window to the marks inside it, so the box hugs the data
-            ys_, xs_ = np.nonzero(sub)
-            c = [x + xs_.min(), y + ys_.min(), x + xs_.max() + 1, y + ys_.max() + 1, dens[y, x]] if len(xs_) else [x, y, x + ww, y + wh, dens[y, x]]
-            if not any(iou(c, p) > 0.15 or inside(c, p) or inside(p, c) for p in picked): picked.append(c)
-            dens[max(0, y - wh):y + wh, max(0, x - ww):x + ww] = 0
+    if len(picked) < 2:   # a chart (sparse marks on white): no boxes. Blind critics read ellipses on chart space as noise;
+        return [bw, bh], []   # the chart is the image, the points stay as on-screen labels
     picked.sort(key=lambda c: (round(c[1] / (H / 6)), c[0]))   # reading order: rows, then left → right
     sx, sy = bw / W, bh / H
     pad = 8
@@ -187,4 +179,4 @@ if __name__ == '__main__':
         for p, r in res.items():
             print(f"{p}  base {r['base']}" + (f"  → preview {r['preview']}" if r.get('preview') else ''))
             for i, rc in enumerate(r['rects'], 1): print(f'  {i}: {rc}')
-            if not r['rects']: print('  no clear regions — measure with grid_overlay.py, or use "frame": "photo" (no highlight boxes)')
+            if not r['rects']: print('  a chart (sparse marks): no highlight boxes — let the chart be the image; the points stay as labels')

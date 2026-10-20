@@ -1,0 +1,272 @@
+{
+ "_how": "Rebuilt from treatment.md (crew). Replace nothing by hand in film_out/.",
+ "name": "medstat-pilot-film",
+ "out": "film_out",
+ "materials": "../../materials/medstat-real",
+ "genre": "science-data",
+ "style": "paper-academic",
+ "motion": "precision-data",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "MedStat Pilot",
+  "nameAccent": "",
+  "logo": "../../materials/medstat-real/logo.png",
+  "positioningZh": "医学与公共卫生的统计工作台",
+  "positioningEn": "STATISTICS WORKBENCH FOR CLINICAL AND PUBLIC HEALTH RESEARCH",
+  "taglineZh": "每个结果，都有脚本可查",
+  "taglineEn": "Every result, with its script.",
+  "motto": [
+   "审稿人问，",
+   "脚本来答。",
+   "The reviewer asks. The script answers."
+  ],
+  "contacts": [],
+  "chips": [
+   "macOS · Apple silicon",
+   "Windows 10/11 x64",
+   "Internal beta · 内测版",
+   "Demo data · 演示数据"
+  ]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../../materials/medstat-real/ai_final.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "say": [
+    {
+     "en": "A reviewer asks how you got that number.",
+     "zh": "审稿人问：这个数字怎么来的？",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/medstat-real/home.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "title": {
+    "zh": "从数据文件开始",
+    "en": "Start from the data file"
+   },
+   "points": [
+    {
+     "zh": "拖入统计数据文件",
+     "en": "Drop in the data file",
+     "rect": [
+      576,
+      485,
+      665,
+      182
+     ]
+    },
+    {
+     "zh": "新建统计项目",
+     "en": "Start a new project",
+     "rect": [
+      536,
+      204,
+      424,
+      200
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Drop in your data file. Upload, cleaning and analysis stay in one workspace.",
+     "zh": "拖入数据文件，就在同一个工作区里开始分析。"
+    }
+   ],
+   "chapter": [
+    "01",
+    "数据",
+    "DATA"
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/medstat-real/tool_compute.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "title": {
+    "zh": "一个面板里整理变量",
+    "en": "Calculate and recode in one panel"
+   },
+   "points": [
+    {
+     "zh": "快速公式",
+     "en": "Quick formulas",
+     "rect": [
+      506,
+      396,
+      908,
+      80
+     ]
+    },
+    {
+     "zh": "运算符与函数",
+     "en": "Operators and functions",
+     "rect": [
+      1057,
+      549,
+      357,
+      243
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Calculate and recode variables in one panel, then run the analysis on the cleaned data.",
+     "zh": "在一个面板里计算、重编码变量，再用整理好的数据做分析。"
+    }
+   ],
+   "chapter": [
+    "02",
+    "清理",
+    "CLEAN"
+   ]
+  },
+  {
+   "type": "statement",
+   "bars": 2,
+   "zh": "先整理，再下结论。",
+   "en": "Clean first. Then conclude."
+  },
+  {
+   "type": "carousel",
+   "bars": 3,
+   "title": {
+    "zh": "更多输出",
+    "en": "More outputs"
+   },
+   "panels": [
+    {
+     "zh": "Meta 森林图",
+     "en": "Meta-analysis forest plot",
+     "media": "../../materials/medstat-real/meta_plot.png",
+     "base": [
+      1920,
+      1080
+     ]
+    },
+    {
+     "zh": "ROC 曲线",
+     "en": "ROC curve",
+     "media": "../../materials/medstat-real/roc_plot.png",
+     "base": [
+      1920,
+      1080
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "ROC curves and meta-analysis forest plots, from the same data.",
+     "zh": "ROC 曲线与 Meta 森林图，来自同一份数据。"
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/medstat-real/km.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "title": {
+    "zh": "生存曲线与风险人数表",
+    "en": "Survival curves with numbers at risk"
+   },
+   "points": [
+    {
+     "zh": "Kaplan–Meier 曲线",
+     "en": "Kaplan–Meier curves",
+     "rect": [
+      1116,
+      470,
+      300,
+      290
+     ]
+    },
+    {
+     "zh": "每个时间点的风险人数",
+     "en": "Numbers at risk, by time",
+     "rect": [
+      1171,
+      686,
+      230,
+      72
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Kaplan–Meier curves, with numbers at risk. Every result exports as a reproducible R script.",
+     "zh": "Kaplan–Meier 曲线与风险人数。每个结果可导出可复现的 R 脚本。"
+    }
+   ],
+   "chapter": [
+    "03",
+    "证据",
+    "PROOF"
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/medstat-real/ai_final.png"
+   ],
+   "hero": "result",
+   "image": "../../materials/medstat-real/ai_final.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "MedStat Pilot. Every result, with its script.",
+     "zh": "MedStat Pilot：每个结果，都有脚本可查。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "The reviewer asks. The script answers.",
+     "zh": "审稿人问，脚本来答。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

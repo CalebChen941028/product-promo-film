@@ -182,6 +182,15 @@ def guard_generated(out):
                  f"(references/film-spec.md), then rerun --stage build. Hand edits are lost on every build.")
 
 
+def chart_media(base_dir, sc):
+    """A chart (sparse marks) needs no highlight boxes: suggest_rects finds none, and boxes on chart space read as noise."""
+    try:
+        sys.path.insert(0, str(HERE)); import suggest_rects
+        return isinstance(sc.get('media'), str) and suggest_rects.is_chart(base_dir / sc['media'], sc.get('base'))
+    except Exception:
+        return False
+
+
 def treatment_gate(spec, spec_path):
     """Hard gate before build: the crew's treatment must pass check_treatment.py against this film.json."""
     t = spec.get('treatment', 'treatment.md')
@@ -314,7 +323,7 @@ def check(spec, base_dir):
         for j, p in enumerate(sc.get('points', [])):
             r = p.get('rect')
             if r is None:
-                if sc.get('frame') != 'photo':
+                if sc.get('frame') != 'photo' and not chart_media(base_dir, sc):
                     warn(f'{where}.points[{j}]: no rect → no highlight box', f'python3 {HERE / "suggest_rects.py"} {sc.get("media")} --preview . → copy the numbered rect this point talks about; real photos ("frame": "photo") need none')
             elif len(r) != 4:
                 err(f'{where}.points[{j}]: rect must be [x,y,w,h]', 'measure it with grid_overlay.py on the screenshot (base coordinates)')

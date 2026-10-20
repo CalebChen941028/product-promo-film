@@ -242,7 +242,8 @@ if len(sys.argv) > 2:
         caps['Image'] = 3
         warn(f'the same image carries two beats: {sorted(dup)[0]}', 'one image, one beat — use another material, or drop the weaker beat')
     for i, sc in enumerate(scenes):
-        if sc['type'] == 'feature' and sc.get('frame') != 'photo' and sc.get('points') and not any(p.get('rect') for p in sc['points']):
+        if sc['type'] == 'feature' and sc.get('frame') != 'photo' and sc.get('points') and not any(p.get('rect') for p in sc['points']) and \
+                not (isinstance(sc.get('media'), str) and (base / sc['media']).exists() and __import__('suggest_rects').is_chart(base / sc['media'], sc.get('base'))):
             caps['Image'] = min(caps.get('Image', 5), 3)
             warn(f'scenes[{i}] feature on a screen has no highlight rects', f'python3 scripts/suggest_rects.py {sc.get("media")} --preview . → copy the rect of the region each point talks about')
             break
