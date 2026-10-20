@@ -218,6 +218,9 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         wall = [path_of(i) for i in items if i['kind'] == 'image' and i.get('role') in ('desktop', 'photo', 'cutout', 'figure', 'phone')][:8]
         if not wall: continue
         sc['media'] = wall
+        first = scenes[0] if scenes and scenes[0]['type'] == 'cover' else None
+        if first and first.get('frame') == 'photo' and genre['arc'] in ('sensory', 'human-story', 'reveal'):
+            sc.update({'image': first['media'], 'base': first.get('base', [1920, 1080])})   # bookend: the cold-open photo returns for the hero
         sc['say'] = [{'id': 'tagline', 'en': TODO('hero line = treatment §3 Hero line: the name + the tagline'), 'zh': TODO('口号'), 'at': 1.2}]
     elif t == 'endcard':
         sc['say'] = [{'id': 'motto', 'en': TODO('last line = treatment §3 Last line: a callback to the hook, not logistics'), 'zh': TODO('收尾一句'), 'at': 0.6}]

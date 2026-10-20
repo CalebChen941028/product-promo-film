@@ -66,7 +66,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `phone` | 2 | `media`, `base` (points, e.g. [393,852]), `title{zh,en}` | mobile screenshot in a device frame |
 | `compare` | 3 | `rows[[oldZh,oldEn,newZh,newEn]]` ≤ 6, `header?` | traditional vs this product |
 | `statement` | 1 | `zh`, `en?` | one big line (manifesto beat) |
-| `finale` | 4 | `media` = list of images | tilted wall of real screens + name + tagline |
+| `finale` | 4 | `media` = list of images, `image?`, `base?` | tilted wall of real screens + name + tagline; with `image` (one photograph, usually the cover's) it is a bookend instead: that photo full-bleed, lit, with the name and tagline (autofilm sets it for photo-led films) |
 | `endcard` | 4 | — | logo, name, positioning, motto, contacts, chips |
 | `photo` | 2 | `media`, `base?`, `title?{zh,en}`, `focus?` (end crop), `side?: "left"\|"bottom"` | full-bleed photograph with a slow push-in; text on a soft scrim |
 | `hero` | 3 | `media` (one image or several angles), `base?`, `title{zh,en}`, `cutout?` | the reveal: the product lights up and breathes. Transparent PNGs stand on the stage with a contact shadow and reflection (auto-detected); a single photograph fills the frame and lights up as the camera eases in |
@@ -141,7 +141,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `phone` | 2 | `media`、`base`（点尺寸，如 [393,852]）、`title{zh,en}` | 手机截图套设备外框 |
 | `compare` | 3 | `rows[[旧中文,旧英文,新中文,新英文]]` ≤ 6、`header?` | 传统方式 vs 本产品 |
 | `statement` | 1 | `zh`、`en?` | 一句大字（宣言） |
-| `finale` | 4 | `media` = 图片列表 | 真实界面倾斜成墙 + 名称 + 口号 |
+| `finale` | 4 | `media` = 图片列表、`image?`、`base?` | 真实界面倾斜成墙 + 名称 + 口号；给出 `image`（一张照片，通常就是封面那张）时改为首尾呼应：这张照片满幅亮起，叠名称与口号（照片为主的片子由 autofilm 自动设置） |
 | `endcard` | 4 | — | Logo、名称、定位、理念、联系方式、平台标签 |
 | `photo` | 2 | `media`、`base?`、`title?{zh,en}`、`focus?`（终止裁切）、`side?` | 满幅照片缓慢推近，文字放在柔和的渐变遮罩上 |
 | `hero` | 3 | `media`（一张或多个角度）、`base?`、`title{zh,en}`、`cutout?` | 揭晓：产品亮起并轻微呼吸；透明底 PNG 会自动带接触阴影与倒影立在舞台上；单张照片则满幅铺开，随镜头缓推逐渐亮起 |

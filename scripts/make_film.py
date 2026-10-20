@@ -284,6 +284,7 @@ def check(spec, base_dir):
         for key in ['media']:
             v = sc.get(key)
             media += v if isinstance(v, list) else ([v] if v else [])
+        if sc.get('image'): media.append(sc['image'])
         media += [p.get('media') for p in sc.get('panels', [])] + [it.get('media') for it in sc.get('items', []) if isinstance(it, dict)]
         for m in filter(None, media):
             if not (base_dir / m).exists():
@@ -444,6 +445,7 @@ def build(spec, base_dir, out):
         tr = sc['type'] in ('hero', 'lineup') and o.get('cutout')
         if isinstance(o.get('media'), list): o['media'] = [media(m, tr) for m in o['media']]
         elif o.get('media'): o['media'] = media(o['media'], tr)
+        if o.get('image'): o['image'] = media(o['image'])
         for p in o.get('panels', []): p['media'] = media(p['media'])
         for it in o.get('items', []):
             if isinstance(it, dict) and it.get('media'): it['media'] = media(it['media'], tr)

@@ -161,6 +161,21 @@ const LIB = (() => {
   // finale { media: [paths] } — tilted wall of real screens + name + tagline.
   function finale(start, end, o) {
     const srcs = o.media || [];
+    if (o.image) {   // bookend: the opening photograph returns full-bleed, lit, with the name and the tagline
+      const base = o.base || [1920, 1080], from = fill169(base), to = zoomIn(from, 1.1, 0.5, 0.5);
+      scene(start, end, (R, S) => {
+        S.W = backdrop(R, o.image, base); qaIgnore(S.W.root);
+        S.dim = qaIgnore(div('', R)); Object.assign(S.dim.style, { position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.38), rgba(0,0,0,0.62) 80%)' });
+        S.tag = textEl(R, `<div class="h-display" style="text-align:center;color:#fff">${BR().name} <span style="opacity:0.86">${BR().nameAccent || ''}</span></div><div class="h-zh" style="text-align:center;margin-top:16px;color:#fff">${BR().taglineZh || ''}</div><div style="text-align:center;margin-top:12px;font:500 22px var(--en);letter-spacing:5px;color:rgba(255,255,255,0.86)">${BR().taglineEn || ''}</div>`, { whiteSpace: 'nowrap' });
+      }, (S, lt, d) => {
+        setCrop(S.W, from.map((v, j) => lerp(v, to[j], esoft(prog(lt, 0, d + ST.xf)))), 1920);
+        place(S.W.root, { o: prog(lt, 0, 0.8) * (1 - prog(lt, d - 0.8, d)) });
+        S.W.root.style.filter = `brightness(${lerp(0.55, 1, esoft(prog(lt, 0, 1.6))).toFixed(3)})`;
+        S.dim.style.opacity = prog(lt, 0.4, 1.4) * (1 - prog(lt, d - 0.8, d));
+        M.text(S.tag, lt, 1.0, { y: -30, o: 1 - prog(lt, d - 0.6, d) });
+      });
+      return;
+    }
     scene(start, end, (R, S) => {
       S.wall = qaIgnore(div('abs', R)); Object.assign(S.wall.style, { width: '3000px', height: '2400px', transformStyle: 'preserve-3d' });
       for (let r = 0; r < 7; r++) for (let c = 0; c < 6; c++) {
