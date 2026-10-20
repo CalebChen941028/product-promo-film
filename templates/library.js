@@ -184,34 +184,40 @@ const LIB = (() => {
       S.hmax = Math.max(...S.wins.map((W, i) => W.h + (kind === 'stack' ? (S.wins.length - 1) * 46 : 0)));   // settle so the outputs end above the line
       S.tag = textEl(R, `<div class="h-display" style="text-align:center">${nameHTML()}</div><div class="h-zh" style="text-align:center;margin-top:14px">${BR().taglineZh || ''}</div><div class="kicker" style="text-align:center;margin-top:10px">${BR().taglineEn || ''}</div>`, { whiteSpace: 'nowrap' });
     }, (S, lt, d) => {
-      const n = S.wins.length, per = Math.min(0.9, (d * 0.45) / n), settle = esoft(prog(lt, d * 0.5, d * 0.5 + 1.2)), out = 1 - prog(lt, d - 0.7, d);
-      if (S.bd) { place(S.bd.root, { o: 0.55 * prog(lt, 0, 0.8) * out }); }
+      // staging: the music leaves a half-beat of silence before this downbeat; on it, ONE move — the output resolves
+      // (sharpens, lifts) out of the hook's own screen. Then it holds alone (2–3 s, backdrop dimmed), then the name.
+      const n = S.wins.length, per = kind === 'stack' ? Math.min(0.6, 1.6 / n) : 0, hold = Math.min(d * 0.55, 3.8);
+      const settle = esoft(prog(lt, hold, hold + 1.1)), out = 1 - prog(lt, d - 0.7, d);
+      if (S.bd) { place(S.bd.root, { o: lerp(0.7, 0.35, esoft(prog(lt, 0.2, 1.2))) * out }); S.bd.root.style.filter = `blur(${lerp(2, 12, esoft(prog(lt, 0, 1.0))).toFixed(1)}px) saturate(0.8)`; }
       S.wins.forEach((W, i) => {
-        const a = esoft(prog(lt, 0.2 + i * per, 0.2 + i * per + 1.0));
+        const a = esoft(prog(lt, i * per, i * per + 0.9));
         const off = kind === 'stack' ? (i - (n - 1) / 2) : 0;
-        place(W.root, { x: off * 70, y: off * 46 + (kind === 'rise' ? lerp(140, 0, a) : lerp(30, 0, a)), z: kind === 'stack' ? i * 10 : 0,
-          s: (kind === 'result' ? lerp(0.97, 1.02, esoft(prog(lt, 0, d * 0.5))) : 1), o: a * out });
+        place(W.root, { x: off * 70, y: off * 46 + lerp(kind === 'rise' ? 60 : 20, 0, a), z: kind === 'stack' ? i * 10 : 0,
+          s: lerp(0.94, 1, a) * (kind === 'result' ? lerp(1, 1.025, esoft(prog(lt, 1, hold))) : 1), o: Math.min(1, a * 1.4) * out });
+        W.root.style.filter = a < 1 ? `blur(${((1 - a) * 9).toFixed(1)}px)` : '';
       });
       place(S.group, { y: lerp(0, -175, settle), s: lerp(1, Math.min(0.72, 460 / S.hmax), settle) });
-      M.text(S.tag, lt, d * 0.5 + 0.5, { y: 290, o: out });
+      M.text(S.tag, lt, hold + 0.5, { y: 290, o: out });
     });
   }
 
   function finale(start, end, o) {
     const srcs = o.media || [];
     if (['result', 'rise', 'stack'].includes(o.hero)) return screenHero(start, end, o);
-    if (o.image) {   // bookend: the opening photograph returns full-bleed, lit, with the name and the tagline
-      const base = o.base || [1920, 1080], from = fill169(base), to = zoomIn(from, 1.1, 0.5, 0.5);
+    if (o.image) {   // bookend that transforms: the hook's photograph returns tight and dim; on the downbeat it pulls back to
+      // the whole frame and lights up (detail → whole), holds alone for ~2.5 s, then the name and tagline arrive.
+      const base = o.base || [1920, 1080], to = fill169(base), from = o.focus ? padTo169(o.focus, base, 1.0) : zoomIn(to, 1.6, 0.5, 0.55);
       scene(start, end, (R, S) => {
         S.W = backdrop(R, o.image, base); qaIgnore(S.W.root);
         S.dim = qaIgnore(div('', R)); Object.assign(S.dim.style, { position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.38), rgba(0,0,0,0.62) 80%)' });
         S.tag = textEl(R, `<div class="h-display" style="text-align:center;color:#fff">${BR().name} <span style="opacity:0.86">${BR().nameAccent || ''}</span></div><div class="h-zh" style="text-align:center;margin-top:16px;color:#fff">${BR().taglineZh || ''}</div><div style="text-align:center;margin-top:12px;font:500 22px var(--en);letter-spacing:5px;color:rgba(255,255,255,0.86)">${BR().taglineEn || ''}</div>`, { whiteSpace: 'nowrap' });
       }, (S, lt, d) => {
-        setCrop(S.W, from.map((v, j) => lerp(v, to[j], esoft(prog(lt, 0, d + ST.xf)))), 1920);
-        place(S.W.root, { o: prog(lt, 0, 0.8) * (1 - prog(lt, d - 0.8, d)) });
-        S.W.root.style.filter = `brightness(${lerp(0.55, 1, esoft(prog(lt, 0, 1.6))).toFixed(3)})`;
-        S.dim.style.opacity = prog(lt, 0.4, 1.4) * (1 - prog(lt, d - 0.8, d));
-        M.text(S.tag, lt, 1.0, { y: -30, o: 1 - prog(lt, d - 0.6, d) });
+        const hold = Math.min(d * 0.5, 3.2);
+        setCrop(S.W, from.map((v, j) => lerp(v, to[j], esoft(prog(lt, 0, 1.6)))), 1920);
+        place(S.W.root, { o: prog(lt, 0, 0.4) * (1 - prog(lt, d - 0.8, d)) });
+        S.W.root.style.filter = `brightness(${lerp(0.5, 1, esoft(prog(lt, 0.1, 1.8))).toFixed(3)})`;
+        S.dim.style.opacity = prog(lt, hold, hold + 1.0) * (1 - prog(lt, d - 0.8, d));
+        M.text(S.tag, lt, hold + 0.4, { y: -30, o: 1 - prog(lt, d - 0.6, d) });
       });
       return;
     }

@@ -37,7 +37,7 @@
    "zh": "下班后预约，工作也保住了。", "en": "I booked after work and kept the job.", "who": "Sam", "role": "patient"},
   {"type": "finale", "bars": 4, "media": ["materials/desk-evening.jpg", "materials/street-dusk.jpg", "materials/treatment-room.jpg"],
    "image": "materials/desk-evening.jpg", "base": [1920, 1080],
-   "_why": "Hero at ~65 %, after the quiet quote: the evening desk from the cold open returns full-bleed (a bookend), with the proposition in three words.",
+   "_why": "Hero at ~65 %, after the quiet quote: the evening desk from the cold open returns, transformed: it starts tight and dim, and on the downbeat pulls back to the whole frame and lights up, holds alone for ~2.5 s, then the name (a bookend that changes, not a repeat), with the proposition in three words.",
    "say": [{"id": "tagline", "en": "Northside. Open after work.", "zh": "Northside：下班后，我们还在。", "at": 1.2}]},
   {"type": "endcard", "bars": "rest",
    "_why": "The callback answers the hook's 'five' with 'nine'. The booking details are in the contacts.",

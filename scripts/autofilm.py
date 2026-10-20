@@ -129,7 +129,7 @@ def need_ok(need):
 OUTPUT = re.compile(r'plot|chart|figure|graph|curve|forest|roc|km|result|report|export|output|summary|图|结果|报告', re.I)
 
 
-def screen_hero():
+def screen_hero(cover=None):
     """Hero treatment for a screen-led film: real outputs carry the hero moment (templates/library.js screenHero).
     result = one real result screen; rise = the one output that matters rises out of the UI; stack = a calm cascade of outputs."""
     screens = pool['desktop'] + pool['figure']
@@ -146,8 +146,12 @@ def screen_hero():
         o = outs[0]; rest = [i for i in pool['desktop'] if i not in outs]
         h.update({'image': path_of(o), 'base': o.get('base', [1920, 1080])})
         if crops[o['file']]: h['crop'] = crops[o['file']]
-        if rest: h.update({'backdrop': path_of(rest[0]), 'backdropBase': rest[0].get('base', [1920, 1080])})
+        hook = cover.get('media') if cover and cover.get('media') and not cover.get('frame') else None   # callback: the hook's own screen
+        if hook: h.update({'backdrop': hook, 'backdropBase': cover.get('base', [1920, 1080])})
+        elif rest: h.update({'backdrop': path_of(rest[0]), 'backdropBase': rest[0].get('base', [1920, 1080])})
     else:
+        if cover and cover.get('media') and not cover.get('frame'):   # callback: the hook pushed into one region of this screen; the hero shows it whole
+            h.update({'image': cover['media'], 'base': cover.get('base', [1920, 1080])}); return h
         pick = next((i for i in pool['desktop'] if re.search(r'result|dashboard|report|workspace|overview', i['file'], re.I)), None) or \
             next((i for i in pool['desktop'] if i not in outs), None) or screens[0]
         h.update({'image': path_of(pick), 'base': pick.get('base', [1920, 1080])})
@@ -274,7 +278,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         if first and first.get('frame') == 'photo' and genre['arc'] in ('sensory', 'human-story', 'reveal'):
             sc.update({'image': first['media'], 'base': first.get('base', [1920, 1080])})   # bookend: the cold-open photo returns for the hero
         elif pool['desktop'] or pool['figure']:
-            sc.update(screen_hero())
+            sc.update(screen_hero(first))
         sc['say'] = [{'id': 'tagline', 'en': TODO('hero line = treatment §3 Hero line: the name + the tagline'), 'zh': TODO('口号'), 'at': 1.2}]
     elif t == 'endcard':
         sc['say'] = [{'id': 'motto', 'en': TODO('last line = treatment §3 Last line: a callback to the hook, not logistics'), 'zh': TODO('收尾一句'), 'at': 0.6}]

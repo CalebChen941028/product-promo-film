@@ -67,6 +67,7 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **The cold open needs a subject:** the cover image plays full-frame for the first seconds, so give it a place, a person or the product in use, never a texture.
 - **The hook before the name.** The first ~5 s are the product truth (the image and the hook line); the logo comes after, or only at the hero and end card (`"name": false`).
 - **Readable screens.** At film scale, UI text must land at ≥ 18 px: a whole dense screen is shown for under a second, then the beat zooms to the region the line is about (a rect per point; carousel panels get a `crop`; a screen cover gets a `focus`). `check` warns when text would be smaller.
+- **The hero pays off the hook.** It is the hook's image transformed (the same screen, now with the answer resolved out of it; the same photo, now whole and lit) or the hook's words answered. One move on the downbeat after the half-beat of silence, ~3 s alone, then the name. `check_treatment` caps "hero" at 3 without a callback.
 - **The hero is a real output.** Screen-led films end on the work, done: one result screen (`"hero": "result"`), the one figure or report that matters rising out of the UI (`"rise"`), or a calm stack of outputs (`"stack"`). Photo-led films return to the cover photo (`"image"`). The tilted wall is a fallback, not a hero.
 - **A texture has a purpose:** a silent detail beat needs a line or labelled crops; otherwise cut it.
 
@@ -163,6 +164,7 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
   - **不用俗套**：地球、握手、灯泡、摆拍笑脸、漂浮图标、假仪表盘。
 - **按产品选风格**：见 `references/styles.md` 与 `genres.py`。照片放 `photo` / `detail` / `hero`；透明底产品图放 `hero` / `lineup`；界面截图放 `feature` / `carousel` / `phone`。
 - **满幅胜过卡片**：照片满幅承载一个拍点（`photo`、单张照片的 `hero`），配一句话；带规格清单的卡片像幻灯片。任何卡片最多 2 个要点，而且只放服务于核心概念的要点。
+- **高潮回应开场**：高潮是开场画面的变化（同一张界面，答案从中浮现；同一张照片，变成完整而明亮的全景），或者回答开场句。在半拍静默后的强拍上只做一个动作，单独停留约 3 秒，再出名称。没有呼应时 `check_treatment` 会把高潮分封顶为 3。
 - **高潮是真实的产出**：以界面为主的片子落在“做成的结果”上——一张结果界面（`"hero": "result"`）、从界面中升起的那张关键图表或报告（`"rise"`），或一组安静叠入的产出（`"stack"`）；以照片为主的片子回到封面照片（`"image"`）。倾斜图片墙只是兜底，不是高潮。
 - **纹理要有用意**：无旁白的细节拍点需要一句话或带标注的裁切，否则就删掉。
 - **冷开场要有主体**：封面图会在开头几秒满幅播放，要用地点、人物或使用中的产品，不要用纹理。

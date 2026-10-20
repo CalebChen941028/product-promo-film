@@ -44,7 +44,7 @@
    "items": [{"media": "materials/h1-raw.png", "zh": "原铝", "en": "Raw aluminium"}, {"media": "materials/h1-graphite.png", "zh": "石墨", "en": "Graphite"}]},
   {"type": "finale", "bars": 4, "media": ["materials/desk-afternoon.jpg", "materials/dial-macro.jpg", "materials/h1-raw.png", "materials/h1-graphite.png", "materials/kelvin-noon-dusk.jpg"],
    "image": "materials/desk-afternoon.jpg", "base": [1920, 1080],
-   "_why": "Hero at ~65 %, after the silent lineup: the four o'clock desk from the cold open returns full-bleed (a bookend), and the tagline is the proposition in four words.",
+   "_why": "Hero at ~65 %, after the silent lineup: the four o'clock desk from the cold open returns, transformed: it starts tight and dim, and on the downbeat pulls back to the whole frame and lights up, holds alone for ~2.5 s, then the name (a bookend that changes, not a repeat), and the tagline is the proposition in four words.",
    "say": [{"id": "tagline", "en": "Halden. Light that keeps the time.", "zh": "Halden：光，跟着时间走。", "at": 1.2}]},
   {"type": "endcard", "bars": "rest",
    "_why": "Callback to the hook's hour. Three words, and the specs stay in the chips.",

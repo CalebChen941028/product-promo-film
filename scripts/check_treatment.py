@@ -235,7 +235,18 @@ if len(sys.argv) > 2:
     if silent_tex:
         caps['Rhythm'] = min(caps.get('Rhythm', 5), 3)
         warn(f'scenes[{silent_tex[0]}] is a silent texture with no purpose', 'give the detail a line or a labelled crop (what are we looking at, and why it matters) — or cut it')
+    # hero ≥ 4 needs a staged treatment AND a callback to the hook (the same image transformed, or the hook's words answered)
     fin = next((sc for sc in scenes if sc['type'] == 'finale'), None)
+    if fin:
+        hook_media = c0.get('media') if c0.get('type') == 'cover' else None
+        img_cb = bool(hook_media) and hook_media in (fin.get('image'), fin.get('backdrop'))
+        hero_say = ' '.join(x['en'] for sc in scenes if sc['type'] in ('finale', 'hero') for x in sc.get('say', []))
+        hook_line = next((x['en'] for sc in scenes[:1] for x in sc.get('say', [])), '')
+        word_cb = bool(hook_line) and overlap(hook_line, hero_say + ' ' + (tag_en or ''), MINSTOP) > 0
+        staged = fin.get('hero') in ('result', 'rise', 'stack') or fin.get('image') or any(sc['type'] == 'hero' for sc in scenes)
+        if not (staged and (img_cb or word_cb)):
+            caps['Hero'] = min(caps.get('Hero', 5), 3)
+            warn('the hero does not pay off the hook', 'stage the finale (a hero treatment or a bookend image) and call back to the hook: the same image transformed, or the hook line answered in the hero line')
     if fin and not (fin.get('hero') in ('result', 'rise', 'stack') or fin.get('image')) and not any(sc['type'] == 'hero' for sc in scenes):
         caps['Hero'] = min(caps.get('Hero', 5), 3)
         warn('the hero moment is the default image wall', 'give the finale a hero treatment: "hero": "result" | "rise" | "stack" for screens, or "image" (a bookend photo)')

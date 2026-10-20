@@ -41,7 +41,7 @@
    "say": [{"en": "Add it last. A pinch is enough.", "zh": "最后撒上，一小撮就够。"}]},
   {"type": "finale", "bars": 4, "media": ["materials/bay-low-tide.jpg", "materials/flakes-macro.jpg", "materials/tin.png", "materials/plate.jpg"],
    "image": "materials/bay-low-tide.jpg", "base": [1920, 1080],
-   "_why": "Hero at ~65 %: the bay from the cold open returns full-bleed (a bookend); the tagline is the concept in four words.",
+   "_why": "Hero at ~65 %: the bay from the cold open returns, transformed: it starts tight and dim, and on the downbeat pulls back to the whole frame and lights up, holds alone for ~2.5 s, then the name (a bookend that changes, not a repeat); the tagline is the concept in four words.",
    "say": [{"id": "tagline", "en": "Saltwick. One bay. One pinch.", "zh": "Saltwick：一湾海，一撮盐。", "at": 1.2}]},
   {"type": "endcard", "bars": "rest",
    "_why": "The callback brings the hook's place to the viewer's table: the film ends on the audience, not on the tin.",
