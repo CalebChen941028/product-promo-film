@@ -46,7 +46,7 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **Job:** the tagline (zh ≤ 12 字, en ≤ 8 words; format `中文 / English`), the full script — one bullet per scene in film order (`- cover → "line"`; a silent scene says why) — and every on-screen word. film.json's lines are copied from this script, never written somewhere else.
 - **Rules:**
   - Verbs and nouns, not adjectives.
-  - Every proof line (feature, hero, numbers…) carries one fact from the docs: a number, a material, a place, a feature by name. Say what it means for the viewer; never read a spec list aloud.
+  - Every proof line (feature, hero, numbers…) carries one fact from the docs: a number, a material, a place, a feature by name. Say what it means for the viewer; never read a spec list aloud (`lint_copy` flags attribute lists, runs of units and 3+ short items; the copy score is capped).
   - Numbers only if checkable.
   - Never repeat on screen what the voice says.
   - Spoken English runs at about 2.5 words per second.
@@ -65,6 +65,8 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **Style choice by product:** `references/styles.md` and `genres.py`. Photos go in `photo` / `detail` / `hero` scenes. Cut-outs (transparent PNG) go in `hero` / `lineup`. Screens go in `feature` / `carousel` / `phone`.
 - **Full bleed beats a card.** A photograph carries its beat full-frame (`photo`, a one-photo `hero`) with one line; a card with a list of specs reads as a slide. Keep ≤ 2 points on any card, and only points that serve the idea.
 - **The cold open needs a subject:** the cover image plays full-frame for the first seconds, so give it a place, a person or the product in use, never a texture.
+- **The hero is a real output.** Screen-led films end on the work, done: one result screen (`"hero": "result"`), the one figure or report that matters rising out of the UI (`"rise"`), or a calm stack of outputs (`"stack"`). Photo-led films return to the cover photo (`"image"`). The tilted wall is a fallback, not a hero.
+- **A texture has a purpose:** a silent detail beat needs a line or labelled crops; otherwise cut it.
 
 ### 6. Motion designer & editor: rhythm
 - **Job:** the motion language (by theme) and the rhythm map (one row per scene).
@@ -140,7 +142,7 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
 - **职责**：口号（中文 ≤ 12 字、英文 ≤ 8 词，格式 `中文 / English`）、完整脚本（按片序每个场景一条：`- cover → "台词"`；无旁白的场景写明原因）、所有画面文字。film.json 的台词从这份脚本照抄，不在别处另写。
 - **规则**：
   - 多用动词和名词，少用形容词。
-  - 每句证据（feature、hero、numbers 等）都带一个文档里的事实：数字、材料、地点、功能名；讲它对观众意味着什么，不要念规格清单。
+  - 每句证据（feature、hero、numbers 等）都带一个文档里的事实：数字、材料、地点、功能名；讲它对观众意味着什么，不要念规格清单（`lint_copy` 会标出属性罗列、连串单位和 3 个以上的短项，文案分会被封顶）。
   - 只写可核实的数字。
   - 画面文字不重复旁白。
   - 英文语速约每秒 2.5 个词。
@@ -158,6 +160,8 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
   - **不用俗套**：地球、握手、灯泡、摆拍笑脸、漂浮图标、假仪表盘。
 - **按产品选风格**：见 `references/styles.md` 与 `genres.py`。照片放 `photo` / `detail` / `hero`；透明底产品图放 `hero` / `lineup`；界面截图放 `feature` / `carousel` / `phone`。
 - **满幅胜过卡片**：照片满幅承载一个拍点（`photo`、单张照片的 `hero`），配一句话；带规格清单的卡片像幻灯片。任何卡片最多 2 个要点，而且只放服务于核心概念的要点。
+- **高潮是真实的产出**：以界面为主的片子落在“做成的结果”上——一张结果界面（`"hero": "result"`）、从界面中升起的那张关键图表或报告（`"rise"`），或一组安静叠入的产出（`"stack"`）；以照片为主的片子回到封面照片（`"image"`）。倾斜图片墙只是兜底，不是高潮。
+- **纹理要有用意**：无旁白的细节拍点需要一句话或带标注的裁切，否则就删掉。
 - **冷开场要有主体**：封面图会在开头几秒满幅播放，要用地点、人物或使用中的产品，不要用纹理。
 
 ### 6. 动效设计与剪辑：节奏

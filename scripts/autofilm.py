@@ -182,6 +182,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         it = take(['photo', 'cutout'], used, 1, prefer=lambda i: bool(MACRO.search(i['file']))) or take(['photo', 'cutout'], used, 1) or take(['photo', 'cutout'], set(), 1)
         if not it: continue
         sc.update({'media': path_of(it[0]), 'base': it[0]['base']})
+        sc['say'] = [{'en': TODO('the texture, named: what we are looking at and why it matters (≤ 10 words)'), 'zh': TODO('点出质感（≤ 16 字）')}]
     elif t == 'hero':
         its = take(['cutout'], used, 3) or take(['photo'], used, 1)
         if not its: continue
@@ -268,7 +269,12 @@ if a.music not in ('auto', 'generate') and Path(a.music).exists(): music = {'fil
 elif a.music == 'auto' and music_files: music = {'file': rel(src / music_files[0]['file'])}
 if music is None: music = {'generate': {'mood': 'auto'}}
 bpm = genre['music']['bpm']; bar_s = 240 / bpm
-target = a.seconds or {'problem-solution': 100, 'reveal': 80, 'sensory': 75, 'human-story': 90, 'hype': 70}[genre['arc']]
+arc_target = {'problem-solution': 100, 'reveal': 80, 'sensory': 75, 'human-story': 90, 'hype': 70}[genre['arc']]
+n_vis = sum(len(pool[r]) for r in ('desktop', 'phone', 'photo', 'cutout', 'figure', 'video'))
+mat_target = max(45, 20 + 9 * n_vis)   # the length follows the materials: about 9 s per distinct image or clip, never padded
+target = a.seconds or min(arc_target, mat_target)
+LENGTH_NOTE = (f'~{target:.0f} s — {n_vis} images/clips carry about {mat_target} s; the {genre["arc"]} arc would run {arc_target} s with more material. Do not pad: no repeats, no long holds'
+               if not a.seconds and mat_target < arc_target else f'~{target:.0f} s')
 optional = ['quote', 'lineup', 'gallery', 'carousel', 'phone', 'photo', 'clip', 'compare', 'detail', 'statement']
 while sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s + MF.rest_bars(bpm) * bar_s > target + bar_s * 2:
     drop = next((s for t in optional for s in scenes if s['type'] == t), None)
@@ -312,7 +318,7 @@ tpl = (SKILL / 'templates' / 'treatment.template.md').read_text()
 beats = '\n'.join(f"| {i + 1} | `{s['type']}` | {s['bars'] if s['bars'] != 'rest' else MF.rest_bars(bpm)} | {next((b['role'] for b in G.GENRES['arcs'][genre['arc']] if b['type'] == s['type']), '')} | |" for i, s in enumerate(scenes))
 fills = {'{{PRODUCT}}': name, '{{GENRE}}': f"{gid} — {genre['en']} / {genre['zh']}", '{{STYLE}}': style, '{{MOTION}}': motion, '{{ARC}}': genre['arc'],
          '{{MUSIC}}': music.get('file') or f"composed: {genre['music']['mood']} ~{bpm} BPM (original, royalty-free)", '{{TONE}}': genre['tone'],
-         '{{MATERIALS}}': ', '.join(f'{k} {v}' for k, v in sorted(mats.items()) if v), '{{BEATS}}': beats, '{{SECONDS}}': f'{target:.0f}',
+         '{{MATERIALS}}': ', '.join(f'{k} {v}' for k, v in sorted(mats.items()) if v), '{{BEATS}}': beats, '{{SECONDS}}': LENGTH_NOTE,
          '{{GOLDEN}}': f"templates/golden/{genre['arc']}.json", '{{FACTS}}': ' · '.join(FACTS) or '(no docs — ask the user for a README or brief)'}
 for k, v in fills.items(): tpl = tpl.replace(k, str(v))
 (proj / 'treatment.md').write_text(tpl)
@@ -323,6 +329,7 @@ print(f"genre   {gid} ({genre['en']})" + (f"   ⚠ close call with {ranked[1]['g
 print(f"look    {style} · motion {motion} · arc {genre['arc']} · music {music.get('file') or 'composed ' + genre['music']['mood']}")
 print(f"scenes  {len(scenes)} ({', '.join(s['type'] for s in scenes)}) ≈ {sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s + MF.rest_bars(bpm) * bar_s:.0f} s")
 print(f"copy    {todo} TODO fields — the crew writes them (references/crew.md), starting with treatment.md")
+print(f"length  {LENGTH_NOTE}")
 print(f"voice   {voice['engine']}" + (f" {voice.get('voice')}" if voice['engine'] == 'kokoro' else '') + (f"  ({voice['_note']})" if voice.get('_note') else ''))
 print(f"study   {SKILL / 'templates' / 'golden' / (genre['arc'] + '.json')} and references/copy-bank.md before writing a word")
 print("next    1) run the crew: fill treatment.md (anchor lines first)   2) replace every TODO in film.json   3) python3 scripts/make_film.py film.json --stage check")

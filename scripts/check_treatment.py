@@ -215,6 +215,18 @@ if len(sys.argv) > 2:
         warn(f'{run_} scenes of the same type in a row at the same length', 'breathe: put a calm beat (photo, detail, statement, a scene without voice) between them, or vary the bars')
     if body and all(sc.get('say') for sc in scenes if sc['type'] not in ('cover', 'endcard', 'finale')):
         caps['Rhythm'] = min(caps.get('Rhythm', 5), 4)
+    specs = [s['en'] for _, _, s in spoken if lint_copy.spec_list(s['en'])]
+    if specs:
+        caps['Specific'] = min(caps.get('Specific', 5), 3 if len(specs) >= 2 else 4)
+        warn(f'{len(specs)} spoken line(s) read as a spec sheet, e.g. "{specs[0][:60]}"', 'rewrite each as one benefit (what it means for the viewer); keep specs for points or the end card')
+    silent_tex = [i for i, sc in enumerate(scenes) if sc['type'] == 'detail' and not sc.get('say') and not any(c.get('zh') or c.get('en') for c in sc.get('crops', []))]
+    if silent_tex:
+        caps['Rhythm'] = min(caps.get('Rhythm', 5), 3)
+        warn(f'scenes[{silent_tex[0]}] is a silent texture with no purpose', 'give the detail a line or a labelled crop (what are we looking at, and why it matters) — or cut it')
+    fin = next((sc for sc in scenes if sc['type'] == 'finale'), None)
+    if fin and not (fin.get('hero') in ('result', 'rise', 'stack') or fin.get('image')) and not any(sc['type'] == 'hero' for sc in scenes):
+        caps['Hero'] = min(caps.get('Hero', 5), 3)
+        warn('the hero moment is the default image wall', 'give the finale a hero treatment: "hero": "result" | "rise" | "stack" for screens, or "image" (a bookend photo)')
     holds = [sc['type'] for sc in scenes if not sc.get('say') and isinstance(sc.get('bars'), (int, float)) and
              ((sc['type'] == 'detail' and sc['bars'] > 2) or (sc['type'] in ('hero', 'photo', 'feature') and sc['bars'] > 3))]
     holds += [sc['type'] for sc in scenes if sc['type'] == 'hero' and isinstance(sc.get('bars'), (int, float)) and sc['bars'] > 3 and not isinstance(sc.get('media'), list)]

@@ -302,6 +302,8 @@ def check(spec, base_dir):
             warn(f'{where}: one image held {bars} bars', 'a single-image reveal lands in 3 bars; more angles (a media list) can hold longer')
         if t == 'feature' and sc.get('frame') == 'photo' and len(sc.get('points', [])) > 2:
             warn(f'{where}: {len(sc["points"])} points on a photo', 'a spec list dilutes the idea: keep ≤ 2 points that serve it, or use a "photo" scene with one line')
+        if t == 'detail' and not sc.get('say') and not any(c.get('zh') or c.get('en') for c in sc.get('crops', [])):
+            warn(f'{where}: a silent texture with no purpose', 'give it a line or a labelled crop (what are we looking at, and why it matters) — or cut it')
         if t == 'cover' and isinstance(sc.get('media'), str) and re.search(r'detail|texture|macro|grain|close|特写|纹理', sc['media'], re.I):
             warn(f'{where}: the cold open is a texture ({sc["media"]})', 'open on an image with a subject (a place, a person, the product in use); textures belong in the detail beat')
         if t == 'feature' and sc.get('frame') == 'photo' and isinstance(sc.get('media'), str) and roles.get(str((base_dir / sc['media']).resolve())) in ('desktop', 'phone', 'figure'):

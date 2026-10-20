@@ -10,7 +10,7 @@
 <a id="english"></a>
 ## English
 
-Point an AI coding agent at a folder: screenshots, product photos or cut-outs, clips, a logo and a README. Music is optional. It produces a 1–4 minute 1080p film with:
+Point an AI coding agent at a folder: screenshots, product photos or cut-outs, clips, a logo and a README. Music is optional. It produces a 1080p film of 45 s to 4 min (the length follows the materials) with:
 - a cover poster;
 - real material animated with restraint, cut on the beat;
 - an original underscore when you have no track;
@@ -120,7 +120,7 @@ Examples:
 <a id="中文"></a>
 ## 中文
 
-把一个文件夹交给 AI 编程智能体：截图、产品照片或透明底产品图、录屏、Logo、README，音乐可有可无。它会做出一部 1–4 分钟的 1080p 宣传片：
+把一个文件夹交给 AI 编程智能体：截图、产品照片或透明底产品图、录屏、Logo、README，音乐可有可无。它会做出一部 45 秒到 4 分钟的 1080p 宣传片（片长取决于素材多少）：
 - 封面海报；
 - 克制而有节奏的真实素材动效，切点卡在节拍上；
 - 没有音乐时自动原创配乐；

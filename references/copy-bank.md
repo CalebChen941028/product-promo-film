@@ -27,6 +27,7 @@ Then every other line is proof: one fact from the docs per line, said as what it
 | "Fair prices. Faster invoices. Happier clients." (tagline) | three ideas in one tagline | "Finish the work. Not the paperwork." |
 | "Experience perfect light, all day." | vague words (lint flags them) | "Clear white at noon. Amber after sunset." |
 | "Powerful, easy, fast." | adjectives | a verb and a noun: "Drop the file. Get the price." |
+| "Machined aluminium, 9 W, CRI 97, two finishes." | an attribute list (`lint_copy` flags it) | one benefit: "Arm and base, turned from one bar of aluminium." — the rest goes to points or the end card |
 | a film whose chosen concept appears only in the treatment | the idea never reaches the screen | the concept's key image or word is in the hook, the hero line and the last line |
 
 ### 3. Moves that work (pick one per beat)

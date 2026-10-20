@@ -23,6 +23,11 @@ VAGUE_EN = ['experience', 'discover', 'journey', 'unlock', 'elevate', 'transform
             'more than just', 'whether you', 'imagine', 'say goodbye', "in today's", 'the art of', 'your way', 'everything you need', 'built for',
             'peace of mind', 'made for you', 'reimagine', 'boost', 'enhance', 'streamline', 'stunning', 'incredible', 'unique experience']
 VAGUE_ZH = ['体验', '品质', '轻松', '简单', '高效', '强大', '尽享', '开启', '专属', '匠心', '美好', '畅享', '全新', '升级', '智能', '便捷', '品味生活', '理想']
+# spec-sheet phrasing: a voice-over that reads like a datasheet. One benefit per line beats four attributes.
+ATTR_EN = ['dishwasher safe', 'dishwasher-safe', 'lead-free', 'bpa-free', 'food-safe', 'food safe', 'waterproof', 'water-resistant', 'microwave safe',
+           'oven safe', 'eco-friendly', 'non-toxic', 'gluten-free', 'sugar-free', 'rechargeable', 'lightweight', 'portable', 'durable', 'compact']
+ATTR_ZH = ['可洗碗机', '洗碗机可', '无铅', '食品级', '防水', '耐热', '便携', '轻量', '环保', '无毒', '可充电']
+UNITS = re.compile(r'\d[\d.,]*\s?(ml|mm|cm|kg|g|w|kw|v|mah|wh|gb|tb|mb|hz|dpi|ppi|fps|%|°c?|nits|lm|db|毫升|毫米|厘米|克|千克|瓦)(?![a-z])', re.I)
 SUPERLATIVE = re.compile(r"(\bthe (best|fastest|only|most \w+)\b|#1|\bnumber one\b|\bworld'?s (best|first|fastest|only)\b|\bunbeatable\b)", re.I)
 zhlen = lambda s: sum(1 for ch in s or '' if '　' <= ch <= '鿿' or '＀' <= ch <= '￯')
 
@@ -38,6 +43,17 @@ def walk(o, path=''):
             yield from walk(v, f'{path}[{i}]')
     elif isinstance(o, str):
         yield path, o
+
+
+def spec_list(s):
+    """Why a line reads as a spec sheet (attribute list, a run of units, 3+ short items in a row), or None."""
+    low = s.lower()
+    attrs = [a for a in ATTR_EN if a in low] + [a for a in ATTR_ZH if a in s]
+    if len(attrs) >= 2: return f'attribute list ({", ".join(attrs[:3])})'
+    if len(UNITS.findall(s)) >= 2: return f'{len(UNITS.findall(s))} units in one line'
+    segs = [x.strip(' .。') for x in re.split(r'[,，、;；/]| and | or |和|与|及', s) if x.strip(' .。')]
+    if len(segs) >= 3 and sum(1 for x in segs if len(x.split()) <= 3 and zhlen(x) <= 6) >= 3: return f'{len(segs)} items in a row'
+    return None
 
 
 def vague(spec):
@@ -72,6 +88,8 @@ def lint(spec):
         if path.split('.')[0] != 'brand' or last in ('motto',):
             for w in [w for w in VAGUE_EN if re.search(r'(?<![a-z])' + re.escape(w) + r'(?![a-z])', low)] + [w for w in VAGUE_ZH if w in s]:
                 out.append((path, f'vague "{w}"', 'name the thing itself: a noun or a number from the docs (what, how many, where)'))
+        if ('say' in path or path.endswith(('title.en', 'title.zh'))) and spec_list(s):
+            out.append((path, f'spec list: {spec_list(s)}', 'one benefit per line, said as what it means for the viewer; specs go to points or the end card'))
         if '!' in s or '！' in s:
             out.append((path, 'exclamation mark', 'premium copy rarely shouts — remove it'))
     return out

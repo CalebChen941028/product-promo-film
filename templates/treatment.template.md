@@ -10,7 +10,7 @@
 - Look · 风格: {{STYLE}} · Motion · 动效: {{MOTION}} · Arc · 叙事结构: {{ARC}}
 - Music · 音乐: {{MUSIC}}
 - Materials · 素材: {{MATERIALS}}
-- Target length · 目标时长: ~{{SECONDS}} s
+- Target length · 目标时长: {{SECONDS}}
 - Tone for this genre · 本类型的语气: {{TONE}}
 - Study first · 先读: `{{GOLDEN}}` (a top film in this arc, every scene with a `_why`) and `references/copy-bank.md` — learn the moves, never copy the lines
 - Facts to use · 可用事实: {{FACTS}}

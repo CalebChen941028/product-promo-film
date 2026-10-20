@@ -66,7 +66,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `phone` | 2 | `media`, `base` (points, e.g. [393,852]), `title{zh,en}` | mobile screenshot in a device frame |
 | `compare` | 3 | `rows[[oldZh,oldEn,newZh,newEn]]` ≤ 6, `header?` | traditional vs this product |
 | `statement` | 1 | `zh`, `en?` | one big line (manifesto beat) |
-| `finale` | 4 | `media` = list of images, `image?`, `base?` | tilted wall of real screens + name + tagline; with `image` (one photograph, usually the cover's) it is a bookend instead: that photo full-bleed, lit, with the name and tagline (autofilm sets it for photo-led films) |
+| `finale` | 4 | `media` = list of images, `hero?`, `image?`, `base?`, `crop?`, `backdrop?`, `crops?`, `bases?` | the hero moment. Screen-led films: `"hero": "result"` (one real result screen, `image`, slow push), `"rise"` (the one output that matters, `image` + optional `crop`, rises out of the blurred UI `backdrop`) or `"stack"` (up to 4 outputs from `media`, with optional `crops`/`bases`, arrive one per beat); each then settles above the name and tagline. Photo-led films: `image` alone = a bookend (the cover photo full-bleed, lit). Neither = the tilted wall (a generic close; `check_treatment` caps the hero score at 3). autofilm chooses by genre and materials |
 | `endcard` | 4 | — | logo, name, positioning, motto, contacts, chips |
 | `photo` | 2 | `media`, `base?`, `title?{zh,en}`, `focus?` (end crop), `side?: "left"\|"bottom"` | full-bleed photograph with a slow push-in; text on a soft scrim |
 | `hero` | 3 | `media` (one image or several angles), `base?`, `title{zh,en}`, `cutout?` | the reveal: the product lights up and breathes. Transparent PNGs stand on the stage with a contact shadow and reflection (auto-detected); a single photograph fills the frame and lights up as the camera eases in |
@@ -141,7 +141,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `phone` | 2 | `media`、`base`（点尺寸，如 [393,852]）、`title{zh,en}` | 手机截图套设备外框 |
 | `compare` | 3 | `rows[[旧中文,旧英文,新中文,新英文]]` ≤ 6、`header?` | 传统方式 vs 本产品 |
 | `statement` | 1 | `zh`、`en?` | 一句大字（宣言） |
-| `finale` | 4 | `media` = 图片列表、`image?`、`base?` | 真实界面倾斜成墙 + 名称 + 口号；给出 `image`（一张照片，通常就是封面那张）时改为首尾呼应：这张照片满幅亮起，叠名称与口号（照片为主的片子由 autofilm 自动设置） |
+| `finale` | 4 | `media` = 图片列表、`hero?`、`image?`、`base?`、`crop?`、`backdrop?`、`crops?`、`bases?` | 高潮。以界面为主的片子：`"hero": "result"`（一张真实结果界面 `image`，缓推）、`"rise"`（最关键的一个产出 `image`，可加 `crop`，从虚化的界面 `backdrop` 中升起）或 `"stack"`（`media` 中最多 4 个产出，可加 `crops`/`bases`，逐拍叠入）；随后上移让出名称与口号。以照片为主的片子：只给 `image` = 首尾呼应（封面照片满幅亮起）。都不给 = 倾斜图片墙（通用收尾，`check_treatment` 会把高潮分封顶为 3）。autofilm 按类型与素材自动选择 |
 | `endcard` | 4 | — | Logo、名称、定位、理念、联系方式、平台标签 |
 | `photo` | 2 | `media`、`base?`、`title?{zh,en}`、`focus?`（终止裁切）、`side?` | 满幅照片缓慢推近，文字放在柔和的渐变遮罩上 |
 | `hero` | 3 | `media`（一张或多个角度）、`base?`、`title{zh,en}`、`cutout?` | 揭晓：产品亮起并轻微呼吸；透明底 PNG 会自动带接触阴影与倒影立在舞台上；单张照片则满幅铺开，随镜头缓推逐渐亮起 |
