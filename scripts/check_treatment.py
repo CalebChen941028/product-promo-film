@@ -123,7 +123,8 @@ for label, sc in rows:
 vals = list(scores.values())
 if len(vals) < 8: err(f'taste review has {len(vals)} of 8 scores', 'score all eight criteria 1–5 honestly')
 elif sum(vals) / len(vals) < 4 or min(vals) < 3:
-    err(f'taste review average {sum(vals) / len(vals):.1f}, lowest {min(vals)}', 'improve the weakest criteria (change the concept, the copy or the images) and re-score — do not inflate scores')
+    err(f'taste review average {sum(vals) / len(vals):.1f}, lowest {min(vals)}', 'redo the weakest part you can change (hook, a calm beat, a callback ending, the hero image) and re-score — up to three rounds; '
+        'never inflate, never stop here. Image quality scores the choice and staging, not the source: placeholder limits go in §1 Gaps and the report')
 
 if len(sys.argv) > 2:
     fpath = Path(sys.argv[2])

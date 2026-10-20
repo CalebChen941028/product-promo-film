@@ -7,7 +7,8 @@ English first, 中文在后。A top film is made by a team, so play each role in
 ### How to run the crew
 1. Read the facts (§0 of the treatment), the materials (look at the images if you can) and the brief. Then study the golden film for your arc (`templates/golden/<arc>.json`, named in §0) and `references/copy-bank.md`: they show what each role's output looks like at the top level.
 2. Play the roles **in order**, one at a time. Write only that role's section, and stay inside its job.
-3. Then play the **design critic**. Score honestly. If the average is < 4 or any score is < 3, go back to the weakest role and redo that part. Never inflate a score.
+3. Then play the **design critic**. Score honestly. If the average is < 4 or any score is < 3, go back to the weakest role **you can change** and redo that part (a sharper hook, a calm beat, a callback ending, a better image for the hero), then re-score. Up to three rounds. Never inflate a score, and never stop at the gate: a limit of the materials (placeholders, few photos) goes in §1 Gaps and in the report, not in a score.
+   - **Image quality & choice** scores what the crew controls: which image carries each beat, the crop, the order, the hero image saved for the hero. Drawn placeholders chosen and staged well can score 4; a weak image chosen when a better one was in the folder cannot.
 4. The copywriter copies the final words into `film.json` and replaces every `TODO`. Run `lint_copy.py`.
 5. The editor checks bars and beats in `film.json` against the rhythm map. Then `make_film.py --stage check`.
 
@@ -97,7 +98,8 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
 ### 怎么运行团队
 1. 读事实（treatment 第 0 节）、素材（能看图就看）和 brief；再读本叙事结构的范例片（`templates/golden/<结构>.json`，第 0 节写明）和 `references/copy-bank.md`，看清每个角色在顶级水准下交出什么。
 2. **按顺序**逐个扮演角色，每次只写该角色的那一节，不越界。
-3. 再扮演**设计评审**，诚实打分：平均分低于 4 或任一项低于 3，就回到最弱的环节重做；绝不虚高打分。
+3. 再扮演**设计评审**，诚实打分：平均分低于 4 或任一项低于 3，就回到**你能改变的**最弱环节重做（更锐利的开场、一个平静拍点、首尾呼应的结尾、为高潮换一张更好的图），再重新打分，最多三轮。绝不虚高打分，也不要停在关卡前：素材本身的局限（占位图、照片太少）写进第 1 节“缺口”和汇报里，不计入分数。
+   - **画面质量与选择**只评团队能控制的部分：每个拍点用哪张图、怎么裁、什么顺序、最好的图是否留给高潮。选得好、用得好的手绘占位图可以得 4 分；文件夹里有更好的图却选了差的，就不行。
 4. 文案把最终文字写进 `film.json`，替换所有 `TODO`，运行 `lint_copy.py`。
 5. 剪辑对照节奏表核对 `film.json` 的小节和拍点，然后运行 `make_film.py --stage check`。
 

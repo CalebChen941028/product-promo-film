@@ -46,7 +46,7 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
    - contacts for the end card.
 
    **Cannot ask** (a batch run, a sub-agent, the user is away)? Do not stop and do not download. Keep autofilm's genre, look, composed music and voice, take contacts from the docs (or leave them empty), and list every assumption in the report.
-4. **Crew.** First study the golden film for your arc (`templates/golden/<arc>.json`, autofilm prints which; every scene has a `_why`) and `references/copy-bank.md`. Learn the moves; never copy their lines. Then read `references/crew.md` and play each role in order, filling `treatment.md`: producer → strategist → creative director (3 concepts, choose 1, then the **three anchor lines**: hook, hero, last) → copywriter (a full script, one bullet per scene) → art director → motion/editor → composer → brand guardian → design critic. Then run `python3 scripts/check_treatment.py treatment.md` until it passes. A low taste score means redo, not re-score.
+4. **Crew.** First study the golden film for your arc (`templates/golden/<arc>.json`, autofilm prints which; every scene has a `_why`) and `references/copy-bank.md`. Learn the moves; never copy their lines. Then read `references/crew.md` and play each role in order, filling `treatment.md`: producer → strategist → creative director (3 concepts, choose 1, then the **three anchor lines**: hook, hero, last) → copywriter (a full script, one bullet per scene) → art director → motion/editor → composer → brand guardian → design critic. Then run `python3 scripts/check_treatment.py treatment.md` until it passes. A low taste score means redo the weakest part you can change, not re-score; never stop at the gate. What the materials cannot give (placeholders, few photos) goes in the report, not in a score.
 5. **Write the film.**
    - Copy the treatment's words into `film.json` and replace every `TODO`.
    - Use the anchor lines exactly as written: hook → cover, hero → finale, last → endcard.
@@ -122,7 +122,7 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
    - 结尾页联系方式。
 
    **无法询问**（批处理、子智能体、用户不在）时：不要停下，也不要下载。沿用 autofilm 选定的类型、风格、原创配乐和音色，联系方式取自文档（没有就留空），并在汇报里列出每一个假设。
-4. **团队创作**：先读本叙事结构的范例片（`templates/golden/<结构>.json`，autofilm 会打印是哪一个；每个场景都有 `_why`）和 `references/copy-bank.md`，学手法，不抄句子。再读 `references/crew.md`，按顺序扮演各角色填写 `treatment.md`：制片 → 策略 → 创意总监（三个概念、选一个，再写**三句锚点**：开场句、高潮句、收尾句）→ 文案（完整脚本，每个场景一条）→ 美术指导 → 动效与剪辑 → 作曲 → 品牌把关 → 设计评审。然后运行 `python3 scripts/check_treatment.py treatment.md` 直到通过。品味分低就重做，不要改分数。
+4. **团队创作**：先读本叙事结构的范例片（`templates/golden/<结构>.json`，autofilm 会打印是哪一个；每个场景都有 `_why`）和 `references/copy-bank.md`，学手法，不抄句子。再读 `references/crew.md`，按顺序扮演各角色填写 `treatment.md`：制片 → 策略 → 创意总监（三个概念、选一个，再写**三句锚点**：开场句、高潮句、收尾句）→ 文案（完整脚本，每个场景一条）→ 美术指导 → 动效与剪辑 → 作曲 → 品牌把关 → 设计评审。然后运行 `python3 scripts/check_treatment.py treatment.md` 直到通过。品味分低就重做你能改变的最弱环节，不要改分数，也不要停在关卡前；素材本身给不了的（占位图、照片太少）写进汇报，不计入分数。
 5. **写入影片**：
    - 把方案中的文字写进 `film.json`，替换所有 `TODO`。
    - 三句锚点原样使用：开场句 → cover，高潮句 → finale，收尾句 → endcard。
