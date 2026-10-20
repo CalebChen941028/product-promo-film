@@ -111,6 +111,45 @@ Before → after, using the mean of the independent critics:
 4. Real full-app screenshots are too dense at film scale. They need tighter crops or zooms on the region the line talks about.
 5. Drawn placeholders cap the image scores on the photo-led folders.
 
+### Round 7: hook first, readable screens, varied proof (same day, evening)
+**What changed before round 7:**
+1. **The hook before the name.**
+   - The cold open now owns about the first 5 s; the name and logo arrive only after the hook line lands.
+   - Photo-led arcs (sensory, human story, reveal) drop the name from the cover entirely. The brand lands at the hero and the end card, and the poster comes from the finale.
+   - Screen covers get 4 bars and push from a calm whole frame into a readable region (`focus`).
+   - A cover with no image, or a logo-first cover, caps the hook at 3.
+2. **Readable real screens.**
+   - Feature zooms are clamped so body text lands at ≥ 18 px.
+   - A dense screen is shown whole for under 1 s; points without a box hold the full frame instead of zooming into empty space.
+   - Carousel panels get readable crops, and dialogs are detected and cropped.
+   - `check` warns when UI text would render under 18 px.
+3. **Varied proof shapes.**
+   - autofilm recasts the second of two same-shape beats: a screen feature becomes a zoomed detail with labelled crops, and a second photo becomes a detail.
+   - `check` warns, and the treatment check caps rhythm, when two proof beats in a row share a shape.
+   - Silent phone or clip scenes are flagged as detours, and autofilm asks for a line or a cut.
+
+**Round 7 scores** (three fresh blind critics scoring the reference, round 6 and round 7 together; contact sheets now made with `evals/sheet.py`, exact labelled times; mean of critics 7–9):
+| Folder | Round 6 | Round 7 |
+| --- | --- | --- |
+| Reference (Opus copy; re-rendered with the round-6 pipeline) | 3.46 | — |
+| Aurel | 3.17 | 3.33 |
+| Quartile (placeholder screens) | 2.67 | **3.25** |
+| Larchwood | 3.38 | **3.50** (critic 9: 3.63) |
+| MedStat Pilot (real screens) | 2.96 | **3.33** (critic 9: 3.50) |
+
+**Reading:** this is the first round that moved every folder: all four improved, in 11 of 12 critic × folder pairs. The mean rose from 3.05 to 3.35, and the gap to the reference shrank to 0.1–0.2. Larchwood and MedStat each beat the reference for at least one critic. The varied shapes, the cut phone and survival detours, and the readable crops are what the critics named. **No film reached 4, so the target is still unmet.** Two caveats:
+- The reference here is a re-render, because I deleted the original render by mistake; its film.json and treatment are unchanged.
+- The first sampled frame of every sheet is the fade from black, so the critics read "blank, then …" as a weak hook. That artefact applies to all films equally and keeps hook scores at 2–3. The next measurement should sample from 1 s, or use the video.
+
+All four runs passed the gate with 0 QA errors, a voice and captions. One run raised a score after the gate blocked it, as in round 6.
+
+**Top remaining failure modes (round 7):**
+1. Empty texture beats: Haiku keeps the flat glaze and wood-plank crops even with a line. These need a stricter rule, such as "a texture must show a subject".
+2. Callout ellipses on real screens still read as clutter.
+3. The middle still reads as a feature tour on screen products.
+4. A spec line still creeps in (dishwasher safe, 350 ml).
+5. The honest "placeholder screens" label on an end card costs ending points. It stays: honesty wins over score.
+
 ### Honesty notes
 - The skill author changed the skill and also produced one of the four score sets. The three blind critics exist to check that bias, and they are stricter.
 - Round 2 Aurel and Quartile were each nudged once with a neutral "your render finished; continue" after they waited on a background monitor. This failure mode was then fixed in the skill.
@@ -207,6 +246,43 @@ Before → after, using the mean of the independent critics:
 3. 结构像功能巡礼：三个同样形状的证据拍点，再加上偏题的手机或录屏场景。
 4. 整屏真实截图在成片尺寸下太密，需要裁切或放大到旁白所说的区域。
 5. 以照片为主的片子，手绘占位图限制了画面分数。
+
+### 第 7 轮：先出钩子、界面可读、证据换形状（同日晚间）
+**第 7 轮前的改动：**
+1. **先出钩子，再出名字**：
+   - 冷开场约占开头 5 秒，开场句落定之后才出现名称与 Logo；
+   - 以照片为主的叙事结构（感官、人物故事、揭晓），封面完全不出名字，品牌在高潮与结尾页出现，海报改取 finale；
+   - 界面封面为 4 小节，先完整停一秒，再推近到可读区域（`focus`）；
+   - 没有画面或先出 Logo 的封面，开场分封顶为 3。
+2. **真实界面可读**：
+   - 功能拍点的推近被限制在正文 ≥ 18 px；
+   - 整屏密集截图停留不超过 1 秒，没有高亮框的要点保持全屏，不再推近到空白处；
+   - 轮播面板自动裁出可读区域，弹窗自动检测并裁切；
+   - 文字小于 18 px 时 `check` 会提示。
+3. **证据换形状**：
+   - 两个相同形状的证据拍点相邻时，autofilm 自动改写后一个（界面功能改为带标注裁切的放大细节，第二张照片改为细节）；
+   - 相邻同形状时 `check` 提示，方案检查给节奏分封顶；
+   - 无旁白的手机或录屏场景会被标为偏题，autofilm 要求补一句旁白或删掉。
+
+**第 7 轮分数**（三位全新盲评同时给参考片、第 6 轮与第 7 轮打分；联系表改用 `evals/sheet.py`，时间标注准确；取评审 7–9 的平均）：见上方英文表格。
+- 参考片：3.46
+- Aurel：3.17 → 3.33
+- Quartile：2.67 → **3.25**
+- Larchwood：3.38 → **3.50**
+- MedStat Pilot（真实界面）：2.96 → **3.33**
+
+**解读**：这是第一轮让每个文件夹都提升的改动：4 个文件夹全部上升，12 组“评审 × 文件夹”中有 11 组上升；平均分从 3.05 升到 3.35，与参考片的差距缩小到 0.1–0.2。Larchwood 与 MedStat 都至少有一位评审打分高于参考片。评审提到的正是换形状的证据拍点、删掉的偏题场景（手机、生存曲线），以及可读的裁切。**仍没有一部片子达到 4，目标仍未达成。**两点说明：
+- 这里的参考片是重新渲染的版本，因为我误删了原渲染；它的 film.json 与方案没有改动。
+- 每张联系表的第一帧都是黑场淡入，评审会把“先是空白”读成弱开场。这一采样问题对所有片子相同，并把开场分压在 2–3。下次测量应从第 1 秒开始取帧，或直接看视频。
+
+4 部片子都通过关卡，QA 0 错误，都有配音和字幕。和第 6 轮一样，有一次运行在被关卡拦下后改了分数。
+
+**仍未解决的主要问题（第 7 轮）：**
+1. 空洞的纹理拍点：即使配了旁白，Haiku 仍保留平涂的釉面和木板裁切，需要更严格的规则（例如“纹理必须有主体”）。
+2. 真实界面上的椭圆标注仍显杂乱。
+3. 软件类片子的中段仍像功能巡礼。
+4. 规格句仍会混进来（可洗碗机、350 毫升）。
+5. 结尾页诚实的“占位界面”标注会扣结尾分，但它应当保留：诚实优先于分数。
 
 ### 诚实说明
 - 加固技能的作者同时提供了四组分数中的一组；三位盲评评审正是为了检验这一偏差，而且他们更严格。
