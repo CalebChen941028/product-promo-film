@@ -215,7 +215,7 @@ const LIB = (() => {
       const base = o.base || [1920, 1080], to = fill169(base), from = o.focus ? padTo169(o.focus, base, 1.0) : zoomIn(to, 1.6, 0.5, 0.55);
       scene(start, end, (R, S) => {
         S.W = backdrop(R, o.image, base); qaIgnore(S.W.root);
-        S.dim = qaIgnore(div('', R)); Object.assign(S.dim.style, { position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at center, rgba(0,0,0,0.38), rgba(0,0,0,0.62) 80%)' });
+        S.dim = qaIgnore(div('', R)); Object.assign(S.dim.style, { position: 'absolute', inset: 0, background: 'linear-gradient(rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.62) 92%)' });   // the product stays clear; the name sits in the lower third
         S.tag = textEl(R, `<div class="h-display" style="text-align:center;color:#fff">${BR().name} <span style="opacity:0.86">${BR().nameAccent || ''}</span></div><div class="h-zh" style="text-align:center;margin-top:16px;color:#fff">${BR().taglineZh || ''}</div><div style="text-align:center;margin-top:12px;font:500 22px var(--en);letter-spacing:5px;color:rgba(255,255,255,0.86)">${BR().taglineEn || ''}</div>`, { whiteSpace: 'nowrap' });
       }, (S, lt, d) => {
         const hold = Math.min(d * 0.5, 3.2);
@@ -223,7 +223,7 @@ const LIB = (() => {
         place(S.W.root, { o: prog(lt, 0, 0.4) * (1 - prog(lt, d - 0.8, d)) });
         S.W.root.style.filter = `brightness(${lerp(0.5, 1, esoft(prog(lt, 0.1, 1.8))).toFixed(3)})`;
         S.dim.style.opacity = prog(lt, hold, hold + 1.0) * (1 - prog(lt, d - 0.8, d));
-        M.text(S.tag, lt, hold + 0.4, { y: -30, o: 1 - prog(lt, d - 0.6, d) });
+        M.text(S.tag, lt, hold + 0.4, { y: 300, o: 1 - prog(lt, d - 0.6, d) });
       });
       return;
     }
