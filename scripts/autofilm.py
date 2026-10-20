@@ -188,6 +188,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
             sc.update({'media': path_of(bg[0]), 'base': bg[0].get('base', [1920, 1080])})
             if bg[0].get('role') == 'photo':
                 sc['frame'] = 'photo'
+                sc['_focus'] = f"set \"focus\" to the subject so the open starts on it, then reveals the place: python3 {HERE / 'subject_grid.py'} {path_of(bg[0])} --preview . then --cells B2,C3"
                 if genre['arc'] in ('sensory', 'human-story', 'reveal'):
                     sc['name'] = False   # the hook owns the cover; the name lands at the hero and the end card
             else:   # a screen: 4 bars so the hook gets ~5 s, and the cold open pushes into a readable region
@@ -367,6 +368,7 @@ beats = '\n'.join(f"| {i + 1} | `{s['type']}` | {s['bars'] if s['bars'] != 'rest
 fills = {'{{PRODUCT}}': name, '{{GENRE}}': f"{gid} — {genre['en']} / {genre['zh']}", '{{STYLE}}': style, '{{MOTION}}': motion, '{{ARC}}': genre['arc'],
          '{{MUSIC}}': music.get('file') or f"composed: {genre['music']['mood']} ~{bpm} BPM (original, royalty-free)", '{{TONE}}': genre['tone'],
          '{{MATERIALS}}': ', '.join(f'{k} {v}' for k, v in sorted(mats.items()) if v), '{{BEATS}}': beats, '{{SECONDS}}': LENGTH_NOTE,
+         '{{IMAGE_LIST}}': '\n'.join(f"  - `{Path(i['file']).name}` → <write: place and subject, e.g. outdoors, a campsite table by a tent>" for i in items if i['kind'] in ('image', 'video') and i.get('role') != 'logo') or '  - (no images)',
          '{{GOLDEN}}': f"templates/golden/{genre['arc']}.json", '{{FACTS}}': ' · '.join(FACTS) or '(no docs — ask the user for a README or brief)'}
 for k, v in fills.items(): tpl = tpl.replace(k, str(v))
 (proj / 'treatment.md').write_text(tpl)

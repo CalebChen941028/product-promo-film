@@ -65,6 +65,8 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **Style choice by product:** `references/styles.md` and `genres.py`. Photos go in `photo` / `detail` / `hero` scenes. Cut-outs (transparent PNG) go in `hero` / `lineup`. Screens go in `feature` / `carousel` / `phone`.
 - **Full bleed beats a card.** A photograph carries its beat full-frame (`photo`, a one-photo `hero`) with one line; a card with a list of specs reads as a slide. Keep ≤ 2 points on any card, and only points that serve the idea.
 - **The cold open needs a subject:** the cover image plays full-frame for the first seconds, so give it a place, a person or the product in use, never a texture.
+- **Two beats in the cold open.** A photo cover gets a `focus` on its subject (`python3 scripts/subject_grid.py <photo> --preview .`, then `--cells`): the film opens on that detail and pulls back to the place. One still frame for 6 s reads as a slide; `check_treatment` caps the hook at 3 without it.
+- **Name what is in the frame.** In §5 write one line per image (place and subject). The copy over an image names the same kind of place: no "room" over a tent. `check_treatment` blocks indoor words over an outdoor image and the reverse.
 - **The hook before the name.** The first ~5 s are the product truth (the image and the hook line); the logo comes after, or only at the hero and end card (`"name": false`).
 - **Readable screens.** At film scale, UI text must land at ≥ 18 px: a whole dense screen is shown for under a second, then the beat zooms to the region the line is about (a rect per point; carousel panels get a `crop`; a screen cover gets a `focus`). `check` warns when text would be smaller.
 - **The hero pays off the hook.** It is the hook's image transformed (the same screen, now with the answer resolved out of it; the same photo, now whole and lit) or the hook's words answered. One move on the downbeat after the half-beat of silence, ~3 s alone, then the name. `check_treatment` caps "hero" at 3 without a callback.
@@ -170,6 +172,8 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
 - **高潮是真实的产出**：以界面为主的片子落在“做成的结果”上——一张结果界面（`"hero": "result"`）、从界面中升起的那张关键图表或报告（`"rise"`），或一组安静叠入的产出（`"stack"`）；以照片为主的片子回到封面照片（`"image"`）。倾斜图片墙只是兜底，不是高潮。
 - **纹理要有用意**：无旁白的细节拍点需要一句话或带标注的裁切，否则就删掉。
 - **冷开场要有主体**：封面图会在开头几秒满幅播放，要用地点、人物或使用中的产品，不要用纹理。
+- **冷开场要有两拍**：照片封面要给主体设 `focus`（`python3 scripts/subject_grid.py <照片> --preview .`，再用 `--cells` 选格子）：片子先停在这个细节上，再拉开到全景。一张静图停 6 秒就像幻灯片；没有 `focus` 时 `check_treatment` 会把开场分封顶为 3。
+- **说画面里有的东西**：在第 5 节为每张图写一行（地点与主体）。图上的文案要说同一类地点：帐篷画面上不能说“房间”。室内词配户外画面（或反过来）会被 `check_treatment` 拦下。
 - **先出钩子，再出名字**：开头约 5 秒是产品的真相（画面与开场句），Logo 在之后出现，或只在高潮与结尾页出现（`"name": false`）。
 - **界面要看得清**：在成片尺寸下，界面文字至少 18 px；整屏密集截图停留不超过一秒，随即推近到旁白所说的区域（每个要点给 rect，轮播面板给 `crop`，界面封面给 `focus`）。文字过小时 `check` 会提示。
 

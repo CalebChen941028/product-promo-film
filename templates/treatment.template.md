@@ -46,6 +46,8 @@
 
 ## 5. Art director · 美术指导
 - Look · 视觉: <write: style id and why; the one accent colour (from the logo)>
+- Each image shows · 每张图的内容 (place and subject, one line per file; the copy over an image must name the same kind of place):
+{{IMAGE_LIST}}
 - Images · 画面选择: <write: which material carries each beat; best image saved for the hero>
 - Composition rules · 构图: <write: margins, where text lives, one focal point per frame>
 - We will NOT show · 不出现: <write: clichés to avoid (globes, handshakes, stock smiles, fake UI…)>

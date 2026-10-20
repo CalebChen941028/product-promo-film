@@ -107,6 +107,10 @@ def omitted_qualifiers(spec, docs):
     return out
 
 
+PLACES = {'indoors': [r'\broom\b', r'\brooms\b', r'\bindoors?\b', r'\binside\b', r'living room', r'bedroom', r'kitchen', r'\boffice\b', r'\bdesk\b', r'\bstudy\b', r'\bsofa\b', r'\bcouch\b', r'\bat home\b',
+                         '房间', '屋里', '室内', '家里', '客厅', '卧室', '书房', '办公室', '书桌', '沙发'],
+          'outdoors': [r'\boutdoors?\b', r'\boutside\b', r'open air', r'\bcamp', r'\btent\b', r'\bgarden\b', r'\briver', r'\bforest\b', r'\bbeach\b', r'\bmountain', r'\bpark\b', r'\btrail\b',
+                       '户外', '室外', '露营', '帐篷', '野外', '河边', '森林', '山间', '花园', '海边']}
 WORD2DIGIT = {'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'ten': '10', 'twelve': '12',
               'fifteen': '15', 'twenty': '20', 'thirty': '30', 'forty': '40', 'fifty': '50', 'sixty': '60', 'hundred': '100'}
 NUMWORD_UNIT = r'\b(?:one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty|hundred)[- ](?:hours?|minutes?|days?|weeks?|months?|years?|millilit\w*|lit(?:re|er)s?|decibels?|watts?|percent|square)\b'
@@ -330,6 +334,23 @@ if len(sys.argv) > 2:
     if body and all(sc.get('say') for sc in scenes if sc['type'] not in ('cover', 'endcard', 'finale')):
         caps['Rhythm'] = min(caps.get('Rhythm', 5), 4)
     c0 = scenes[0] if scenes else {}
+    if c0.get('type') == 'cover' and c0.get('frame') == 'photo' and c0.get('media') and not c0.get('focus'):
+        caps['Hook'] = min(caps.get('Hook', 5), 3)
+        warn('the cold open is one still frame', 'give the cover a "focus" (the subject: scripts/subject_grid.py) — the open starts on that detail and pulls back to reveal the place')
+    # place: the copy over an image names the same kind of place the image shows (no "room" over a tent)
+    shows = {m.group(1): m.group(2) for m in re.finditer(r'`([^`]+\.(?:jpe?g|png|webp|webm|mp4|mov))`\s*(?:→|->|=|:)\s*([^\n]+)', section(md, 5), re.I)}
+    def places(t):
+        t = t.lower()
+        return {k for k, ws in PLACES.items() if any(re.search(w, t) for w in ws)}
+    for i, sc in enumerate(scenes):
+        m = sc.get('media') if isinstance(sc.get('media'), str) else sc.get('image')
+        if not isinstance(m, str) or Path(m).name not in shows: continue
+        seen = places(shows[Path(m).name])
+        copy_here = ' '.join([x.get('en', '') + ' ' + x.get('zh', '') for x in sc.get('say', [])] + [(sc.get('title') or {}).get('en', ''), (sc.get('title') or {}).get('zh', '')])
+        said = places(copy_here)
+        if seen and said and not (said & seen):
+            err(f'scenes[{i}] says {"/".join(sorted(said))} over {Path(m).name}, which shows {"/".join(sorted(seen))} ("{shows[Path(m).name][:50]}")',
+                'name what is in the frame: change the line, or put it over an image of that place')
     if c0.get('type') == 'cover' and (not c0.get('media') or (c0.get('open') is False and c0.get('name') is not False)):
         caps['Hook'] = min(caps.get('Hook', 5), 3)
         warn('the film opens on the logo', 'the first seconds are the product truth: give the cover an image (a cold open) and let the hook line land before the name')

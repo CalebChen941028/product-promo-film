@@ -28,11 +28,18 @@ const LIB = (() => {
       const H = !S.full ? 0 : !named ? d + 1 : Math.max(Math.min(5.2, d - 3.3), Math.min(2.6, d * 0.38)), t = lt - Math.max(0, H - 0.7);
       const push = eio(prog(lt, d - 0.9, d + 0.3)), z = 1 + push * 0.35, out = 1 - push;
       if (S.full) {
-        const f = fill169(base), to = o.focus ? padTo169(o.focus, base, 1.0) : zoomIn(f, 1.06, 0.5, 0.5), k = named ? esoft(prog(lt, H - 0.7, H + 0.5)) : 0;
-        const pushIn = o.focus ? esoft(prog(lt, 0.6, 2.2)) : esoft(prog(lt, 0, Math.min(H, d) + 0.5));   // a screen: a calm context frame, then into the readable region
-        setCrop(S.full, f.map((v, j) => lerp(v, to[j], pushIn)), 1920);
+        const f = fill169(base), k = named ? esoft(prog(lt, H - 0.7, H + 0.5)) : 0;
+        if (o.focus && o.frame === 'photo') {   // a photograph: two beats — open on the subject, then the camera pulls back to reveal the place
+          const tight = padTo169(o.focus, base, 1.0), drift = zoomIn(f, 1.04, 0.5, 0.5), reveal = esoft(prog(lt, 1.5, 3.4));
+          setCrop(S.full, tight.map((v, j) => lerp(lerp(v, padTo169(o.focus, base, 0.92)[j], prog(lt, 0, 1.5)), lerp(f[j], drift[j], esoft(prog(lt, 3.4, d))), reveal)), 1920);
+          S.full.root.style.filter = `brightness(${lerp(0.82, 1, esoft(prog(lt, 0, 2.4))).toFixed(3)})`;
+        } else {
+          const to = o.focus ? padTo169(o.focus, base, 1.0) : zoomIn(f, 1.06, 0.5, 0.5);
+          const pushIn = o.focus ? esoft(prog(lt, 0.6, 2.2)) : esoft(prog(lt, 0, Math.min(H, d) + 0.5));   // a screen: a calm context frame, then into the readable region
+          setCrop(S.full, f.map((v, j) => lerp(v, to[j], pushIn)), 1920);
+        }
         place(S.full.root, { o: 1 - k });
-        S.full.root.style.filter = k > 0 ? `blur(${(k * 8).toFixed(1)}px)` : '';
+        if (k > 0) S.full.root.style.filter = `blur(${(k * 8).toFixed(1)}px)`; else if (!(o.focus && o.frame === 'photo')) S.full.root.style.filter = '';
       }
       if (!named) return;
       if (S.back) place(S.back.root, { z: -700, rx: 8 * MO.tilt, s: 1 + lt * 0.01, o: 0.28 * prog(t, 0.2, 1.6) * out });

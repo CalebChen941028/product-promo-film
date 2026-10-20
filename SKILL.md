@@ -50,6 +50,7 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
 5. **Write the film.**
    - Copy the treatment's words into `film.json` and replace every `TODO`.
    - Use the anchor lines exactly as written: hook → cover, hero → finale, last → endcard.
+   - A photo cover needs a `focus` on its subject (`python3 scripts/subject_grid.py <photo> --preview .`, then `--cells B2,C3`): the open starts on that detail and reveals the place.
    - Screen points come with suggested `rect`s. Check them: `python3 scripts/suggest_rects.py <screenshot> --preview .` draws numbered boxes; give each point the box it talks about. Real photos (`"frame": "photo"`) need none. Never put `"frame": "photo"` on a screenshot to silence a warning.
    - Scene types and fields are in `references/film-spec.md`.
    - Then run `python3 scripts/check_treatment.py treatment.md film.json`. It checks that the film says what the treatment says, that proof lines carry facts from the docs, and it caps any taste score the film does not earn.
@@ -126,6 +127,7 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
 5. **写入影片**：
    - 把方案中的文字写进 `film.json`，替换所有 `TODO`。
    - 三句锚点原样使用：开场句 → cover，高潮句 → finale，收尾句 → endcard。
+   - 照片封面要给主体设 `focus`（`python3 scripts/subject_grid.py <照片> --preview .`，再用 `--cells B2,C3`）：开场先停在这个细节上，再拉开到全景。
    - 界面截图的要点已预填建议的 `rect`。用 `python3 scripts/suggest_rects.py <截图> --preview .` 画出编号框核对，每个要点对应它所说的那个框；真实照片（`"frame": "photo"`）不需要。不要给截图加 `"frame": "photo"` 来消除警告。
    - 场景类型与字段见 `references/film-spec.md`。
    - 然后运行 `check_treatment.py treatment.md film.json`：它检查片子说的是否就是方案里写的、证据句是否带有文档里的事实，并会给片子撑不起的品味分封顶。

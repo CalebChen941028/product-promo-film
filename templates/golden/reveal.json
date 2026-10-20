@@ -20,8 +20,8 @@
   "contacts": [["WEB", "网站", "halden.example", "Raw aluminium · Graphite"]], "chips": ["CRI 97", "2700–6500 K"]
  },
  "scenes": [
-  {"type": "cover", "bars": 3, "media": "materials/desk-afternoon.jpg", "frame": "photo", "name": false,
-   "_why": "The whole cover is a cold open: no logo, no name; the brand lands at the hero and the end card. Detail before the whole: the cover is the warm afternoon light on a desk, not the lamp. The line is a true observation the audience recognises.",
+  {"type": "cover", "bars": 3, "media": "materials/desk-afternoon.jpg", "frame": "photo", "name": false, "focus": [760, 380, 520, 360],
+   "_why": "The whole cover is a cold open in two beats (it opens on the subject at `focus`, then pulls back to the place): no logo, no name; the brand lands at the hero and the end card. Detail before the whole: the cover is the warm afternoon light on a desk, not the lamp. The line is a true observation the audience recognises.",
    "say": [{"en": "At four o'clock, the light outside turns warm.", "zh": "下午四点，窗外的光开始变暖。", "at": 0.6}]},
   {"type": "detail", "bars": 2, "media": "materials/dial-macro.jpg",
    "_why": "The tease: the knurled dial in macro, no voice, but each crop is labelled, so the silence has a purpose. Texture makes the viewer lean in before the reveal.",

@@ -237,6 +237,10 @@ All four runs passed the gate with 0 QA errors, a voice and captions. Two runs w
   - a copy-to-image mismatch: 9b and 9c say "room" over the tent shot, which critics called contradictory.
 - 9c scored below 9a. The fixes in 9c were honesty and casting fixes, not taste fixes, and 9a had the strongest single concept (a reader who never looks up while the mist rises). Within one panel, run-to-run variance (3.17–3.58) is as large as most skill changes.
 
+**After round 9 (not re-measured):** the two most-cited round-9 complaints are now handled in the skill.
+- **The 6 s still cold open.** A photo cover takes a `focus` on its subject, picked with the new `scripts/subject_grid.py` (a labelled 4×4 grid). The film opens on that detail, the light lifts, and by ~3.4 s the camera has pulled back to reveal the place. Without a focus, `check_treatment` caps the hook at 3. Automatic subject finding was tried and dropped: on these renders it picked a window, a curtain and a table top.
+- **"Room" over a tent.** The art director now writes one line per image in §5 (place and subject), and `check_treatment` blocks indoor words over an outdoor image and the reverse. On 9b's script it flags exactly the line critics called contradictory ("A room's air has a texture" over the campsite).
+
 **Honesty findings (round 9):**
 - No invented specs in any run, and the garbled AI clip was excluded every time.
 - 9b's line "Soft mist. Warm light." calls a lilac/blue glow "warm". A small inaccuracy, not caught by any gate.
@@ -458,6 +462,10 @@ All four runs passed the gate with 0 QA errors, a voice and captions. Two runs w
   - 高潮（评审认为都是“棚拍产品图再出标题”的同一套路）；
   - 文案与画面不符：9b、9c 在帐篷画面上说“房间”，评审认为前后矛盾。
 - 9c 分数低于 9a。9c 的修复针对的是诚实与选图，不是审美；而 9a 的核心概念最好（读书的人从不抬头，雾一直在升）。同一组评审内，不同运行之间的差距（3.17–3.58）和大多数技能改动带来的变化一样大。
+
+**第 9 轮之后（尚未复测）：**第 9 轮评审提得最多的两个问题，现在已在技能里处理：
+- **6 秒不动的冷开场**：照片封面要给主体设 `focus`，用新工具 `scripts/subject_grid.py`（带标注的 4×4 网格）选取。片子先停在这个细节上，画面微微亮起，约 3.4 秒内镜头拉开到全景。没有 `focus` 时，`check_treatment` 会把开场分封顶为 3。自动找主体试过后放弃了：在这批渲染图上，它找到的是窗户、窗帘和桌面。
+- **帐篷画面配“房间”文案**：美术指导现在要在第 5 节为每张图写一行（地点与主体），`check_treatment` 会拦下室内词配户外画面（或反过来）的情况。在 9b 的脚本上，它正好标出评审认为矛盾的那一句（营地画面上的“房间里的空气有质感”）。
 
 **诚实方面的发现（第 9 轮）：**
 - 三次运行都没有虚构规格，也都排除了乱码的 AI 视频。

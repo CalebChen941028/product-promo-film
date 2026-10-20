@@ -61,7 +61,13 @@
     1920,
     1280
    ],
-   "frame": "photo"
+   "frame": "photo",
+   "focus": [
+    960,
+    320,
+    480,
+    640
+   ]
   },
   {
    "type": "photo",
