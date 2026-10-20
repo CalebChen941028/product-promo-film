@@ -807,7 +807,7 @@
    },
    {
     "type": "detail",
-    "bars": 3,
+    "bars": 2,
     "needs": "photo|cutout",
     "energy": 1,
     "role": "tease: details before the whole"
@@ -880,7 +880,7 @@
    },
    {
     "type": "detail",
-    "bars": 3,
+    "bars": 2,
     "needs": "photo|cutout",
     "energy": 1,
     "role": "texture"

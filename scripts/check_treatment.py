@@ -215,6 +215,15 @@ if len(sys.argv) > 2:
         warn(f'{run_} scenes of the same type in a row at the same length', 'breathe: put a calm beat (photo, detail, statement, a scene without voice) between them, or vary the bars')
     if body and all(sc.get('say') for sc in scenes if sc['type'] not in ('cover', 'endcard', 'finale')):
         caps['Rhythm'] = min(caps.get('Rhythm', 5), 4)
+    holds = [sc['type'] for sc in scenes if not sc.get('say') and isinstance(sc.get('bars'), (int, float)) and
+             ((sc['type'] == 'detail' and sc['bars'] > 2) or (sc['type'] in ('hero', 'photo', 'feature') and sc['bars'] > 3))]
+    holds += [sc['type'] for sc in scenes if sc['type'] == 'hero' and isinstance(sc.get('bars'), (int, float)) and sc['bars'] > 3 and not isinstance(sc.get('media'), list)]
+    if holds:
+        caps['Rhythm'] = min(caps.get('Rhythm', 5), 3)
+        warn(f'a long hold on one image ({holds[0]})', 'silent or single-image beats over ~6 s read as empty: 2–3 bars, or give the beat a line')
+    if scenes and scenes[0]['type'] == 'cover' and isinstance(scenes[0].get('media'), str) and re.search(r'detail|texture|macro|grain|close', scenes[0]['media'], re.I):
+        caps['Hook'] = min(caps.get('Hook', 5), 3)
+        warn('the cold open is a texture', 'open on an image with a subject; textures belong in the detail beat')
     media = [m for sc in scenes if sc['type'] not in ('finale', 'cover') for m in ([sc['media']] if isinstance(sc.get('media'), str) else sc.get('media') or [])]
     dup = {m for m in media if media.count(m) > 1}
     if dup:
@@ -225,6 +234,11 @@ if len(sys.argv) > 2:
             caps['Image'] = min(caps.get('Image', 5), 3)
             warn(f'scenes[{i}] feature on a screen has no highlight rects', f'python3 scripts/suggest_rects.py {sc.get("media")} --preview . → copy the rect of the region each point talks about')
             break
+    big = [i for i, sc in enumerate(scenes) for p in sc.get('points', []) if p.get('rect') and
+           p['rect'][2] * p['rect'][3] > 0.3 * (sc.get('base') or [1920, 1080])[0] * (sc.get('base') or [1920, 1080])[1]]
+    if big:
+        caps['Image'] = min(caps.get('Image', 5), 3)
+        warn(f'scenes[{big[0]}]: a highlight box covers most of the screen', 'box only the region the point names (suggest_rects.py --preview); a box around everything highlights nothing')
     hero_hits = [sc for sc in scenes if sc.get('hit') == 'hero']
     if len(hero_hits) > 1: caps['Restraint'] = 3; err(f'{len(hero_hits)} scenes marked "hit": "hero"', 'exactly one hero moment (references/director.md §5)')
     cover_line = next((s['en'] for sc in scenes[:1] for s in sc.get('say', [])), '')

@@ -1,7 +1,7 @@
 """Suggest highlight rects for a screenshot: finds the cards, panels, charts and tables a viewer's eye goes to.
 
 Usage: python suggest_rects.py shot.png [more.png …] [--base W H] [--n 4] [--preview DIR] [--json]
-Prints, per image, up to N rects [x, y, w, h] in BASE units (the coordinates film.json uses), in reading
+Prints, per image, up to N rects (each ≤ a quarter of the screen: a box around everything highlights nothing) [x, y, w, h] in BASE units (the coordinates film.json uses), in reading
 order, numbered 1…N. --preview writes <DIR>/<image>.rects.jpg with the numbered boxes drawn on the shot:
 look at it, then copy the rect of the region each feature point talks about into "points[i].rect".
 Base default = the intake rule: captures ≥ 2400 px wide are 2× (base = size / 2), else 1×.
@@ -95,9 +95,20 @@ def suggest(path, base=None, n=4):
             if len(out) >= n: break
         return out
 
-    picked = pick((2, 5), 0.015, 0.45)
-    if len(picked) < 2:   # a chart or a sparse screen: merge harder and allow one large region (the plot area)
-        picked = pick((9, 16), 0.03, 0.8)
+    picked = pick((2, 5), 0.015, 0.25)
+    if len(picked) < 2:   # a chart or a sparse screen: the windows where the marks are densest (never the whole plot)
+        ww, wh = int(W * 0.34), int(H * 0.34)
+        marks = edge.copy()
+        for k in (-1, 0, 1):   # drop axes and rules: rows/columns that are mostly one long line (and their neighbours)
+            marks[np.roll(edge.mean(1) > 0.35, k), :] = False; marks[:, np.roll(edge.mean(0) > 0.35, k)] = False
+        ii = np.pad(marks.astype(float).cumsum(0).cumsum(1), ((1, 0), (1, 0)))
+        dens = (ii[wh:, ww:] - ii[:-wh, ww:] - ii[wh:, :-ww] + ii[:-wh, :-ww])
+        for _ in range(n - len(picked)):
+            y, x = np.unravel_index(np.argmax(dens), dens.shape)
+            if dens[y, x] <= 0: break
+            c = [x, y, x + ww, y + wh, dens[y, x]]
+            if not any(iou(c, p) > 0.15 or inside(c, p) or inside(p, c) for p in picked): picked.append(c)
+            dens[max(0, y - wh):y + wh, max(0, x - ww):x + ww] = 0
     picked.sort(key=lambda c: (round(c[1] / (H / 6)), c[0]))   # reading order: rows, then left → right
     sx, sy = bw / W, bh / H
     pad = 8

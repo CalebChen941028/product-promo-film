@@ -157,6 +157,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
     elif t == 'hero':
         its = take(['cutout'], used, 3) or take(['photo'], used, 1)
         if not its: continue
+        if len(its) == 1: sc['bars'] = min(sc['bars'], 3)   # one object: a short reveal, not a long hold
         sc.update({'media': [path_of(i) for i in its] if len(its) > 1 else path_of(its[0]), 'base': its[0]['base'],
                    'title': {'zh': (P.get('tagline') or {}).get('zh') if fill and (P.get('tagline') or {}).get('zh') else TODO('揭晓标题（≤ 10 字）'), 'en': name}})
         sc['say'] = [{'en': TODO('the reveal line: the name + one fact from the docs (≤ 12 words)'), 'zh': TODO('揭晓旁白')}]
@@ -166,6 +167,11 @@ for beat in G.GENRES['arcs'][genre['arc']]:
             if not mats_f: break
             m0 = mats_f[0]; used.add(m0['file'])
             is_ui = m0.get('role') in ('desktop', 'phone') or m0['kind'] == 'video'
+            if m0.get('role') == 'photo':   # a photograph carries a proof beat full-bleed, with one line — not a card with a list
+                scenes.append({'type': 'photo', 'bars': beat['bars'], 'media': path_of(m0), 'base': m0.get('base', [1920, 1080]),
+                               'title': {'zh': TODO('画面一句：这一拍的事实（≤ 10 字）'), 'en': TODO('the fact of this beat, in a few words')},
+                               'say': [{'en': TODO('one fact from the docs, said as what it means for the viewer (not a spec list)'), 'zh': TODO('旁白中文字幕')}]})
+                continue
             fs = {'type': 'feature', 'bars': beat['bars'], 'media': path_of(m0), 'base': m0.get('base', [1920, 1080]),
                   'title': {'zh': f['zh'] if fill and 'TODO' not in f.get('zh', 'TODO') else TODO('功能标题（≤ 12 字）'), 'en': f['en'] if fill and 'TODO' not in f.get('en', 'TODO') else TODO('feature title (≤ 42 chars)')},
                   'points': [{'zh': TODO('要点（≤ 12 字）'), 'en': TODO('point')} for _ in range(2)],

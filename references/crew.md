@@ -63,11 +63,14 @@ English first, 中文在后。A top film is made by a team, so play each role in
   - **Real over decorative.** A real product photo beats any illustration. A real UI beats any mock-up.
   - **No clichés:** globes, handshakes, light bulbs, stock smiles, floating icons, fake dashboards.
 - **Style choice by product:** `references/styles.md` and `genres.py`. Photos go in `photo` / `detail` / `hero` scenes. Cut-outs (transparent PNG) go in `hero` / `lineup`. Screens go in `feature` / `carousel` / `phone`.
+- **Full bleed beats a card.** A photograph carries its beat full-frame (`photo`, a one-photo `hero`) with one line; a card with a list of specs reads as a slide. Keep ≤ 2 points on any card, and only points that serve the idea.
+- **The cold open needs a subject:** the cover image plays full-frame for the first seconds, so give it a place, a person or the product in use, never a texture.
 
 ### 6. Motion designer & editor: rhythm
 - **Job:** the motion language (by theme) and the rhythm map (one row per scene).
 - Camera cuts only where the story turns. There is exactly one hero moment, around 60–70 % of the film.
 - **Breathing:** after two dense beats, one calm beat. The first 3 s and the last 5 s are the most watched; make them perfect.
+- **No dead holds:** a calm beat is short. A silent texture lasts 2 bars, a one-image reveal 3; anything held longer on one still image reads as empty (`check` warns).
 
 ### 7. Composer & sound designer: what we feel
 - **Job:** the music (the user's track, or a composed mood + BPM that matches the genre), where it builds, the half-beat silence before the hero, and the sound palette. Keep the sound low: felt, not heard.
@@ -154,11 +157,14 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
   - **真实胜过装饰**：真实产品照胜过任何插画，真实界面胜过任何样机。
   - **不用俗套**：地球、握手、灯泡、摆拍笑脸、漂浮图标、假仪表盘。
 - **按产品选风格**：见 `references/styles.md` 与 `genres.py`。照片放 `photo` / `detail` / `hero`；透明底产品图放 `hero` / `lineup`；界面截图放 `feature` / `carousel` / `phone`。
+- **满幅胜过卡片**：照片满幅承载一个拍点（`photo`、单张照片的 `hero`），配一句话；带规格清单的卡片像幻灯片。任何卡片最多 2 个要点，而且只放服务于核心概念的要点。
+- **冷开场要有主体**：封面图会在开头几秒满幅播放，要用地点、人物或使用中的产品，不要用纹理。
 
 ### 6. 动效设计与剪辑：节奏
 - **职责**：动效语言（按主题选）和节奏表（每个场景一行）。
 - 只在故事转折处用镜头转场；全片只有一个高潮，位于 60–70% 处。
 - **呼吸感**：连续两个密集拍点之后给一个平静拍点。开头 3 秒和结尾 5 秒最常被看到，要做到完美。
+- **不要空停**：平静拍点要短。无旁白的纹理 2 小节，单张图的揭晓 3 小节；一张静图停得更久就会显得空（`check` 会提示）。
 
 ### 7. 作曲与声音设计：让人感受到的部分
 - **职责**：音乐（用户的曲子，或按类型选的原创情绪与 BPM）、在哪里推进、高潮前的半拍静默、音效组合。声音要压低：感受得到，不喧宾夺主。

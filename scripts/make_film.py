@@ -291,6 +291,15 @@ def check(spec, base_dir):
             elif t == 'clip' and not m.endswith('.webm'):
                 err(f'{where}: clip must be .webm (Chromium cannot decode H.264)', 'run intake.py — it converts videos to build/clips/*.webm')
         basewh = sc.get('base', [1920, 1080])
+        # holds that read as empty: silent texture, one object held long, a spec list on a photo card, a cold open on a texture
+        if not sc.get('say') and isinstance(bars, (int, float)) and ((t == 'detail' and bars > 2) or (t in ('hero', 'photo', 'feature') and bars > 3)):
+            warn(f'{where}: {bars} bars with no voice on one image', 'a silent hold over ~6 s reads as empty: 2 bars, or give it a line')
+        if t == 'hero' and isinstance(bars, (int, float)) and bars > 3 and not isinstance(sc.get('media'), list):
+            warn(f'{where}: one image held {bars} bars', 'a single-image reveal lands in 3 bars; more angles (a media list) can hold longer')
+        if t == 'feature' and sc.get('frame') == 'photo' and len(sc.get('points', [])) > 2:
+            warn(f'{where}: {len(sc["points"])} points on a photo', 'a spec list dilutes the idea: keep ≤ 2 points that serve it, or use a "photo" scene with one line')
+        if t == 'cover' and isinstance(sc.get('media'), str) and re.search(r'detail|texture|macro|grain|close|特写|纹理', sc['media'], re.I):
+            warn(f'{where}: the cold open is a texture ({sc["media"]})', 'open on an image with a subject (a place, a person, the product in use); textures belong in the detail beat')
         if t == 'feature' and sc.get('frame') == 'photo' and isinstance(sc.get('media'), str) and roles.get(str((base_dir / sc['media']).resolve())) in ('desktop', 'phone', 'figure'):
             err(f'{where}: "frame": "photo" on a screenshot ({sc["media"]})', 'screens get highlight boxes, not a photo frame: remove "frame" and give each point a rect '
                 f'(python3 {HERE / "suggest_rects.py"} {sc["media"]} --preview . suggests them)')
@@ -303,6 +312,8 @@ def check(spec, base_dir):
                 err(f'{where}.points[{j}]: rect must be [x,y,w,h]', 'measure it with grid_overlay.py on the screenshot (base coordinates)')
             elif r[0] < 0 or r[1] < 0 or r[0] + r[2] > basewh[0] + 1 or r[1] + r[3] > basewh[1] + 1:
                 err(f'{where}.points[{j}]: rect {r} outside base {basewh}', 'rects are in base units (CSS px of the capture); check base and rect')
+            elif r[2] * r[3] > 0.3 * basewh[0] * basewh[1]:
+                warn(f'{where}.points[{j}]: rect covers {r[2] * r[3] / (basewh[0] * basewh[1]):.0%} of the screen', 'a box around everything highlights nothing: box only the region this point names (suggest_rects.py --preview)')
             if zhlen(p.get('zh')) > 14:
                 warn(f'{where}.points[{j}]: zh label {zhlen(p.get("zh"))} chars', 'keep on-screen labels ≤ 14 Chinese characters')
         for j, s in enumerate(sc.get('say', [])):
