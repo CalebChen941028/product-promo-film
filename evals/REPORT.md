@@ -2,7 +2,7 @@
 
 English first, 中文在后。Date: 2026-10-20. Model under test: **Claude Haiku** (as a sub-agent), given one line and nothing else:
 `Make a promo film for the product in <folder> using the skill at ~/Desktop/product-promo-film (read SKILL.md and follow it). Output to <dir>.`
-Evidence: [`report/`](report) (each run's `treatment.md`, `film.json` and a 20-frame contact sheet; the three critics' tables and their blind mappings). How to rerun: [README.md](README.md).
+Evidence: [`report/`](report) (each run's `treatment.md`, `film.json` and a 20-frame contact sheet; every critic's table and blind mapping). A follow-up round 6 (with a real-screenshot folder) is at the end of each language section. How to rerun: [README.md](README.md).
 
 ## English
 
@@ -76,6 +76,41 @@ Before → after, using the mean of the independent critics:
 4. **Spec lines creep back into the copy** (dishwasher safe, lead-free), and the crew sometimes still keeps a silent texture beat. The critics notice both.
 5. **Runs come in short** (52–59 s on 4 of 9) when the materials are thin. That is acceptable, but under the ~75 s target.
 
+### Round 6: follow-up on the open items (same day, later)
+**What changed before round 6:**
+1. **Screen-led hero moment.** Three restrained finale treatments replace the tilted wall for screen films, and autofilm chooses one by genre and materials:
+   - `result`: one real result screen, slow push;
+   - `rise`: the one figure or report that matters rises out of the blurred UI, cropped to the dialog when the capture is a modal;
+   - `stack`: up to four outputs arrive one per beat.
+
+   Each one settles above the name and tagline. The plain wall now caps "hero" at 3, and the golden films use the new treatments and photo bookends.
+2. **Highlights.** Boxes now stay inside a dialog on a dimmed page, reject near-empty regions, and never cover more than a quarter of the screen.
+3. **Spec lines and silent textures.** `lint_copy` flags spec-sheet lines: attribute lists, runs of units, and three or more short items. One such spoken line caps copy at 4, two cap it at 3. A detail beat with no line and no labelled crop caps rhythm at 3, and autofilm now gives detail beats a line to write.
+4. **Length.** The target now follows the materials (about 9 s per distinct image or clip, between 45 s and the arc's length) and is stated in the treatment with the reason. Nothing is padded.
+5. **Real-screen software folder.** It uses eight real MedStat Pilot captures with synthetic demo data, kept local only and never committed; its contact sheet is not committed either. There is no physical-product re-test: it needs the user's real product photos, and none were downloaded or invented.
+
+**Round 6 scores** (three fresh blind critics, scoring the reference and rounds 5 and 6 together; mean of critics 4–6):
+| Folder | Round 5 | Round 6 |
+| --- | --- | --- |
+| Reference (Opus) | 3.00 | — |
+| Aurel | 3.25 | 3.08 |
+| Quartile (placeholder screens) | 2.96 | 2.96 |
+| Larchwood | 3.17 | **3.50** (critic 6: 3.75) |
+| MedStat Pilot (real screens) | — | 2.96 |
+
+**Reading:** round 6 is flat within critic noise (critics differ by up to ±0.5 on the same film). Larchwood improved, and the others did not. The new screen-hero treatments did not register with the critics: "hero" still scores 2–3 on every screen film. The real-screens film scored no better than the placeholder one, because the critics found the full-app screens too small and dense to read. **The ≥ 4 target is still not met by independent critics.** The process gains from rounds 1–5 held: 4 of 4 runs had a voice, a concept carried through the anchor lines, a passing gate, QA with 0 errors and SRT files. One Haiku run raised an image score from 3 to 4 after the gate blocked it, citing the guidance that image quality is judged on choice and staging. That guidance is fair, but the re-score is worth watching.
+
+**Changed after round 6 (not re-measured):**
+- Charts get no highlight boxes at all. The critics read ellipses on chart space as noise, and the round-1 film without them was called the most restrained.
+- `check` rejects a brand name that already ends with its accent word. One run showed "Stoneware Stoneware".
+
+**Top remaining failure modes:**
+1. The logo card at about 3 s still reads as a logo-first hook (hook 2–3).
+2. The hero moment on screen films is quiet rather than memorable.
+3. Feature-tour structure: three proof beats of the same shape, plus phone or clip scenes that are off-message.
+4. Real full-app screenshots are too dense at film scale. They need tighter crops or zooms on the region the line talks about.
+5. Drawn placeholders cap the image scores on the photo-led folders.
+
 ### Honesty notes
 - The skill author changed the skill and also produced one of the four score sets. The three blind critics exist to check that bias, and they are stricter.
 - Round 2 Aurel and Quartile were each nudged once with a neutral "your render finished; continue" after they waited on a background monitor. This failure mode was then fixed in the skill.
@@ -139,6 +174,39 @@ Before → after, using the mean of the independent critics:
 3. 占位素材限制了画面分数：一模一样的手绘杯子无法表现“没有两只一样”，线框图显得千篇一律。下一步应换真实照片与真实截图再测。
 4. 规格清单式文案和无旁白的纹理拍点偶尔仍会出现。
 5. 素材少时片长偏短（9 部中 4 部只有 52–59 秒）。
+
+### 第 6 轮：针对遗留问题的跟进（同日稍晚）
+**第 6 轮前的改动：**
+1. **以界面为主的片子的高潮**：用三种克制的收尾替代倾斜图片墙，autofilm 按类型与素材自动选择：
+   - `result`：一张真实结果界面，缓推；
+   - `rise`：最关键的一张图表或报告从虚化界面中升起；截图是弹窗时自动裁出对话框；
+   - `stack`：最多 4 个产出逐拍叠入。
+
+   随后都会上移，让出名称与口号。普通图片墙会把“高潮”分封顶为 3；范例片已改用新的收尾和照片首尾呼应。
+2. **高亮框**：只框暗背景上的对话框内部，排除几乎空白的区域，任何框都不超过画面的四分之一。
+3. **规格清单与无用的纹理拍点**：`lint_copy` 会标出规格清单式的句子（属性罗列、连串单位、3 个以上短项）。一句这样的旁白把文案分封顶为 4，两句封顶为 3；没有旁白、也没有标注裁切的细节拍点把节奏分封顶为 3；autofilm 会给细节拍点留出一句旁白。
+4. **片长**：目标时长随素材而定（每张不同的图片或录屏约 9 秒，介于 45 秒与叙事结构的标准时长之间），并在方案里写明原因，不注水。
+5. **真实界面软件文件夹**：使用 8 张真实的 MedStat Pilot 截图（合成演示数据），只在本地使用，不提交；它的联系表也不提交。实物产品需要用户提供真实照片才能复测，因此没有下载或虚构任何照片。
+
+**第 6 轮分数**（三位全新盲评同时给参考片、第 5 轮与第 6 轮打分，取评审 4–6 的平均）：见上方英文表格。
+- 参考片：3.00
+- Aurel：3.25 → 3.08
+- Quartile：2.96 → 2.96
+- Larchwood：3.17 → **3.50**（评审 6 给 3.75）
+- MedStat Pilot（真实界面）：2.96
+
+**解读**：第 6 轮整体持平，变化在评审误差之内（同一部片不同评审最多相差 ±0.5）。Larchwood 有提升，其余没有。新的界面高潮没有被评审认可，界面类片子的“高潮”仍是 2–3 分。真实界面片的分数并不比占位图更高：评审认为整屏截图在成片尺寸下太小、太密。**独立评审下仍未达到 ≥ 4 的目标。**第 1–5 轮在流程上的改进保持住了：4 部片子都有配音，创意都由锚点句贯穿，都通过关卡，QA 都是 0 错误，也都有字幕。有一次 Haiku 运行在被关卡拦下后，依据“画面按选择与呈现评分”的说明，把画面分从 3 改成了 4；这条说明本身合理，但这种改分值得留意。
+
+**第 6 轮之后的改动（尚未复测）：**
+- 图表不再加高亮框：评审认为图表空白处的椭圆是噪音，而第 1 轮没有椭圆的片子被评为最克制。
+- `check` 会拒绝已经以强调词结尾的品牌名：有一次运行出现了“Stoneware Stoneware”。
+
+**仍未解决的主要问题：**
+1. 第 3 秒左右出现的 Logo 卡仍让开场像是“先出 Logo”（开场分 2–3）。
+2. 界面类片子的高潮安静但不难忘。
+3. 结构像功能巡礼：三个同样形状的证据拍点，再加上偏题的手机或录屏场景。
+4. 整屏真实截图在成片尺寸下太密，需要裁切或放大到旁白所说的区域。
+5. 以照片为主的片子，手绘占位图限制了画面分数。
 
 ### 诚实说明
 - 加固技能的作者同时提供了四组分数中的一组；三位盲评评审正是为了检验这一偏差，而且他们更严格。
