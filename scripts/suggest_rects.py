@@ -106,7 +106,9 @@ def suggest(path, base=None, n=4):
         for _ in range(n - len(picked)):
             y, x = np.unravel_index(np.argmax(dens), dens.shape)
             if dens[y, x] <= 0: break
-            c = [x, y, x + ww, y + wh, dens[y, x]]
+            sub = marks[y:y + wh, x:x + ww]   # shrink the window to the marks inside it, so the box hugs the data
+            ys_, xs_ = np.nonzero(sub)
+            c = [x + xs_.min(), y + ys_.min(), x + xs_.max() + 1, y + ys_.max() + 1, dens[y, x]] if len(xs_) else [x, y, x + ww, y + wh, dens[y, x]]
             if not any(iou(c, p) > 0.15 or inside(c, p) or inside(p, c) for p in picked): picked.append(c)
             dens[max(0, y - wh):y + wh, max(0, x - ww):x + ww] = 0
     picked.sort(key=lambda c: (round(c[1] / (H / 6)), c[0]))   # reading order: rows, then left → right
