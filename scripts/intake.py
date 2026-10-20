@@ -84,7 +84,14 @@ for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswi
         scale = 2 if w >= 2400 else 1
         if role == 'phone': scale = 3 if w >= 1000 else (2 if w >= 700 else 1)
         if role in ('photo', 'cutout'): scale = max(1, w / 1920)          # photos: base ≈ 1920 wide
-        items.append({'file': rel, 'kind': 'image', 'role': role, 'size': [w, h], 'alpha': bool(alpha), 'base': [round(w / scale), round(h / scale)]})
+        it = {'file': rel, 'kind': 'image', 'role': role, 'size': [w, h], 'alpha': bool(alpha), 'base': [round(w / scale), round(h / scale)]}
+        if role == 'photo' and not alpha:   # a packshot: the product on a plain near-white background (border bright and flat)
+            import numpy as np
+            g = np.asarray(im.convert('L').resize((240, max(1, round(240 * h / w))))).astype(float)
+            bd = np.concatenate([g[:6].ravel(), g[-6:].ravel(), g[:, :6].ravel(), g[:, -6:].ravel()])
+            if bd.mean() > 238 and bd.std() < 8 and g[g.shape[0] // 4: -g.shape[0] // 4, g.shape[1] // 4: -g.shape[1] // 4].std() > 12:
+                it['packshot'] = True
+        items.append(it)
     elif ext in VID:
         info = probe(f)
         it = {'file': rel, 'kind': 'video', **info}
@@ -112,6 +119,8 @@ count = lambda k, r=None: sum(1 for i in items if i['kind'] == k and (r is None 
 print(f"images {count('image')} (desktop {count('image', 'desktop')}, phone {count('image', 'phone')}, photo {count('image', 'photo')}, cutout {count('image', 'cutout')}, figure {count('image', 'figure')}, logo {count('image', 'logo')})"
       f" · videos {count('video')} · music {count('audio', 'music')} · voice {count('audio', 'voice')} · texts {count('text')}")
 missing = []
+packs = [i['file'] for i in items if i.get('packshot')]
+if packs: missing.append(f'packshot on white ({", ".join(packs)}): used framed as the hero; for a cut-out hero or lineup, ask for a transparent PNG (no automatic masking: a white product on white cannot be cut out reliably)')
 if not count('image', 'logo'): missing.append('logo (transparent PNG) — ask the user, or use the app icon from the repo (e.g. build/icon.png)')
 if not count('audio', 'music'): missing.append('music — none supplied: make_film.py will compose an original underscore (make_music.py) unless the user provides a licensed track; never pick one from the web')
 visual = sum(count('image', r) for r in ('desktop', 'phone', 'photo', 'cutout', 'figure')) + count('video')

@@ -182,7 +182,8 @@ for beat in G.GENRES['arcs'][genre['arc']]:
     if not need_ok(need): continue
     sc = {'type': t, 'bars': beat['bars']}
     if t == 'cover':
-        bg = take(['photo', 'desktop', 'figure'], set(), 1, prefer=lambda i: not MACRO.search(i['file'])) or take(['photo', 'desktop', 'figure'], set(), 1)
+        nonpack = lambda i: not MACRO.search(i['file']) and not i.get('packshot')   # the cold open needs a scene, not a packshot or a texture
+        bg = take(['photo', 'desktop', 'figure'], used, 1, prefer=nonpack) or take(['photo', 'desktop', 'figure'], used, 1)
         if bg:
             sc.update({'media': path_of(bg[0]), 'base': bg[0].get('base', [1920, 1080])})
             if bg[0].get('role') == 'photo':
@@ -204,12 +205,13 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         if not it: continue
         sc.update({'media': path_of(it[0]), 'base': it[0]['base'], 'title': {'zh': TODO('画面一句（≤ 10 字）'), 'en': TODO('one line over the photo')}})
     elif t == 'detail':
-        it = take(['photo', 'cutout'], used, 1, prefer=lambda i: bool(MACRO.search(i['file']))) or take(['photo', 'cutout'], used, 1) or take(['photo', 'cutout'], set(), 1)
+        it = take(['photo', 'cutout'], used, 1, prefer=lambda i: bool(MACRO.search(i['file']))) or take(['photo', 'cutout'], used, 1, prefer=lambda i: not i.get('packshot')) \
+            or take(['photo', 'cutout'], used, 1) or take(['photo', 'cutout'], set(), 1)   # the packshot is kept for the hero
         if not it: continue
         sc.update({'media': path_of(it[0]), 'base': it[0]['base']})
         sc['say'] = [{'en': TODO('the texture, named: what we are looking at and why it matters (≤ 10 words)'), 'zh': TODO('点出质感（≤ 16 字）')}]
     elif t == 'hero':
-        its = take(['cutout'], used, 3) or take(['photo'], used, 1)
+        its = take(['cutout'], used, 3) or take(['photo'], used, 1, prefer=lambda i: bool(i.get('packshot'))) or take(['photo'], used, 1)
         if not its: continue
         if len(its) == 1: sc['bars'] = min(sc['bars'], 3)   # one object: a short reveal, not a long hold
         sc.update({'media': [path_of(i) for i in its] if len(its) > 1 else path_of(its[0]), 'base': its[0]['base'],

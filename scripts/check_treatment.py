@@ -107,6 +107,31 @@ def omitted_qualifiers(spec, docs):
     return out
 
 
+WORD2DIGIT = {'one': '1', 'two': '2', 'three': '3', 'four': '4', 'five': '5', 'six': '6', 'seven': '7', 'eight': '8', 'nine': '9', 'ten': '10', 'twelve': '12',
+              'fifteen': '15', 'twenty': '20', 'thirty': '30', 'forty': '40', 'fifty': '50', 'sixty': '60', 'hundred': '100'}
+NUMWORD_UNIT = r'\b(?:one|two|three|four|five|six|seven|eight|nine|ten|twelve|fifteen|twenty|thirty|forty|fifty|sixty|hundred)[- ](?:hours?|minutes?|days?|weeks?|months?|years?|millilit\w*|lit(?:re|er)s?|decibels?|watts?|percent|square)\b'
+ZH_NUM_UNIT = r'[一二三四五六七八九十百千两]+(?:个)?(?:小时|分钟|毫升|升|分贝|瓦|平方|个月|年保修)'
+SPEC_TERMS = [[r'battery', '电池'], [r'run ?time', '续航'], [r'\bml\b', r'millilit', '毫升'], [r'\blit(?:re|er)s?\b', r'\b\d+(?:\.\d+)? ?l\b', r'[\d一二三四五六七八九十两]\s*升'],
+              [r'\bdb\b', r'decibel', '分贝'], [r'whisper', r'\bsilent', r'noiseless', '静音'], [r'coverage', '覆盖面积'], [r'square (?:feet|met)', r'm²', r'sq\.? ?ft', '平方'],
+              [r'ultrasonic', '超声波'], [r'\bbpa\b'], [r'auto[- ]?(?:shut|off)', '自动断电'], [r'\btimer\b', '定时'], [r'rechargeable', '可充电'], [r'\busb'],
+              [r'bluetooth', '蓝牙'], [r'waterproof', '防水'], [r'\bip[x\d]\d'], [r'certified', '认证'], [r'\bfda\b'], [r'clinically'], [r'antibacterial', '抗菌'],
+              [r'\bhepa\b'], [r'warranty', '保修']]
+
+
+def zh_num(s):
+    """四十分钟 → '40', 十二 → '12', 三百 → '300' (simple Chinese numerals, for matching docs that use digits)."""
+    d = {'零': 0, '一': 1, '二': 2, '两': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9}
+    m = re.match(r'[一二三四五六七八九十百千两零]+', s)
+    if not m: return s
+    total, cur = 0, 0
+    for ch in m.group(0):
+        if ch in d: cur = d[ch]
+        elif ch == '十': total += (cur or 1) * 10; cur = 0
+        elif ch == '百': total += (cur or 1) * 100; cur = 0
+        elif ch == '千': total += (cur or 1) * 1000; cur = 0
+    return str(total + cur)
+
+
 def section(md, n):
     m = re.search(rf'^##\s+{n}\..*?(?=^##\s+\d+\.|\Z)', md, re.M | re.S)
     return m.group(0) if m else ''
@@ -195,6 +220,40 @@ if len(sys.argv) > 2:
         if bp and bp.exists():
             docs += ' ' + json.dumps({k: v for k, v in json.load(open(bp)).items() if not k.startswith('_')}, ensure_ascii=False)
     vocab = concrete_vocab(docs, b.get('name', ''))
+
+    # truth: numbers and spec terms need a source the USER supplied (text in the materials folder) — not file names, not an
+    # agent-written brief. With no such text, the film may only claim what the materials show (a handle, mist, a glow, a place).
+    truth = ''
+    if mats and (base / mats).is_dir():
+        for tp in sorted((base / mats).rglob('*')):
+            if tp.is_file() and tp.suffix.lower() in ('.md', '.txt', '.json', '.csv', '.html') and tp.stat().st_size < 400000:
+                truth += ' ' + tp.read_text(errors='ignore')
+    tlow = truth.lower()
+    copy_items = [(p_, v) for p_, v in lint_copy.walk(spec)] + [(f'brand.chips[{k}]', c) for k, c in enumerate(b.get('chips') or []) if isinstance(c, str)]
+    copy_items += [(f'scenes[{i}].stats[{k}]', f"{st.get('value', '')}{st.get('suffix', '')} {st.get('en', '')} {st.get('zh', '')}") for i, sc in enumerate(spec.get('scenes', [])) for k, st in enumerate(sc.get('stats', []))]
+    name_nums = set(re.findall(r'\d+', f"{b.get('name', '')} {b.get('nameAccent', '')}"))
+    unsourced = []
+    sec8 = section(md, 8)
+    mat_stems = [tp.stem for tp in (base / mats).iterdir()] if mats and (base / mats).is_dir() else []
+    def screen_sourced(n):   # §8 names the material file the figure is read from ("95% CI → km.png")
+        return any(n in ln and any(st and st in ln for st in mat_stems) for ln in sec8.splitlines())
+    for path_, v in copy_items:
+        if '.chapter' in path_: continue   # chapter numbers are labels, not claims
+        nums = [n for n in re.findall(r'(?<![\w.])\d+(?:[.,]\d+)?', v) if n not in name_nums]
+        nums += [m.group(0) for m in re.finditer(NUMWORD_UNIT, v, re.I)] + re.findall(ZH_NUM_UNIT, v)
+        for n in nums:
+            key = n if n[0].isdigit() else (zh_num(n) if re.match(r'[一二三四五六七八九十百千两]', n) else re.split(r'[- ]', n.lower())[0])
+            if key not in tlow and not (key in WORD2DIGIT and WORD2DIGIT[key] in tlow) and not screen_sourced(n) and not screen_sourced(key):
+                unsourced.append((path_, n, 'number'))
+        for group in SPEC_TERMS:
+            m = next((m for t in group if (m := re.search(t, v, re.I))), None)
+            if m and not any(re.search(t, truth, re.I) for t in group) and not screen_sourced(m.group(0)):
+                unsourced.append((path_, m.group(0), 'spec'))
+    for path_, n, kind in unsourced[:8]:
+        err(f'{path_}: the {kind} "{n}" has no source in the user\'s docs' + ('' if truth.strip() else ' (there are no docs)'),
+            'say only what the docs or the materials show; ask the user for the spec sheet, and list it in §1 Gaps. An invented spec is a false claim')
+    if not truth.strip():
+        warn('no user docs (README, brief, spec sheet) in the materials', 'claim only what the images and clips show, and list in §1 Gaps what the user must supply (name, specs, contacts)')
 
     scenes = spec.get('scenes', [])
     spoken = [(i, sc['type'], s) for i, sc in enumerate(scenes) for s in sc.get('say', []) if s.get('en')]
