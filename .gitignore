@@ -9,3 +9,4 @@ build/
 evals/*/materials/*
 !evals/*/materials/README.md
 evals/runs/
+node_modules
