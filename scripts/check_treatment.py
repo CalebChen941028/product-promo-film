@@ -11,6 +11,8 @@ Checks
     script      the treatment's voice-over is a real script (one line per beat), and every spoken line in film.json is in it
     specificity ≥ 2/3 of the spoken lines, and every feature/hero line, carry a concrete fact from the docs (a number or a
                 noun from the README/brief) — "Like the first cup of the morning" may be the mood, not the whole film
+    qualifiers  a claim the docs limit (Pro/paid edition, beta, one platform, region, planned) carries that limit in its scene
+                (line, caption or chip); a limit that does not apply is named in §8 Qualifiers with 'not affected' and a reason
     idea        the chosen concept is on screen: its key words reach the film's copy, the tagline echoes the proposition
     cross-check each taste score is capped by what the film shows (e.g. "specific copy" cannot be 4 when half the lines
                 are generic). A score above its cap is an ERROR: fix the film, never the score.
@@ -61,6 +63,48 @@ def is_concrete(line, vocab):
     if re.search(r'\d', line): return True
     ws = [w.lower() for w in words(line)]
     return any(w in NUMWORDS for w in ws) or any(stem(w) in vocab for w in ws if w not in STOP and w not in GENERIC)
+
+
+QUALIFIERS = [r'pro(?:fessional)? (?:edition|version|plan|tier)', r'\bpro\b', r'premium', r'paid', r'enterprise', r'business plan', r'subscription', r'\bplus\b',
+              r'beta', r'preview', r'early access', r'waitlist', r'coming soon', r'planned', r'roadmap', r'experimental', r'not yet',
+              r'(?:mac ?os|windows|ios|android|linux|web|desktop|mobile)[- ]only', r'only (?:on|in|for) \w+', r'select(?:ed)? (?:regions|markets|countries)',
+              r'limited edition', r'add-on', r'sold separately', r'requires? (?:a |an )?\w+ (?:plan|licen[cs]e|subscription|account)',
+              '专业版', '高级版', '旗舰版', '付费', '会员', '订阅', '企业版', '测试版', '内测', '预览版', '即将', '计划中', '规划中', '实验性', '仅限', '仅支持', '选配', '另售', '部分地区', '限量']
+QRE = re.compile('|'.join(f'(?:{q})' for q in QUALIFIERS), re.I)
+
+
+def cjk_grams(s):
+    c = re.sub(r'[^\u4e00-\u9fff]', '', s or '')
+    return {c[k:k + 2] for k in range(len(c) - 1)}
+
+
+def qkey(q):
+    """The word that must reappear: "Pro edition" → Pro, "only on macOS" → macOS, "coming soon" → soon, 专业版 → 专业版."""
+    w = q.split()
+    if len(w) == 1: return w[0]
+    return w[-1] if w[0].lower() in ('only', 'requires', 'require', 'not', 'select', 'selected', 'coming', 'sold', 'limited', 'early', 'business') else w[0]
+
+
+def omitted_qualifiers(spec, docs):
+    """(scene index, claim, doc sentence, qualifier) for claims the docs qualify but the scene does not."""
+    flat = re.sub(r'"\s*[,:]\s*"|"\s*[\]\[{}]|[\]\[{}]\s*"|\\n', '\n', docs)       # JSON lists/fields from brief.json → one item per line
+    sents = [x.strip(' -•*"') for x in re.split(r'(?<=[.!?。！？；;])\s+|\n+', flat) if QRE.search(x or '')]
+    out, seen = [], set()
+    for i, sc in enumerate(spec.get('scenes', [])):
+        texts = [v for _, v in lint_copy.walk(sc) if isinstance(v, str) and len(v) > 3]
+        scene_txt = ' '.join(texts)
+        for t in texts:
+            tw = {stem(w) for w in words(t) if w.lower() not in STOP and w.lower() not in GENERIC and len(w) > 2}
+            for sent in sents:
+                q = QRE.search(sent).group(0)
+                sw = {stem(w) for w in words(sent) if w.lower() not in STOP and w.lower() not in GENERIC and len(w) > 2}
+                cg = len(cjk_grams(t) & cjk_grams(sent))
+                shared = len(tw & sw) + (2 if cg >= 3 else 1 if cg >= 2 else 0)
+                need = 1 if len(sw) <= 3 else 2          # a short qualifier sentence ("Linux is planned.") names one thing
+                if shared >= need and not re.search(re.escape(qkey(q)), scene_txt, re.I):
+                    key = (i, sent)
+                    if key not in seen: seen.add(key); out.append((i, t, sent, q))
+    return out
 
 
 def section(md, n):
@@ -193,6 +237,17 @@ if len(sys.argv) > 2:
         if vague_lines and not proof: warn(f'{len(vague_lines)} line(s) without a fact, e.g. "{vague_lines[0][1][:60]}"', 'fine for one mood line; more reads as filler')
     elif not docs:
         warn('no docs found to check facts against', 'set "materials": "<folder with the README/brief>" in film.json (autofilm writes it)')
+
+    # qualifiers: a claim the docs limit (edition, plan, beta, platform, region, "planned") must carry that limit in its scene
+    if docs:
+        reviewed = section(md, 8)
+        for i, phrase, sent, q in omitted_qualifiers(spec, docs):
+            if re.search(re.escape(qkey(q)), reviewed, re.I) and re.search(r'not affected|does not apply|不受影响|不适用', reviewed, re.I):
+                warn(f'scene {i}: qualifier "{q}" reviewed in §8 as not applying to "{phrase[:50]}"', 'keep the reason in §8 Qualifiers')
+                continue
+            err(f'scene {i} says "{phrase[:60]}" without the docs\' qualifier "{q}" ("{sent[:90]}")',
+                f'brand guardian: say the limit in that scene (put "{q}" in the line, the caption or a chip), or drop the claim. '
+                'An omitted qualifier is a false claim even when every word is true')
 
     # idea: the chosen concept must reach the film
     copy_all = ' '.join(v for p, v in lint_copy.walk(spec))

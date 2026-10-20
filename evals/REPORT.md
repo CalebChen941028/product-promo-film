@@ -184,6 +184,10 @@ All four runs passed the gate with 0 QA errors, a voice and captions. Two runs w
 - **Aurel:** the title sits over the mug in the lit bookend frames (a staging flaw the agent saw on QA and left).
 - **Quartile:** critics read "600 / 92" on the numbers scene. That frame was caught mid-count by the counter animation; the end value is 95 %. The claim is true, but a counter that passes through other numbers can mislead in a still frame.
 
+**Fixed after round 8 (not re-measured; no film changes, only gates):**
+- **Counters.** The `numbers` scene now reveals the true value and never counts through other numbers, so no frame, poster or contact sheet can show "600 / 92". A count-up is opt-in (`"count": true`), and its in-between digits stay blurred and dimmed.
+- **Omitted qualifiers.** `check_treatment.py` blocks the build when a scene makes a claim the docs limit (Pro or paid edition, beta, one platform, a region, "planned") without saying the limit in that scene. On the round-8 MedStat run it flags exactly the "export … from the same screen" line (Pro edition), with no other hits. Adding "In the Pro edition" clears it. The same check found nothing in the Aurel, Larchwood and Quartile runs. Treatment §8 gets a Qualifiers line.
+
 **Top remaining failure modes (round 8):**
 1. **Static cold opens.** One image held 6–8 s under the hook. The hook needs a second beat, such as a detail then the whole, or a move that reveals something.
 2. **Hero as a title card.** Restraint plus a still image reads as "competent". It may need real motion material (a clip of the result being produced) or a stronger visual transformation than light and scale.
@@ -356,6 +360,10 @@ All four runs passed the gate with 0 QA errors, a voice and captions. Two runs w
 - **MedStat**：旁白说报告与 R 代码可以“在同一屏导出”，却没有说明导出属于专业版，而 README 写明了这一点。智能体自己指出了，但没有修改。这句话真实但不完整，所以具体性检查拦不住；`check_treatment` 抓不到被省略的限定，需要品牌把关来补。
 - **Aurel**：首尾呼应亮起时，标题压在杯子上。这是呈现上的瑕疵，智能体在 QA 中看到了，但没有改。
 - **Quartile**：评审在数字场景里读到“600 / 92”，那是计数动画中途的一帧，最终是 95%。说法是真的，但会经过其他数字的计数器，在静帧里可能造成误读。
+
+**第 8 轮之后已修复（未重新测量；只改关卡，不改片子）：**
+- **计数器**：`numbers` 场景默认直接呈现真实数值，不再经过其他数字，因此任何一帧、海报或联系表都不会出现“600 / 92”。递增计数需显式开启（`"count": true`），中间数字保持模糊、变暗。
+- **遗漏的限定条件**：场景作出文档有限定的说法（专业版或付费版、测试版、仅某平台、部分地区、“计划中”），却没在该场景说明限定时，`check_treatment.py` 会阻止构建。在第 8 轮 MedStat 的片子上，它只标出“在同一屏导出”那一句（专业版），没有其他误报；加上“In the Pro edition”后即通过。Aurel、Larchwood、Quartile 三部均未报出问题。treatment 第 8 节新增“限定条件”一行。
 
 **仍未解决的主要问题（第 8 轮）：**
 1. **静止的冷开场**：一张图配开场句停 6–8 秒。开场需要第二个节拍，例如先细节后全景，或一个揭示信息的运动。

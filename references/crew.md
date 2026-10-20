@@ -84,6 +84,8 @@ English first, 中文在后。A top film is made by a team, so play each role in
 
 ### 8. Brand guardian: nothing false, nothing unreadable
 - **Job:** check every claim against a source.
+- **Qualifiers:** when the docs limit a claim (Pro or paid edition, beta or preview, one platform, some regions, "planned" or "coming soon"), the scene that makes the claim must say the limit: in the line, the caption or a chip. An omitted qualifier is a false claim even when every word is true. `check_treatment.py` blocks the build on one; list them in §8 Qualifiers.
+- **Numbers:** a number on screen is the true value from the docs. Never show a count-up frame that reads as another number (the `numbers` scene reveals the real value by default).
 - Check rights for music, photos, logos and quotes.
 - Captions must always be readable, and nothing important may sit under them.
 - **Sign-off** is required before the build.
@@ -184,6 +186,8 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
 
 ### 8. 品牌把关：没有虚假，没有看不清
 - **职责**：每条说法都对照来源核实。
+- **限定条件**：文档对某个说法有限定（专业版或付费版、测试版或预览版、仅某平台、部分地区、“计划中”“即将推出”），作出该说法的场景就必须说明这个限定，写在旁白、字幕或标签里。遗漏限定条件就是虚假说法，即使每个字都属实。`check_treatment.py` 发现后会阻止构建；请在第 8 节“限定条件”中逐条列出。
+- **数字**：画面上的数字必须是文档中的真实值，不能出现计数途中被读成别的数字的帧（`numbers` 场景默认直接呈现真实值）。
 - 核实音乐、照片、Logo、引言的授权。
 - 字幕必须始终可读，重要内容不能被字幕遮挡。
 - 构建前必须**签字**。

@@ -68,6 +68,7 @@
 
 ## 8. Brand guardian · 品牌把关
 - Every claim checked · 每条说法已核实: <write: claim → source>
+- Qualifiers · 限定条件: <write: every limit the docs put on a claim (edition/plan, beta, platform, region, planned) → how the film says it in that scene; or 'none in the docs'. A limit that truly does not apply: name it and write 'not affected' with the reason>
 - Legibility & access · 可读与无障碍: <write: captions on, contrast OK, nothing important under captions>
 - Sign-off · 签字: <write: approved / changes needed>
 

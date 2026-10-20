@@ -28,6 +28,7 @@ English first, 中文在后。
 | A photo was treated as a screen (or the reverse) | role guess from pixel statistics | rename the file with a hint (`*_photo.jpg`, `*_screen.png`) and rerun autofilm |
 | `copy not written: …TODO` | the crew has not filled that line | write it from treatment.md (references/crew.md) |
 | `check_treatment` fails on the taste average | weak concept, copy or images | redo the weakest role's section; do not inflate scores |
+| `… without the docs' qualifier "Pro edition"` | a scene makes a claim the docs limit (edition, beta, platform, region, planned) | say the limit in that scene (line, caption or chip) or drop the claim; if it truly does not apply, write it in treatment §8 Qualifiers with "not affected" and why |
 
 ## 中文
 
@@ -55,3 +56,4 @@ English first, 中文在后。
 | 照片被当成界面（或相反） | 按像素统计猜测角色 | 文件名加提示（`*_photo.jpg`、`*_screen.png`）后重跑 autofilm |
 | 报 `copy not written: …TODO` | 团队还没写这一句 | 按 treatment.md 写上（见 references/crew.md） |
 | `check_treatment` 品味平均分不够 | 概念、文案或画面偏弱 | 重做最弱角色的部分，不要虚高打分 |
+| 报 `… without the docs' qualifier "Pro edition"` | 场景中的说法在文档里有限定（版本、测试版、平台、地区、计划中） | 在该场景的旁白、字幕或标签里说明限定，或删掉这句；确实不适用时，在 treatment 第 8 节“限定条件”中写明“not affected”与原因 |

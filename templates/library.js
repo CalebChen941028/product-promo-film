@@ -92,7 +92,7 @@ const LIB = (() => {
     });
   }
 
-  // numbers { stats: [{value, suffix?, zh, en}] (1–3), chips?: [..] } — counters on the downbeat, chips on half beats.
+  // numbers { stats: [{value, suffix?, zh, en}] (1–3), chips?: [..], count?: false } — true values arrive on the downbeat (count: true = blurred count-up), chips on half beats.
   function numbers(start, end, o) {
     const ST2 = o.stats || [];
     scene(start, end, (R, S) => {
@@ -102,9 +102,15 @@ const LIB = (() => {
     }, (S, lt) => {
       const n = ST2.length, gap = 560;
       ST2.forEach((s, i) => {
-        const x = (i - (n - 1) / 2) * gap, v = Math.round(s.value * eo(prog(lt, 0.2 + i * 0.4, 1.6 + i * 0.4)));
-        S.n[i].textContent = v + (v >= s.value ? s.suffix || '' : '');
-        place(S.n[i], M.pop(lt, 0.1 + i * 0.4, { x, y: -200 })); M.text(S.l[i], lt, 0.5 + i * 0.3, { x, y: -60 });
+        // Honest numbers: by default the TRUE value is the only value ever on screen (it arrives, it does not count),
+        // so no frame, poster or still can show a number the product never claimed. "count": true opts into a
+        // count-up, and then the in-between digits are blurred and dimmed until the final value lands.
+        const x = (i - (n - 1) / 2) * gap, a = prog(lt, 0.2 + i * 0.4, 1.6 + i * 0.4);
+        const counting = o.count && a < 1;
+        S.n[i].textContent = (o.count ? Math.round(s.value * eo(a)) : s.value) + (counting ? '' : s.suffix || '');
+        place(S.n[i], M.pop(lt, 0.1 + i * 0.4, { x, y: -200 }));
+        if (counting) { S.n[i].style.filter = 'blur(22px)'; S.n[i].style.opacity = Math.min(+S.n[i].style.opacity, 0.22); } else S.n[i].style.filter = '';
+        M.text(S.l[i], lt, 0.5 + i * 0.3, { x, y: -60 });
       });
       const per = 4, cw = 1500 / per;
       S.c.forEach((C, i) => place(C, M.pop(lt, 1.6 + i * 0.25, { x: -750 + cw / 2 + (i % per) * cw, y: 90 + Math.floor(i / per) * 80 })));

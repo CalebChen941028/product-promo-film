@@ -60,7 +60,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `pain` | 3 | `items?` = 4 × [zh, en] | "the old way": grey tool windows tangle and collapse |
 | `feature` | 3 (≥ 1 + points) | `media`, `base?`, `title{zh,en}`, `points[{zh,en,rect?,focus?}]` ≤ 4, `frame?: "photo"` | the workhorse; layout depends on the motion language. `rect` highlights a screen region; photos (`"frame": "photo"`) need none |
 | `carousel` | 2 | `title?`, `panels[{zh,en,media,base?,crop?}]` ≤ 6 | dialogs/tools flip in one per slice beside a menu |
-| `numbers` | 2 | `stats[{value,suffix?,zh,en}]` ≤ 3, `chips?` ≤ 12 | counters on the beat |
+| `numbers` | 2 | `stats[{value,suffix?,zh,en}]` ≤ 3, `chips?` ≤ 12, `count?` | the true values arrive on the beat; no frame ever shows another number. `"count": true` adds a count-up whose in-between digits stay blurred |
 | `gallery` | 2 | `items[{media,zh?,en?}]` ≤ 8 | coverflow of result images; say one name per item (`at`) |
 | `clip` | 2 | `media` (.webm), `base?`, `title?`, `offset?`, `rate?` | screen recording, seeked frame-exactly |
 | `phone` | 2 | `media`, `base` (points, e.g. [393,852]), `title{zh,en}` | mobile screenshot in a device frame |
@@ -135,7 +135,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `pain` | 3 | `items?` = 4 组 [中文, 英文] | “传统方式”：灰色工具窗口互相牵扯后塌缩 |
 | `feature` | 3（≥ 1 + 要点数） | `media`、`base?`、`title{zh,en}`、`points[{zh,en,rect?,focus?}]` ≤ 4、`frame?: "photo"` | 主力场景；版式随动效语言变化；`rect` 用于高亮界面区域，照片（`"frame": "photo"`）不需要 |
 | `carousel` | 2 | `title?`、`panels[{zh,en,media,base?,crop?}]` ≤ 6 | 工具 / 对话框逐个翻入，左侧菜单同步高亮 |
-| `numbers` | 2 | `stats[{value,suffix?,zh,en}]` ≤ 3、`chips?` ≤ 12 | 按拍计数的大数字 |
+| `numbers` | 2 | `stats[{value,suffix?,zh,en}]` ≤ 3、`chips?` ≤ 12、`count?` | 真实数值按拍出现，任何一帧都不会显示别的数字；`"count": true` 加入递增计数，中间数字保持模糊 |
 | `gallery` | 2 | `items[{media,zh?,en?}]` ≤ 8 | 结果图 coverflow，旁白逐张点名（用 `at`） |
 | `clip` | 2 | `media`（.webm）、`base?`、`title?`、`offset?`、`rate?` | 录屏，逐帧精确定位 |
 | `phone` | 2 | `media`、`base`（点尺寸，如 [393,852]）、`title{zh,en}` | 手机截图套设备外框 |

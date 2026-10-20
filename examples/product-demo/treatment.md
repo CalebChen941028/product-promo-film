@@ -70,6 +70,7 @@
 
 ## 8. Brand guardian · 品牌把关
 - Every claim checked · 每条说法已核实: handmade, wheel-thrown, glazed by hand, fired twice, 350 ml, double-thick wall, 40 a week → materials/README.md (placeholder brand)
+- Qualifiers · 限定条件: none in the docs (no edition, platform, region or planned limits on any claim)
 - Legibility & access · 可读与无障碍: captions always on; dark-on-linen captions with a band; no text under captions
 - Sign-off · 签字: approved for the demo — images are labelled as placeholders in the README
 
