@@ -56,7 +56,7 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
 6. **Direct.** Do the director's pass (`references/director.md` §5). Defaults already set the colour script, hits, cuts, light and sound. Change a beat only on purpose.
 7. **Check.** Run `python3 scripts/make_film.py film.json --stage check` until there is no ERROR. Fix copy warnings from the lint too.
 8. **Build + voice + QA.** Run `--stage build`, then `--stage vo`, then `--stage qa`. QA must have 0 errors. If you can view images, read `film_out/qa/sheet*.png` and fix anything ugly in `film.json`.
-9. **Render.** Optional quick look: `--stage render --draft`, then `--stage finish --draft`. Final: `--stage render`, then `--stage finish`. Motion blur is applied only to frames that move.
+9. **Render.** Optional quick look: `--stage render --draft`, then `--stage finish --draft`. Final, as ONE command so nothing waits on you in between: `python3 scripts/make_film.py film.json --stage render && python3 scripts/make_film.py film.json --stage finish`. It takes 5–20 minutes; if you run it in the background, wait for that command to exit, then check `final/`. Motion blur is applied only to frames that move.
 10. **Report** to the user:
     - the file paths and the chosen concept;
     - every assumption you made without asking;
@@ -132,7 +132,7 @@ description: Make a commercial-grade promo film (1–4 min, 1080p, landscape) fo
 6. **导演检查**：按 `references/director.md` 第 5 节检查；默认值已设好色彩脚本、击点、转场、光效和声音，只有刻意为之才改。
 7. **检查**：`python3 scripts/make_film.py film.json --stage check` 直到没有 ERROR，文案检查的提示也要处理。
 8. **构建 + 配音 + QA**：依次运行 `--stage build`、`--stage vo`、`--stage qa`，QA 必须 0 错误；能看图就看 `film_out/qa/sheet*.png`，不满意就改 `film.json`。
-9. **渲染**：可选快速预览 `--stage render --draft`，再 `--stage finish --draft`；终版运行 `--stage render`，再 `--stage finish`（运动模糊只用于运动的帧）。
+9. **渲染**：可选快速预览 `--stage render --draft`，再 `--stage finish --draft`。终版用**一条命令**连跑，中间不用等你：`python3 scripts/make_film.py film.json --stage render && python3 scripts/make_film.py film.json --stage finish`，需 5–20 分钟；若放在后台运行，等这条命令结束后再检查 `final/`（运动模糊只用于运动的帧）。
 10. **汇报**：
     - 文件路径与选定的创意；
     - 未经询问而做的每一个假设；

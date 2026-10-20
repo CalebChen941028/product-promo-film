@@ -616,6 +616,7 @@ def render(spec, out, draft=False):
     if samples > 1:
         print(f'  motion blur: {samples} samples (180° shutter) on frames that move; still frames render once. Use --draft for quick looks')
     run(['node', out / 'tools' / 'render.mjs', 'video', out / 'film' / 'film.html', out / 'silent', ff, b['DUR'], workers, 30, samples], cwd=out)
+    print('render done → NEXT: python3 scripts/make_film.py film.json --stage finish' + (' --draft' if draft else '') + '  (mix, grade, poster, captions; nothing is delivered until finish runs)')
 
 
 def finish(spec, out, draft=False):
