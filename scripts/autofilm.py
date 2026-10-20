@@ -154,6 +154,20 @@ def screen_hero():
     return h
 
 
+def readable_crop(it, maxw):
+    """A 16:9 crop of a screen (base units) around its main region, at most maxw wide so UI text stays readable."""
+    try:
+        base = it.get('base', [1920, 1080])
+        reg = SR.modal_crop(src / it['file'], base) or (SR.suggest(src / it['file'], base, 1)[1] or [None])[0]
+        if not reg: return None
+        x, y, w, h = reg
+        W = min(maxw, max(w * 1.15, h * 1.15 * 16 / 9, 0.45 * base[0])); H = W * 9 / 16
+        cx, cy = x + w / 2, y + h / 2
+        return [round(max(0, min(base[0] - W, cx - W / 2))), round(max(0, min(base[1] - H, cy - H / 2))), round(W), round(H)]
+    except Exception:
+        return None
+
+
 # 3 · cast: arc beats → scenes ------------------------------------------------------------------------
 used, scenes, fill = set(), [], a.fill_copy
 logo = pool['logo'][0] if pool['logo'] else None
@@ -167,7 +181,14 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         bg = take(['photo', 'desktop', 'figure'], set(), 1, prefer=lambda i: not MACRO.search(i['file'])) or take(['photo', 'desktop', 'figure'], set(), 1)
         if bg:
             sc.update({'media': path_of(bg[0]), 'base': bg[0].get('base', [1920, 1080])})
-            if bg[0].get('role') == 'photo': sc['frame'] = 'photo'
+            if bg[0].get('role') == 'photo':
+                sc['frame'] = 'photo'
+                if genre['arc'] in ('sensory', 'human-story', 'reveal'):
+                    sc['name'] = False   # the hook owns the cover; the name lands at the hero and the end card
+            else:   # a screen: 4 bars so the hook gets ~5 s, and the cold open pushes into a readable region
+                sc['bars'] = max(sc['bars'], 4)
+                f = readable_crop(bg[0], 1386)
+                if f: sc['focus'] = f
         sc['say'] = [{'en': TODO('hook line = treatment §3 Hook line: a tension, a question or a physical detail (≤ 12 words)'), 'zh': TODO('开场钩子（≤ 20 字）'), 'at': 0.6}]
     elif t == 'pain':
         sc['say'] = [{'en': txt('pain', 'en', 'the tension, one sentence'), 'zh': txt('pain', 'zh', '痛点一句话')}]
@@ -219,7 +240,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
     elif t == 'carousel':
         its = take(['desktop'], used, 4)
         if len(its) < 2: continue
-        sc['panels'] = [{'zh': TODO('名称'), 'en': TODO('name'), 'media': path_of(i), 'base': i['base']} for i in its]
+        sc['panels'] = [{'zh': TODO('名称'), 'en': TODO('name'), 'media': path_of(i), 'base': i['base'], **({'crop': c} if (c := readable_crop(i, 1000)) else {})} for i in its]
     elif t == 'gallery':
         its = take(['figure', 'photo'], used, 5)
         if len(its) < 2: continue
@@ -227,11 +248,13 @@ for beat in G.GENRES['arcs'][genre['arc']]:
     elif t == 'clip':
         its = take(['video'], used, 1)
         if not its: continue
-        sc.update({'media': path_of(its[0]), 'title': {'zh': TODO('录屏标题'), 'en': TODO('clip title')}})
+        sc.update({'media': path_of(its[0]), 'title': {'zh': TODO('录屏标题'), 'en': TODO('clip title')},
+                   'say': [{'en': TODO('how this clip serves the idea, one line — or delete the scene if it does not'), 'zh': TODO('旁白中文字幕')}]})
     elif t == 'phone':
         its = take(['phone'], used, 1)
         if not its: continue
-        sc.update({'media': path_of(its[0]), 'base': its[0]['base'], 'title': {'zh': TODO('手机端一句'), 'en': TODO('mobile line')}})
+        sc.update({'media': path_of(its[0]), 'base': its[0]['base'], 'title': {'zh': TODO('手机端一句'), 'en': TODO('mobile line')},
+                   'say': [{'en': TODO('how the phone serves the idea, one line — or delete the scene if it does not'), 'zh': TODO('旁白中文字幕')}]})
     elif t == 'lineup':
         its = take(['cutout'], used, 5) or take(['cutout'], set(), 5)
         if len(its) < 2: continue
@@ -257,9 +280,28 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         sc['say'] = [{'id': 'motto', 'en': TODO('last line = treatment §3 Last line: a callback to the hook, not logistics'), 'zh': TODO('收尾一句'), 'at': 0.6}]
     scenes.append(sc)
 
+# shapes: no two proof beats of the same shape in a row — a second screen feature becomes a zoomed detail (labelled crops)
+for k in range(1, len(scenes)):
+    a_, b_ = scenes[k - 1], scenes[k]
+    if a_['type'] == b_['type'] == 'photo':   # two photographs in a row: the second becomes slow macro crops of itself
+        scenes[k] = {'type': 'detail', 'bars': b_['bars'], 'media': b_['media'], 'base': b_['base'], 'say': b_['say'],
+                     '_shape': 'a photo beat recast as a detail, so two proof beats do not share a shape'}
+        continue
+    if a_['type'] == b_['type'] == 'feature' and b_.get('frame') != 'photo' and not str(b_.get('media', '')).endswith('.webm'):
+        pts = [p for p in b_.get('points', []) if p.get('rect')]
+        if True:   # rects → crops on them; a chart (no rects) → the detail's own slow crops
+            bw, bh = b_.get('base', [1920, 1080])
+            crops = []
+            for p in pts[:2]:
+                x, y, w, h = p['rect']; W = min(900, max(w * 1.3, h * 1.3 * 16 / 9, 520)); H = W * 9 / 16
+                crops.append({'rect': [round(max(0, min(bw - W, x + w / 2 - W / 2))), round(max(0, min(bh - H, y + h / 2 - H / 2))), round(W), round(H)],
+                              'zh': TODO('这一处是什么（≤ 10 字）'), 'en': TODO('what this region shows')})
+            scenes[k] = {'type': 'detail', 'bars': b_['bars'], 'media': b_['media'], 'base': b_['base'], 'crops': crops,
+                         'say': b_['say'], '_shape': 'a screen feature recast as a zoomed detail, so two proof beats do not share a shape'}
+
 # breathing: never three proof beats in a row — a one-line statement after the second (crew.md §6)
 for k in range(len(scenes) - 2):
-    if all(x['type'] == 'feature' for x in scenes[k:k + 3]):
+    if all(x['type'] in ('feature', 'detail') for x in scenes[k:k + 3]):
         scenes.insert(k + 2, {'type': 'statement', 'bars': 2, 'zh': TODO('一口气：点出感受，不加新事实（≤ 16 字）'), 'en': TODO('a breath between proofs: the feeling, no new fact')})
         break
 

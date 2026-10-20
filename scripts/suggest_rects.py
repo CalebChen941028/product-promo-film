@@ -133,9 +133,11 @@ def suggest(path, base=None, n=4):
             if len(out) >= n: break
         return out
 
+    want, n = n, max(n, 2)   # the chart test needs two regions, whatever was asked for
     picked = pick((2, 5), 0.015, 0.25)
     if len(picked) < 2:   # a chart (sparse marks on white): no boxes. Blind critics read ellipses on chart space as noise;
         return [bw, bh], []   # the chart is the image, the points stay as on-screen labels
+    picked = picked[:want]
     picked.sort(key=lambda c: (round(c[1] / (H / 6)), c[0]))   # reading order: rows, then left → right
     sx, sy = bw / W, bh / H
     pad = 8

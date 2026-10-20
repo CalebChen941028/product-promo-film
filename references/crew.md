@@ -65,6 +65,8 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **Style choice by product:** `references/styles.md` and `genres.py`. Photos go in `photo` / `detail` / `hero` scenes. Cut-outs (transparent PNG) go in `hero` / `lineup`. Screens go in `feature` / `carousel` / `phone`.
 - **Full bleed beats a card.** A photograph carries its beat full-frame (`photo`, a one-photo `hero`) with one line; a card with a list of specs reads as a slide. Keep ≤ 2 points on any card, and only points that serve the idea.
 - **The cold open needs a subject:** the cover image plays full-frame for the first seconds, so give it a place, a person or the product in use, never a texture.
+- **The hook before the name.** The first ~5 s are the product truth (the image and the hook line); the logo comes after, or only at the hero and end card (`"name": false`).
+- **Readable screens.** At film scale, UI text must land at ≥ 18 px: a whole dense screen is shown for under a second, then the beat zooms to the region the line is about (a rect per point; carousel panels get a `crop`; a screen cover gets a `focus`). `check` warns when text would be smaller.
 - **The hero is a real output.** Screen-led films end on the work, done: one result screen (`"hero": "result"`), the one figure or report that matters rising out of the UI (`"rise"`), or a calm stack of outputs (`"stack"`). Photo-led films return to the cover photo (`"image"`). The tilted wall is a fallback, not a hero.
 - **A texture has a purpose:** a silent detail beat needs a line or labelled crops; otherwise cut it.
 
@@ -72,6 +74,7 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **Job:** the motion language (by theme) and the rhythm map (one row per scene).
 - Camera cuts only where the story turns. There is exactly one hero moment, around 60–70 % of the film.
 - **Breathing:** after two dense beats, one calm beat. The first 3 s and the last 5 s are the most watched; make them perfect.
+- **Vary the proof.** Two proof beats in a row never share a shape: follow a feature with a zoomed detail, one number, a clip, a before → after, or a breath. A phone or clip scene earns its place with a line that serves the idea, or it is cut.
 - **No dead holds:** a calm beat is short. A silent texture lasts 2 bars, a one-image reveal 3; anything held longer on one still image reads as empty (`check` warns).
 
 ### 7. Composer & sound designer: what we feel
@@ -163,11 +166,14 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
 - **高潮是真实的产出**：以界面为主的片子落在“做成的结果”上——一张结果界面（`"hero": "result"`）、从界面中升起的那张关键图表或报告（`"rise"`），或一组安静叠入的产出（`"stack"`）；以照片为主的片子回到封面照片（`"image"`）。倾斜图片墙只是兜底，不是高潮。
 - **纹理要有用意**：无旁白的细节拍点需要一句话或带标注的裁切，否则就删掉。
 - **冷开场要有主体**：封面图会在开头几秒满幅播放，要用地点、人物或使用中的产品，不要用纹理。
+- **先出钩子，再出名字**：开头约 5 秒是产品的真相（画面与开场句），Logo 在之后出现，或只在高潮与结尾页出现（`"name": false`）。
+- **界面要看得清**：在成片尺寸下，界面文字至少 18 px；整屏密集截图停留不超过一秒，随即推近到旁白所说的区域（每个要点给 rect，轮播面板给 `crop`，界面封面给 `focus`）。文字过小时 `check` 会提示。
 
 ### 6. 动效设计与剪辑：节奏
 - **职责**：动效语言（按主题选）和节奏表（每个场景一行）。
 - 只在故事转折处用镜头转场；全片只有一个高潮，位于 60–70% 处。
 - **呼吸感**：连续两个密集拍点之后给一个平静拍点。开头 3 秒和结尾 5 秒最常被看到，要做到完美。
+- **证据要换形状**：相邻两个证据拍点不用同一种形状：功能之后接放大的细节、一个数字、一段录屏、前后对比，或一口气。手机或录屏场景要有一句服务于核心概念的旁白，否则就删掉。
 - **不要空停**：平静拍点要短。无旁白的纹理 2 小节，单张图的揭晓 3 小节；一张静图停得更久就会显得空（`check` 会提示）。
 
 ### 7. 作曲与声音设计：让人感受到的部分

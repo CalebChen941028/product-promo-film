@@ -50,9 +50,14 @@ function feature(start, end, opts) {
       S.title = textEl(R, title, { whiteSpace: 'nowrap' });
     }
   }, (S, lt, d) => {
-    const step = (d - 1.4) / n, T = P.map((_, i) => 1.2 + i * step);
+    const t0 = opts.chrome === 'frame' ? 1.2 : 0.8, step = (d - t0 - 0.2) / n, T = P.map((_, i) => t0 + i * step);   // a dense screen is shown whole for < 1 s
     const cur = P.reduce((c, _, i) => (lt >= T[i] ? i : c), -1);
-    const focusSteps = [[0, full], ...P.map((p, i) => [T[i] + MO.focus.dur * 0.6, p.focus || padTo169(p.rect, base, MO_ID === 'kinetic-launch' ? 1.5 : 2.2)])];
+    // readable zoom: a screen's body text (opts.textPx base px, ~13 for desktop UI) must land at ≥ 18 px, so a crop is at
+    // most L.w·textPx/18 wide. Points without a rect on a screen hold the full frame; photos (frame) keep the slow drift.
+    const maxW = opts.chrome === 'frame' ? base[0] : L.w * (opts.textPx || 13) / 18;
+    const readable = (r) => { const c = padTo169(r, base, MO_ID === 'kinetic-launch' ? 1.5 : 2.2); if (c[2] <= maxW) return c;
+      const W = maxW, H = W * 9 / 16, cx = r[0] + r[2] / 2, cy = r[1] + r[3] / 2; return [clamp(cx - W / 2, 0, base[0] - W), clamp(cy - H / 2, 0, base[1] - H), W, H]; };
+    const focusSteps = [[0, full], ...P.map((p, i) => [T[i] + MO.focus.dur * 0.6, p.focus || (p.nohl && opts.chrome !== 'frame' ? full : readable(p.rect))])];
     if (MO_ID === 'gentle-story') focusSteps.push([d, focusSteps[focusSteps.length - 1][1]]);
     setCrop(S.W, cur < 0 && MO_ID !== 'gentle-story' ? full : M.focus(lt, focusSteps));
     if (MO_ID === 'kinetic-launch') { // burst: punch scale on each point arrival

@@ -20,8 +20,8 @@
   "contacts": [["BOOK", "预约", "northside.example", "Leeds"]], "chips": ["Weekdays until 9 pm"]
  },
  "scenes": [
-  {"type": "cover", "bars": 3, "media": "materials/desk-evening.jpg", "frame": "photo",
-   "_why": "Two short true sentences make the tension in under 3 s; the second is from the clinic's own survey (see _facts), so it can be said. No product yet.",
+  {"type": "cover", "bars": 3, "media": "materials/desk-evening.jpg", "frame": "photo", "name": false,
+   "_why": "The whole cover is a cold open: no logo, no name; the brand lands at the hero and the end card. Two short true sentences make the tension in under 3 s; the second is from the clinic's own survey (see _facts), so it can be said. No product yet.",
    "say": [{"en": "Your back hurts from work. Most clinics in Leeds close at five.", "zh": "腰是上班累坏的，利兹的诊所却大多五点关门。", "at": 0.5}]},
   {"type": "photo", "bars": 3, "media": "materials/street-dusk.jpg",
    "_why": "A person and a place at the hour that matters. The title is the time on the clock, not a slogan.",

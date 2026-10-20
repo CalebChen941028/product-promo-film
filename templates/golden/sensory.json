@@ -20,8 +20,8 @@
   "contacts": [["SHOP", "购买", "saltwick.example", "120 g tin"]], "chips": ["Yorkshire", "April–September"]
  },
  "scenes": [
-  {"type": "cover", "bars": 3, "media": "materials/bay-low-tide.jpg", "frame": "photo",
-   "_why": "Macro-to-place: the voice says something physical and true before we know the product.",
+  {"type": "cover", "bars": 3, "media": "materials/bay-low-tide.jpg", "frame": "photo", "name": false,
+   "_why": "The whole cover is a cold open: no logo, no name; the brand lands at the hero and the end card. Macro-to-place: the voice says something physical and true before we know the product.",
    "say": [{"en": "Every flake starts as a wave.", "zh": "每一片盐，都从一道浪开始。", "at": 0.6}]},
   {"type": "photo", "bars": 3, "media": "materials/bay-low-tide.jpg",
    "_why": "Mood with a fact in it: the name of the place and the season. A place you can find on a map beats 'pristine nature'.",

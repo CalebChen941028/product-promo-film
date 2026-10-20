@@ -215,6 +215,18 @@ if len(sys.argv) > 2:
         warn(f'{run_} scenes of the same type in a row at the same length', 'breathe: put a calm beat (photo, detail, statement, a scene without voice) between them, or vary the bars')
     if body and all(sc.get('say') for sc in scenes if sc['type'] not in ('cover', 'endcard', 'finale')):
         caps['Rhythm'] = min(caps.get('Rhythm', 5), 4)
+    c0 = scenes[0] if scenes else {}
+    if c0.get('type') == 'cover' and (not c0.get('media') or (c0.get('open') is False and c0.get('name') is not False)):
+        caps['Hook'] = min(caps.get('Hook', 5), 3)
+        warn('the film opens on the logo', 'the first seconds are the product truth: give the cover an image (a cold open) and let the hook line land before the name')
+    same = [i for i in range(1, len(scenes)) if scenes[i]['type'] in ('feature', 'photo', 'detail') and scenes[i]['type'] == scenes[i - 1]['type']]
+    if same:
+        caps['Rhythm'] = min(caps.get('Rhythm', 5), 4)
+        warn(f'scenes[{same[0]}]: two {scenes[same[0]]["type"]} beats in a row share one shape', 'vary the proof (zoomed detail, one number, a clip, before → after) or put a breath between them')
+    detours = [sc['type'] for sc in scenes if sc['type'] in ('clip', 'phone') and not sc.get('say')]
+    if detours:
+        caps['One idea'] = min(caps.get('One idea', 5), 4)
+        warn(f'a silent {detours[0]} scene', 'give it one line that serves the idea — or cut it')
     specs = [s['en'] for _, _, s in spoken if lint_copy.spec_list(s['en'])]
     if specs:
         caps['Specific'] = min(caps.get('Specific', 5), 3 if len(specs) >= 2 else 4)

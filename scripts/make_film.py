@@ -313,6 +313,23 @@ def check(spec, base_dir):
             warn(f'{where}: one image held {bars} bars', 'a single-image reveal lands in 3 bars; more angles (a media list) can hold longer')
         if t == 'feature' and sc.get('frame') == 'photo' and len(sc.get('points', [])) > 2:
             warn(f'{where}: {len(sc["points"])} points on a photo', 'a spec list dilutes the idea: keep ≤ 2 points that serve it, or use a "photo" scene with one line')
+        # legibility: UI text on a whole dense screen is too small at film scale (≥ 18 px at 1080p is the floor)
+        FEATURE_W = {'cinematic-3d': 1320, 'precision-data': 1120, 'kinetic-launch': 1400, 'gentle-story': 1120, 'playful-pop': 1180, 'editorial-type': 1000}
+        is_screen = isinstance(sc.get('media'), str) and roles.get(str((base_dir / sc['media']).resolve())) in ('desktop', 'figure') and not chart_media(base_dir, sc)
+        if t == 'feature' and is_screen and sc.get('frame') != 'photo':
+            px = 13 * FEATURE_W.get(spec.get('motion') or '', 1400) / basewh[0]
+            if px < 18 and any(not p.get('rect') and not p.get('focus') for p in sc.get('points', [])):
+                warn(f'{where}: a point on the whole screen — UI text renders at ~{px:.0f} px (< 18)', 'give the point a rect (suggest_rects.py) so the beat zooms to a readable region, or a "focus" crop')
+        if t == 'carousel':
+            for j, pnl in enumerate(sc.get('panels', [])):
+                if not pnl.get('crop') and roles.get(str((base_dir / pnl.get('media', '')).resolve())) == 'desktop':
+                    warn(f'{where}.panels[{j}]: a whole dense screen as a panel — its text is unreadable at film scale', 'give the panel a "crop" (the region it is about, ≤ 1000 base px wide)')
+        if t == 'cover' and is_screen and not sc.get('focus') and sc.get('open') is not False:
+            warn(f'{where}: the cold open is a whole dense screen', 'give the cover a "focus" crop (the readable region the hook is about); the open pushes in after a calm second')
+        if t in ('clip', 'phone') and not sc.get('say'):
+            warn(f'{where}: a silent {t} scene', 'give it one line that serves the idea — or cut it; an extra device or clip is a detour')
+        if i and t in ('feature', 'photo', 'detail') and scenes[i - 1].get('type') == t:
+            warn(f'{where}: two {t} beats in a row share one shape', 'vary the proof: a zoomed detail, one number, a clip, a before → after, or a calm statement between them')
         if t == 'detail' and not sc.get('say') and not any(c.get('zh') or c.get('en') for c in sc.get('crops', [])):
             warn(f'{where}: a silent texture with no purpose', 'give it a line or a labelled crop (what are we looking at, and why it matters) — or cut it')
         if t == 'cover' and isinstance(sc.get('media'), str) and re.search(r'detail|texture|macro|grain|close|特写|纹理', sc['media'], re.I):
@@ -678,6 +695,12 @@ def finish(spec, out, draft=False):
     cover = fin / f'{name}-cover-4k.png'
     sc0 = spec['scenes'][0]   # poster: the cover's settled title frame (after the cold open), unless cover_t says otherwise
     cover_t = spec.get('cover_t') or (round(b['G'] + b['BAR'] * sc0['bars'] - 1.2, 2) if sc0.get('type') == 'cover' and isinstance(sc0.get('bars'), (int, float)) else 4.2)
+    if not spec.get('cover_t') and sc0.get('name') is False:   # a name-less cold open: the poster is the hero (finale) with the name settled
+        fb = 0
+        for sc in spec['scenes']:
+            if sc.get('type') == 'finale':
+                cover_t = round(b['G'] + b['BAR'] * (fb + 0.8 * sc['bars']), 2); break
+            fb += sc['bars'] if isinstance(sc.get('bars'), (int, float)) else 0
     run(['node', out / 'tools' / 'cover.mjs', out / 'film' / 'film.html', cover, cover_t], cwd=out)
     if cube:
         raw = out / 'cover-raw.png'; shutil.move(cover, raw)

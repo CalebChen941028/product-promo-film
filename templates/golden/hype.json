@@ -20,7 +20,7 @@
   "contacts": [["GITHUB", "开源", "github.com/relay-example", "MIT"]], "chips": ["pytest", "Jest", "Local"]
  },
  "scenes": [
-  {"type": "cover", "bars": 3, "media": "materials/terminal-fail.png",
+  {"type": "cover", "bars": 4, "media": "materials/terminal-fail.png", "focus": [120, 500, 1200, 675],
    "_why": "A question the viewer has asked at 11 pm. Numbers make it concrete; the 'two thousand' is the repo in the capture.",
    "say": [{"en": "One failing test. Two thousand files. Which three matter?", "cap": "One failing test. 2,000 files. Which three matter?", "zh": "一个失败的测试，两千个文件；到底是哪三个？", "at": 0.5}]},
   {"type": "clip", "bars": 3, "media": "build/clips/relay-run.webm",

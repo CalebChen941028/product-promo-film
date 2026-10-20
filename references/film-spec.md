@@ -56,7 +56,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 ### Scene types
 | type | min bars | fields | notes |
 | --- | --- | --- | --- |
-| `cover` | 3 | `media?`, `base?`, `open?` | a cold open: the media plays full-bleed under the hook line for ~2.5 s, then recedes behind the logo, name, positioning and chips (`"open": false` = logo first); also the poster |
+| `cover` | 3 | `media?`, `base?`, `open?`, `name?`, `focus?` | the hook first: the media plays full-bleed under the hook line for ~5 s (a screen starts whole for a calm second, then pushes into `focus`, a readable region), then recedes behind the logo, name, positioning and chips. `"name": false` = the whole cover is a cold open and the name lands at the hero and end card (autofilm sets it for photo-led arcs; the poster then comes from the finale). `"open": false` = logo first (capped as a weak hook). Screen covers get 4 bars |
 | `pain` | 3 | `items?` = 4 × [zh, en] | "the old way": grey tool windows tangle and collapse |
 | `feature` | 3 (≥ 1 + points) | `media`, `base?`, `title{zh,en}`, `points[{zh,en,rect?,focus?}]` ≤ 4, `frame?: "photo"` | the workhorse; layout depends on the motion language. `rect` highlights a screen region; photos (`"frame": "photo"`) need none |
 | `carousel` | 2 | `title?`, `panels[{zh,en,media,base?,crop?}]` ≤ 6 | dialogs/tools flip in one per slice beside a menu |
@@ -131,7 +131,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 ### 场景类型
 | 类型 | 最少小节 | 字段 | 说明 |
 | --- | --- | --- | --- |
-| `cover` | 3 | `media?`、`base?`、`open?` | 冷开场：素材先满幅播放约 2.5 秒、配开场句，再退到 Logo、名称、定位与平台标签之后（`"open": false` 则先出 Logo）；同时是封面海报 |
+| `cover` | 3 | `media?`、`base?`、`open?`、`name?`、`focus?` | 先出钩子：素材满幅播放约 5 秒、配开场句（界面截图先完整停留一秒，再推近到可读区域 `focus`），然后才退到 Logo、名称、定位与平台标签之后。`"name": false` = 整个封面都是冷开场，名称在高潮和结尾页出现（照片为主的叙事结构由 autofilm 自动设置，海报改取 finale）。`"open": false` = 先出 Logo（会被判为弱开场）。界面封面为 4 小节 |
 | `pain` | 3 | `items?` = 4 组 [中文, 英文] | “传统方式”：灰色工具窗口互相牵扯后塌缩 |
 | `feature` | 3（≥ 1 + 要点数） | `media`、`base?`、`title{zh,en}`、`points[{zh,en,rect?,focus?}]` ≤ 4、`frame?: "photo"` | 主力场景；版式随动效语言变化；`rect` 用于高亮界面区域，照片（`"frame": "photo"`）不需要 |
 | `carousel` | 2 | `title?`、`panels[{zh,en,media,base?,crop?}]` ≤ 6 | 工具 / 对话框逐个翻入，左侧菜单同步高亮 |

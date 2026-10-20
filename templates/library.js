@@ -8,28 +8,33 @@ const LIB = (() => {
   const nameHTML = () => `${BR().name} <span class="accent">${BR().nameAccent || ''}</span>`;
   const chipsHTML = (list, size = 20) => (list || []).map((c, i, a) => `<span class="chip${i === a.length - 1 && /beta|preview|内测|新/i.test(c) ? ' accent' : ''}" style="font-size:${size}px;margin:0 7px">${c}</span>`).join('');
 
-  // cover { media?, base?, frame?: 'photo', open?: false } — logo, name, positioning, platform chips; blurred real UI behind.
-  // Cold open (default when there is media): the image plays full-bleed and sharp under the spoken hook for ~2.5 s,
-  // then recedes as the name arrives — the film opens on the product's world, not on a logo fade-in.
+  // cover { media?, base?, frame?: 'photo', open?: false, name?: false, focus?: [x,y,w,h] } — the hook first, then the name.
+  // Cold open (default when there is media): the image plays full-bleed under the spoken hook and owns the first ~5 s
+  // (a screen pushes into `focus`, a readable region); only then does the name arrive. "name": false keeps the whole
+  // cover a cold open — the name lands at the hero and the end card (photo-led arcs).
   function cover(start, end, o = {}) {
-    const base = o.base || [1920, 1080];
+    const base = o.base || [1920, 1080], named = o.name !== false;
     scene(start, end, (R, S) => {
-      if (o.media) { S.back = win(R, { srcs: o.media, base: o.base, w: 1500, chrome: o.frame === 'photo' ? 'frame' : 'auto' }); S.back.root.style.filter = 'blur(3px) saturate(0.85)'; qaIgnore(S.back.root); }
-      if (o.media && o.open !== false) { S.full = backdrop(R, o.media, base); qaIgnore(S.full.root); }
+      if (o.media && named) { S.back = win(R, { srcs: o.media, base: o.base, w: 1500, chrome: o.frame === 'photo' ? 'frame' : 'auto' }); S.back.root.style.filter = 'blur(3px) saturate(0.85)'; qaIgnore(S.back.root); }
+      if (o.media && (o.open !== false || !named)) { S.full = backdrop(R, o.media, base); qaIgnore(S.full.root); }
+      if (!named) return;
       S.icon = img(BR().logo, R, 'abs'); S.icon.style.width = '250px';
       S.title = textEl(R, nameHTML(), { whiteSpace: 'nowrap' }); S.title.className += ' h-display';
       S.sub = textEl(R, BR().positioningZh || '', { whiteSpace: 'nowrap' }); S.sub.className += ' h-zh';
       S.kick = textEl(R, BR().positioningEn || '', { whiteSpace: 'nowrap' }); S.kick.className += ' kicker';
       S.chips = textEl(R, chipsHTML(BR().chips), { whiteSpace: 'nowrap' });
     }, (S, lt, d) => {
-      const H = S.full ? Math.min(2.6, d * 0.38) : 0, t = lt - Math.max(0, H - 0.7);   // t: the title sequence overlaps the end of the cold open
+      // H: the cold open. The name needs ~2.6 s to settle before the cover hands off, so the hook gets everything before that.
+      const H = !S.full ? 0 : !named ? d + 1 : Math.max(Math.min(5.2, d - 3.3), Math.min(2.6, d * 0.38)), t = lt - Math.max(0, H - 0.7);
       const push = eio(prog(lt, d - 0.9, d + 0.3)), z = 1 + push * 0.35, out = 1 - push;
       if (S.full) {
-        const f = fill169(base), k = esoft(prog(lt, H - 0.7, H + 0.5));
-        setCrop(S.full, f.map((v, j) => lerp(v, zoomIn(f, 1.06, 0.5, 0.5)[j], esoft(prog(lt, 0, H + 0.5)))), 1920);
+        const f = fill169(base), to = o.focus || zoomIn(f, 1.06, 0.5, 0.5), k = named ? esoft(prog(lt, H - 0.7, H + 0.5)) : 0;
+        const pushIn = o.focus ? esoft(prog(lt, 0.6, 2.2)) : esoft(prog(lt, 0, Math.min(H, d) + 0.5));   // a screen: a calm context frame, then into the readable region
+        setCrop(S.full, f.map((v, j) => lerp(v, to[j], pushIn)), 1920);
         place(S.full.root, { o: 1 - k });
         S.full.root.style.filter = k > 0 ? `blur(${(k * 8).toFixed(1)}px)` : '';
       }
+      if (!named) return;
       if (S.back) place(S.back.root, { z: -700, rx: 8 * MO.tilt, s: 1 + lt * 0.01, o: 0.28 * prog(t, 0.2, 1.6) * out });
       place(S.icon, { ...M.pop(t, 0.3, { y: -250, s: z }), o: prog(t, 0.3, 0.9) * out });
       M.text(S.title, t, 0.8, { y: -20, s: z, o: out });
