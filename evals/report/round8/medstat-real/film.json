@@ -1,0 +1,311 @@
+{
+ "_how": "Written from treatment.md by the crew. Build with: python3 <skill>/scripts/make_film.py film.json --stage check",
+ "name": "medstat-pilot-film",
+ "out": "film_out",
+ "materials": "../../materials/medstat-real",
+ "treatment": "treatment.md",
+ "genre": "science-data",
+ "style": "paper-academic",
+ "motion": "precision-data",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "MedStat",
+  "nameAccent": "Pilot",
+  "logo": "../../materials/medstat-real/logo.png",
+  "positioningZh": "面向临床医学与公共卫生的研究统计工作台",
+  "positioningEn": "RESEARCH STATISTICS WORKBENCH FOR CLINICAL RESEARCH",
+  "taglineZh": "分析过程，写成代码",
+  "taglineEn": "The analysis, written as code.",
+  "motto": [
+   "审稿人问怎么算的，",
+   "运行这段脚本即可。",
+   "The reviewer asks how. Run the script."
+  ],
+  "contacts": [],
+  "chips": [
+   "macOS · Apple silicon",
+   "Windows 10/11 x64",
+   "Beta 内测"
+  ]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 4,
+   "media": "../../materials/medstat-real/km.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "focus": [
+    1100,
+    330,
+    780,
+    520
+   ],
+   "chapter": [
+    "01",
+    "演示数据",
+    "DEMO DATA"
+   ],
+   "say": [
+    {
+     "en": "The reviewer asked how. Nobody remembered the clicks.",
+     "zh": "审稿人问，这个数字怎么来的。没人记得点过哪些按钮。",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/medstat-real/home.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "chapter": [
+    "02",
+    "数据",
+    "DATA"
+   ],
+   "title": {
+    "zh": "拖入数据，先核对变量",
+    "en": "Drop the data. Check the variables."
+   },
+   "points": [
+    {
+     "zh": "读取 .sav .csv .xlsx .dta",
+     "en": "Reads .sav, .csv, .xlsx, .dta",
+     "rect": [
+      576,
+      440,
+      667,
+      228
+     ]
+    },
+    {
+     "zh": "分析前核对变量",
+     "en": "Check variables before analysis",
+     "rect": [
+      770,
+      600,
+      290,
+      40
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Upload the data and clean it in the same workspace.",
+     "zh": "数据上传与清洗，在同一个工作台完成。"
+    }
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 5,
+   "media": "../../materials/medstat-real/km.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "crops": [
+    {
+     "rect": [
+      1040,
+      180,
+      920,
+      150
+     ],
+     "zh": "三线表",
+     "en": "APA three-line table"
+    },
+    {
+     "rect": [
+      1610,
+      150,
+      290,
+      40
+     ],
+     "zh": "导出与 R 代码",
+     "en": "Export and R code"
+    }
+   ],
+   "say": [
+    {
+     "en": "The table is ready for the paper. Export the report or the R code from the same screen.",
+     "zh": "三线表可直接放进论文；同一屏导出报告或 R 代码。"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "bars": 2,
+   "zh": "结果会被读，方法会被查。",
+   "en": "Results get read. Methods get checked."
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/medstat-real/km_plot.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "chapter": [
+    "03",
+    "生存分析",
+    "SURVIVAL"
+   ],
+   "title": {
+    "zh": "生存曲线与风险人数表",
+    "en": "Survival curves with numbers at risk"
+   },
+   "points": [
+    {
+     "zh": "风险人数表",
+     "en": "Numbers at risk",
+     "rect": [
+      516,
+      768,
+      888,
+      240
+     ]
+    },
+    {
+     "zh": "两组曲线同图对照",
+     "en": "Both groups on one figure",
+     "rect": [
+      640,
+      208,
+      764,
+      584
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Survival curves come with their numbers at risk, so the reader sees who is left.",
+     "zh": "生存曲线下方附风险人数表，读者能看到每个时点还剩多少人。"
+    }
+   ]
+  },
+  {
+   "type": "carousel",
+   "bars": 3,
+   "panels": [
+    {
+     "zh": "生存曲线",
+     "en": "Survival",
+     "media": "../../materials/medstat-real/km_plot.png",
+     "base": [
+      1920,
+      1080
+     ],
+     "crop": [
+      510,
+      150,
+      900,
+      815
+     ]
+    },
+    {
+     "zh": "Meta 森林图",
+     "en": "Forest plot",
+     "media": "../../materials/medstat-real/meta_plot.png",
+     "base": [
+      1920,
+      1080
+     ],
+     "crop": [
+      400,
+      140,
+      1120,
+      830
+     ]
+    },
+    {
+     "zh": "ROC 曲线",
+     "en": "ROC curve",
+     "media": "../../materials/medstat-real/roc_plot.png",
+     "base": [
+      1920,
+      1080
+     ],
+     "crop": [
+      540,
+      120,
+      830,
+      870
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "The same workbench draws survival curves, ROC curves and forest plots.",
+     "zh": "同一个工作台里，也能画 ROC 曲线与森林图。"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/medstat-real/km.png",
+    "../../materials/medstat-real/km_plot.png",
+    "../../materials/medstat-real/meta_plot.png",
+    "../../materials/medstat-real/roc_plot.png"
+   ],
+   "hero": "rise",
+   "image": "../../materials/medstat-real/km_plot.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "crop": [
+    384,
+    70,
+    1152,
+    940
+   ],
+   "backdrop": "../../materials/medstat-real/km.png",
+   "backdropBase": [
+    1920,
+    1080
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "MedStat Pilot. The analysis, written as code.",
+     "zh": "MedStat Pilot：分析过程，写成代码。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "The reviewer asks how. Run the script.",
+     "zh": "审稿人问怎么算的，运行这段脚本即可。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

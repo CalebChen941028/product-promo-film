@@ -1,0 +1,236 @@
+{
+ "_how": "Written from treatment.md (crew sign-off). Screens are labelled demo placeholders (materials README). Build with make_film.py.",
+ "name": "quartile-film",
+ "out": "film_out",
+ "materials": "../../materials/quartile",
+ "genre": "science-data",
+ "style": "paper-academic",
+ "motion": "precision-data",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "Quartile",
+  "nameAccent": "",
+  "logo": "../../materials/quartile/logo.png",
+  "positioningZh": "给临床研究者的桌面统计工具",
+  "positioningEn": "DESKTOP STATISTICS FOR CLINICAL RESEARCHERS",
+  "taglineZh": "每张图，都能重跑",
+  "taglineEn": "Every figure, rerunnable.",
+  "motto": [
+   "审稿人问怎么来的，",
+   "脚本给出答案。",
+   "The reviewer asks how. The script answers."
+  ],
+  "contacts": [],
+  "chips": [
+   "macOS",
+   "Windows",
+   "Demo screens"
+  ]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 4,
+   "media": "../../materials/quartile/survival-curve.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "_why": "Hook: the survival curve fills the frame, still, while a question is asked. A real chart from the product, not a logo.",
+   "say": [
+    {
+     "en": "A reviewer asks how you got that curve.",
+     "zh": "审稿人问：这条曲线是怎么来的？",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/quartile/workspace.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "title": {
+    "zh": "三类分析，一个工作区",
+    "en": "Three analyses, one workspace"
+   },
+   "points": [
+    {
+     "zh": "生存与 ROC 曲线",
+     "en": "Survival and ROC curves",
+     "rect": [
+      312,
+      180,
+      576,
+      264
+     ]
+    },
+    {
+     "zh": "森林图与 Meta 分析",
+     "en": "Forest plots and meta-analysis",
+     "rect": [
+      972,
+      180,
+      576,
+      264
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "It runs on your own Mac or Windows PC, and your data never leaves it.",
+     "zh": "在你自己的 Mac 或 Windows 电脑上运行，数据不离开电脑。"
+    }
+   ],
+   "chapter": [
+    "01",
+    "工作区",
+    "WORKSPACE"
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 5,
+   "media": "../../materials/quartile/roc-curve.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "crops": [],
+   "say": [
+    {
+     "en": "The AUC comes with its 95% confidence interval, on the figure you would publish.",
+     "zh": "AUC 附带 95% 置信区间，就是你会发表的那张图。"
+    }
+   ],
+   "_shape": "a screen feature recast as a zoomed detail, so two proof beats do not share a shape"
+  },
+  {
+   "type": "statement",
+   "bars": 2,
+   "zh": "审稿人要的，是能重跑的过程。",
+   "en": "Reviewers want a process they can rerun."
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/quartile/forest-plot.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "title": {
+    "zh": "两种方式合并的荟萃分析",
+    "en": "Meta-analysis, pooled two ways"
+   },
+   "points": [
+    {
+     "zh": "I² 异质性",
+     "en": "I² heterogeneity"
+    },
+    {
+     "zh": "固定与随机效应",
+     "en": "Fixed and random effects"
+    }
+   ],
+   "say": [
+    {
+     "en": "Forest plots with fixed and random effects, and I² for heterogeneity.",
+     "zh": "固定与随机效应的森林图，并附 I² 异质性。"
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "bars": 2,
+   "media": "build/clips/scroll-results.webm",
+   "title": {
+    "zh": "每个结果都可导出为 R 脚本",
+    "en": "Every result exports as an R script"
+   },
+   "say": [
+    {
+     "en": "Every result exports as an R script a reviewer can run.",
+     "zh": "每个结果都可导出为 R 脚本，审稿人可以重跑。"
+    }
+   ]
+  },
+  {
+   "type": "phone",
+   "bars": 3,
+   "media": "../../materials/quartile/phone-results.png",
+   "base": [
+    393,
+    852
+   ],
+   "title": {
+    "zh": "手机上查看已保存的分析",
+    "en": "Saved analyses, on your phone"
+   },
+   "say": [
+    {
+     "en": "A phone companion lists your saved analyses.",
+     "zh": "手机伴侣列出你所有已保存的分析。"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/quartile/forest-plot.png",
+    "../../materials/quartile/phone-results.png",
+    "../../materials/quartile/roc-curve.png",
+    "../../materials/quartile/survival-curve.png",
+    "../../materials/quartile/workspace.png"
+   ],
+   "hero": "rise",
+   "image": "../../materials/quartile/survival-curve.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "backdrop": "../../materials/quartile/workspace.png",
+   "backdropBase": [
+    1920,
+    1080
+   ],
+   "_hero": "the hook's curve returns and resolves out of the UI as the finished figure (callback to the cover)",
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Quartile. Every figure, rerunnable.",
+     "zh": "Quartile：每张图，都能重跑",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "The reviewer asks how. The script answers.",
+     "zh": "审稿人问怎么来的，脚本给出答案。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

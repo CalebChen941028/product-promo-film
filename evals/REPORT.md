@@ -150,6 +150,47 @@ All four runs passed the gate with 0 QA errors, a voice and captions. Two runs w
 4. A spec line still creeps in (dishwasher safe, 350 ml).
 5. The honest "placeholder screens" label on an end card costs ending points. It stays: honesty wins over score.
 
+### Round 8: measurement fixed, hero staged on the hit (same day, night)
+**Measurement fix.**
+- `evals/sheet.py` now samples the 20-frame grid from 1.0 s, so it never shows the fade from black.
+- Each film also gets a moments sheet with dense, labelled strips of the hook (0.5–6.5 s), the hero (−1…+5 s around the finale) and the last 5 s. The critics' tools show images, not video, so dense stills stand in for motion.
+- The reference and round 7 were re-scored on the new sheets in the same blind pass as round 8.
+
+**How much of the hook deficit was the artefact? Essentially none.** The same five films (the reference and round 7) averaged 3.00 for "hook" on the old sheets (critics 7–9) and 2.93 on the fixed sheets (critics 10–12). The weak-hook verdict is real. With the fade removed and the hook visible frame by frame, critics now name the actual causes: a cold open that holds one still frame for 6–8 s ("a nice shot, nothing more"), and a dense first frame on real screens.
+
+**Hero changes before round 8:**
+- **Screen films:** on the downbeat after the half-beat of silence, the output resolves (sharpens, lifts) out of the hook's own screen, holds alone for about 3 s, then the name arrives.
+- **Photo-led films:** the bookend transforms. It returns tight and dim, then pulls back to the whole frame and lights up, before the name.
+- **Gate and goldens:** "hero ≥ 4" now needs both a staged treatment and a callback to the hook (the same image transformed, or the hook's words answered). autofilm uses the hook's screen as the hero backdrop, and the golden films were updated.
+
+**Round 8 scores** (three fresh blind critics scoring the reference, round 7 re-sampled and round 8 together; mean of critics 10–12):
+| Folder | Round 7 | Round 8 |
+| --- | --- | --- |
+| Reference | 3.29 | — |
+| Aurel | 3.29 | 3.17 |
+| Quartile (placeholder screens) | 2.84 | 2.88 |
+| Larchwood | 3.38 | **3.54** (critic 11: 3.63) |
+| MedStat Pilot (real screens) | 3.17 | 3.25 |
+
+**Reading:**
+- Round 8 is flat within critic noise (mean 3.17 → 3.21).
+- **The staged hero did not register.** "Hero" scored 3 on every round-8 film (2 for two Quartile ratings), and critics still call it "a title card rather than a memorable beat". The callback is there, and critics noticed the bookend loops, but one restrained move on a still image is not yet memorable.
+- Larchwood is the best film in every panel since round 6 and now beats the reference with every critic.
+- Panels differ: critics 7–9 gave round 7 a mean of 3.35, while critics 10–12 gave the same films 3.17. **Compare rounds only within one panel.**
+- **The target is still unmet:** no film reached 4.
+
+**Honesty findings in round 8 runs:**
+- **MedStat:** the voice-over says the report and R code export "from the same screen" without saying export is a Pro-edition feature, which its README states. The agent flagged this itself but did not fix it. The specificity check passes it, because the claim is true but incomplete. `check_treatment` cannot catch an omitted qualifier; the brand guardian has to.
+- **Aurel:** the title sits over the mug in the lit bookend frames (a staging flaw the agent saw on QA and left).
+- **Quartile:** critics read "600 / 92" on the numbers scene. That frame was caught mid-count by the counter animation; the end value is 95 %. The claim is true, but a counter that passes through other numbers can mislead in a still frame.
+
+**Top remaining failure modes (round 8):**
+1. **Static cold opens.** One image held 6–8 s under the hook. The hook needs a second beat, such as a detail then the whole, or a move that reveals something.
+2. **Hero as a title card.** Restraint plus a still image reads as "competent". It may need real motion material (a clip of the result being produced) or a stronger visual transformation than light and scale.
+3. **Empty texture beats and blown-up crops** (wood planks, glaze, bare ROC lines, giant function chips).
+4. **The feature-tour middle** on screen products, with callout ellipses on real screens.
+5. **Placeholder materials.** Every critic still caps image quality at 3 because of them. A real-photo re-test needs the user's photos.
+
 ### Honesty notes
 - The skill author changed the skill and also produced one of the four score sets. The three blind critics exist to check that bias, and they are stricter.
 - Round 2 Aurel and Quartile were each nudged once with a neutral "your render finished; continue" after they waited on a background monitor. This failure mode was then fixed in the skill.
@@ -283,6 +324,45 @@ All four runs passed the gate with 0 QA errors, a voice and captions. Two runs w
 3. 软件类片子的中段仍像功能巡礼。
 4. 规格句仍会混进来（可洗碗机、350 毫升）。
 5. 结尾页诚实的“占位界面”标注会扣结尾分，但它应当保留：诚实优先于分数。
+
+### 第 8 轮：修正测量，高潮落在击点上（同日夜间）
+**测量修正：**
+- `evals/sheet.py` 的 20 帧网格从第 1.0 秒开始取帧，不再出现黑场淡入；
+- 每部片另附“关键时刻”联系表，带准确时间标注：开场（0.5–6.5 秒）、高潮（finale 前 1 秒到后 5 秒）、最后 5 秒。评审工具只能看图、不能看视频，所以用密集静帧代替动态；
+- 参考片与第 7 轮在同一轮盲评中用新联系表重新打分。
+
+**开场分偏低，有多少是采样问题？几乎没有。**同样 5 部片（参考片与第 7 轮），旧联系表上（评审 7–9）开场分平均 3.00，修正后（评审 10–12）为 2.93。开场弱是真实的问题。去掉黑场、能逐帧看到开场后，评审指出的原因是：冷开场一张静图停 6–8 秒（“好看，但仅此而已”），以及真实界面的第一帧太密。
+
+**第 8 轮前的高潮改动：**
+- **界面类片子**：在半拍静默后的强拍上，产出从开场那张界面中一举清晰、浮起，单独停留约 3 秒，再出名称；
+- **照片类片子**：首尾呼应会变化，先以近景、暗调回来，再拉开到全景并亮起，然后才出名称；
+- **关卡与范例**：“高潮 ≥ 4”需要同时具备呈现方式和呼应开场（同一画面的变化，或回答开场句）；autofilm 用开场界面作高潮背景，范例片已同步更新。
+
+**第 8 轮分数**（三位全新盲评同时给参考片、重新采样的第 7 轮与第 8 轮打分，取评审 10–12 的平均）：见上方英文表格。
+- 参考片：3.29
+- Aurel：3.29 → 3.17
+- Quartile：2.84 → 2.88
+- Larchwood：3.38 → **3.54**
+- MedStat：3.17 → 3.25
+
+**解读：**
+- 第 8 轮整体持平，变化在评审误差之内（平均 3.17 → 3.21）。
+- **新的高潮没有被评审认可**：第 8 轮每部片的高潮都是 3 分（Quartile 有两次是 2 分），评审仍说它“像标题卡，而不是难忘的时刻”。呼应已经做到，评审也注意到了首尾呼应，但在静图上只做一个克制的动作，还不足以让人记住。
+- Larchwood 自第 6 轮起在每一组评审里都是最好的，这一轮在三位评审那里都超过了参考片。
+- 不同评审组之间有差异：评审 7–9 给第 7 轮的平均分是 3.35，评审 10–12 给同样的片子 3.17。**只在同一组评审内比较各轮。**
+- **目标仍未达成**：没有一部片子达到 4 分。
+
+**第 8 轮运行中的诚实问题：**
+- **MedStat**：旁白说报告与 R 代码可以“在同一屏导出”，却没有说明导出属于专业版，而 README 写明了这一点。智能体自己指出了，但没有修改。这句话真实但不完整，所以具体性检查拦不住；`check_treatment` 抓不到被省略的限定，需要品牌把关来补。
+- **Aurel**：首尾呼应亮起时，标题压在杯子上。这是呈现上的瑕疵，智能体在 QA 中看到了，但没有改。
+- **Quartile**：评审在数字场景里读到“600 / 92”，那是计数动画中途的一帧，最终是 95%。说法是真的，但会经过其他数字的计数器，在静帧里可能造成误读。
+
+**仍未解决的主要问题（第 8 轮）：**
+1. **静止的冷开场**：一张图配开场句停 6–8 秒。开场需要第二个节拍，例如先细节后全景，或一个揭示信息的运动。
+2. **高潮像标题卡**：克制加静图只能做到“合格”。可能需要真实的动态素材（产出结果过程的录屏），或比光线、缩放更强的画面变化。
+3. **空洞的纹理拍点和放大过度的裁切**：木板、釉面、空的 ROC 线、巨大的函数名。
+4. **软件类片子的中段像功能巡礼**，真实界面上的椭圆标注也显杂乱。
+5. **占位素材**：所有评审都因此把画面分压在 3 分；要用用户的真实照片复测。
 
 ### 诚实说明
 - 加固技能的作者同时提供了四组分数中的一组；三位盲评评审正是为了检验这一偏差，而且他们更严格。
