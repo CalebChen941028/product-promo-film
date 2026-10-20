@@ -1,0 +1,1 @@
+The user's own test materials (AI-generated renders and a clip) and any contact sheets made from them stay local and are not committed. Only the text treatments and film.json are kept here.

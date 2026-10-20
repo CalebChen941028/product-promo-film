@@ -1,0 +1,157 @@
+{
+ "_how": "Written from treatment.md (anchor lines verbatim). Source images are AI-generated renders; see treatment §1.",
+ "name": "humidifier-film",
+ "out": "film_out",
+ "materials": "../materials",
+ "genre": "travel-hospitality-living",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes",
+  "_note": "the genre suggests af_heart; am_michael is used because it is already downloaded. af_heart is a ≈ 0.5 MB download: ask the user first, then set \"allow_download\": true"
+ },
+ "brand": {
+  "name": "Humidifier",
+  "nameAccent": "",
+  "positioningZh": "家用加湿器",
+  "positioningEn": "A home humidifier",
+  "taglineZh": "让空气，慢慢变柔和",
+  "taglineEn": "Let the air soften, slowly",
+  "motto": [
+   "细雾缓缓升起，",
+   "无论坐在哪里。",
+   "Wherever you sit, the mist rises slowly."
+  ],
+  "contacts": [],
+  "chips": [
+   "Concept"
+  ],
+  "logo": "brand/logo_placeholder.png"
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../materials/lifestyle_camp.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "frame": "photo",
+   "name": false,
+   "say": [
+    {
+     "en": "A thin thread of mist, rising in the open air.",
+     "zh": "一缕细雾，在露天里慢慢升起。",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "photo",
+   "bars": 3,
+   "media": "../materials/lifestyle_living.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "title": {
+    "zh": "晚上的客厅",
+    "en": "Evening, in the living room"
+   },
+   "say": [
+    {
+     "en": "A soft blue-violet glow, low in the room.",
+     "zh": "蓝紫色柔光落在房间里。"
+    }
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 2,
+   "media": "../materials/lifestyle_office.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "say": [
+    {
+     "en": "A rose-gold ring, and three quiet controls.",
+     "zh": "玫瑰金的环，三个安静的按键。"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "bars": 2,
+   "zh": "空气一干，房间就让人坐不住。",
+   "en": "Dry air makes a room hard to settle in."
+  },
+  {
+   "type": "hero",
+   "bars": 3,
+   "media": "../materials/product_studio.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "title": {
+    "zh": "加湿器",
+    "en": "Humidifier"
+   },
+   "say": [
+    {
+     "en": "Mist, a glow, and a leather handle to carry it.",
+     "zh": "细雾、柔光，还有一根皮革提手。",
+     "at": 1.0
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../materials/lifestyle_camp.jpeg",
+    "../materials/lifestyle_living.jpeg",
+    "../materials/lifestyle_office.jpeg",
+    "../materials/product_studio.jpeg"
+   ],
+   "image": "../materials/lifestyle_camp.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Humidifier. Let the air soften, slowly.",
+     "zh": "加湿器：让空气，慢慢变柔和。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Wherever you sit, the mist rises slowly.",
+     "zh": "无论坐在哪里，细雾都慢慢升起。",
+     "at": 0.6
+    }
+   ]
+  }
+ ],
+ "_logo_note": "PLACEHOLDER wordmark (typeset name, not a brand logo). Replace with the user's transparent PNG logo before any public use."
+}

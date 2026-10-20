@@ -1,0 +1,143 @@
+{
+ "_how": "Edited by hand from autofilm's draft: genre changed to travel-hospitality-living (autofilm's close-call alternative); text written from the photos only.",
+ "name": "humidifier-film",
+ "out": "film_out",
+ "materials": "../../materials/humidifier/",
+ "genre": "travel-hospitality-living",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "ambient-air",
+   "bpm": 88
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes",
+  "allow_download": false
+ },
+ "brand": {
+  "name": "Humidifier",
+  "nameAccent": "",
+  "positioningZh": "为居室送去柔和的湿润",
+  "positioningEn": "Soft moisture for the room you live in",
+  "taglineZh": "柔雾，安静的房间",
+  "taglineEn": "Soft mist, quiet room",
+  "motto": [
+   "雾还在升，",
+   "书页还在翻。",
+   "The mist keeps rising."
+  ],
+  "contacts": [],
+  "chips": [],
+  "logo": "PLACEHOLDER-logo.png"
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "frame": "photo",
+   "name": false,
+   "say": [
+    {
+     "en": "The reader never looks up. The mist keeps rising.",
+     "zh": "读书的人没有抬头，雾还在升。",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "photo",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_7qz0iq7qz0iq7qz0.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "title": {
+    "zh": "户外桌边，近处有河",
+    "en": "A table outside, a river nearby"
+   }
+  },
+  {
+   "type": "detail",
+   "bars": 2,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "say": [
+    {
+     "en": "Frosted glass, so the light glows through softly.",
+     "zh": "磨砂穹顶让灯光柔和透出。"
+    }
+   ]
+  },
+  {
+   "type": "hero",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_rhr16lrhr16lrhr1.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "title": {
+    "zh": "加湿器",
+    "en": "Humidifier"
+   },
+   "say": [
+    {
+     "en": "Mist from the top. Light from within.",
+     "zh": "顶部出雾，内里透光。"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/humidifier/Gemini_Generated_Image_7qz0iq7qz0iq7qz0.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_rhr16lrhr16lrhr1.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg"
+   ],
+   "image": "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Humidifier. Soft mist, quiet room.",
+     "zh": "柔雾里的安静房间",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "The mist keeps rising.",
+     "zh": "雾还在升。",
+     "at": 0.6
+    }
+   ]
+  }
+ ],
+ "_logo_note": "PLACEHOLDER: a plain ring drawn for this run; replace with the user's transparent PNG logo"
+}

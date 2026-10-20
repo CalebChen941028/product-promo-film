@@ -1,0 +1,134 @@
+{
+ "_how": "Written from treatment.md (crew pass). Rebuild: python3 <skill>/scripts/make_film.py film.json --stage check",
+ "name": "humidifier-film",
+ "out": "film_out",
+ "materials": "../../materials/humidifier",
+ "treatment": "treatment.md",
+ "genre": "food-beverage",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "warm-acoustic"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes",
+  "_note": "am_michael is already downloaded. The genre suggests af_heart (≈ 0.5 MB download): not used, because the user could not be asked."
+ },
+ "brand": {
+  "name": "Humidifier",
+  "nameAccent": "",
+  "logo": "brand/logo-PLACEHOLDER.png",
+  "_logo_note": "PLACEHOLDER: a plain text wordmark of the generic product word, not a brand. Replace with the real transparent PNG logo.",
+  "positioningZh": "为你所在的房间，送去柔雾与暖光。",
+  "positioningEn": "Soft mist and warm light, in the room you live in.",
+  "taglineZh": "柔雾，暖光。",
+  "taglineEn": "Soft mist. Warm light.",
+  "motto": [
+   "房间的空气，",
+   "现在能被你感觉到。",
+   "Now you can feel the air."
+  ],
+  "contacts": [],
+  "chips": []
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 4,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_7qz0iq7qz0iq7qz0.jpeg",
+   "base": [1920, 1072],
+   "frame": "photo",
+   "name": false,
+   "say": [
+    {
+     "en": "A room's air has a texture. Nobody notices.",
+     "zh": "房间里的空气也有质地，只是很少有人留意。",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "photo",
+   "bars": 4,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+   "base": [1920, 1072],
+   "title": {
+    "zh": "雾气，慢慢升起",
+    "en": "Mist, rising slowly"
+   },
+   "say": [
+    {
+     "en": "Mist drifts past a quiet desk by the window.",
+     "zh": "雾气飘过窗边安静的书桌。"
+    }
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 2,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg",
+   "base": [1920, 1072],
+   "say": [
+    {
+     "en": "The frosted shell glows warm from within.",
+     "zh": "磨砂外壳，从内里透出暖光。"
+    }
+   ]
+  },
+  {
+   "type": "hero",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_rhr16lrhr16lrhr1.jpeg",
+   "base": [1920, 1072],
+   "title": {
+    "zh": "加湿器",
+    "en": "Humidifier"
+   },
+   "say": [
+    {
+     "en": "A rose-gold ring frames the glowing dome.",
+     "zh": "玫瑰金环，托住发光的穹顶。"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/humidifier/Gemini_Generated_Image_7qz0iq7qz0iq7qz0.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_rhr16lrhr16lrhr1.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg"
+   ],
+   "image": "../../materials/humidifier/Gemini_Generated_Image_7qz0iq7qz0iq7qz0.jpeg",
+   "base": [1920, 1072],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Humidifier. Soft mist. Warm light.",
+     "zh": "柔雾，暖光。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Now you can feel the air.",
+     "zh": "现在，你能感觉到空气了。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}
