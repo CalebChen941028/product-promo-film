@@ -224,6 +224,11 @@ if len(sys.argv) > 2:
         if bp and bp.exists():
             docs += ' ' + json.dumps({k: v for k, v in json.load(open(bp)).items() if not k.startswith('_')}, ensure_ascii=False)
     vocab = concrete_vocab(docs, b.get('name', ''))
+    # with no user docs, what the images visibly show (§5 "Each image shows", written by the art director) is the source
+    # for specificity — never for numbers or specs, which still need the user's docs (below)
+    visible = ' '.join(m.group(1) for m in re.finditer(r'`[^`]+\.(?:jpe?g|png|webp|webm|mp4|mov)`\s*(?:→|->|=|:)\s*([^\n]+)', section(md, 5), re.I))
+    visible += ' ' + field(section(md, 2), 'Proof')   # the strategist's proof; with no docs it lists what the materials visibly show
+    vocab |= concrete_vocab(visible, b.get('name', ''))
 
     # truth: numbers and spec terms need a source the USER supplied (text in the materials folder) — not file names, not an
     # agent-written brief. With no such text, the film may only claim what the materials show (a handle, mist, a glow, a place).
