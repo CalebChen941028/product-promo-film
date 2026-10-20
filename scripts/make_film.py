@@ -374,7 +374,9 @@ def build(spec, base_dir, out):
     if not rest and total_bars - fixed > 6:
         print(f'WARN  {total_bars - fixed} bars of music left unused — set the last scene to "bars": "rest"')
     each_rest = (total_bars - fixed) // max(1, len(rest))
-    if grid.get('generated'): each_rest = rest_bars(grid['bpm'])
+    if grid.get('generated'):
+        each_rest = rest_bars(grid['bpm'])
+        dur = min(dur, G + BAR * (fixed + each_rest * len(rest) + 1))   # end on the ring-out bar, not the reverb tail (the mix fades it)
     # hi-energy bars → chorus ranges (background pulse)
     his = [bb['hi'] for bb in grid['bars']]
     q = sorted(his)[int(len(his) * 0.66)] if his else 1
