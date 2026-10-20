@@ -226,6 +226,20 @@ const LIB = (() => {
   // hero { media | [angles], base?, cutout?: bool, title: {zh, en}, kicker? } — the reveal: the product lights up, then breathes.
   function hero(start, end, o) {
     const srcs = [].concat(o.media || []);
+    if (!o.cutout && srcs.length === 1) {   // one photograph: full bleed, it lights up while the camera eases in (no slide-like card)
+      const base = o.base || [1920, 1080], from = fill169(base), to = zoomIn(from, 1.08, 0.5, 0.5);
+      scene(start, end, (R, S) => {
+        S.W = backdrop(R, srcs[0], base); S.scrim = scrim(R, 'left');
+        S.t = textEl(R, `<div class="h-zh" style="color:#fff;font-size:60px;letter-spacing:10px;text-shadow:0 4px 30px rgba(0,0,0,0.5)">${o.title?.zh || ''}</div><div style="margin-top:14px;font:500 22px var(--en);letter-spacing:5px;color:rgba(255,255,255,0.86)">${o.title?.en || ''}</div>`, { width: '760px' });
+      }, (S, lt, d) => {
+        const on = esoft(prog(lt, 0.1, 1.6));
+        setCrop(S.W, from.map((v, j) => lerp(v, to[j], esoft(prog(lt, 0, d + ST.xf)))), 1920); place(S.W.root, { o: 1 });
+        S.W.root.style.filter = `brightness(${lerp(0.3, 1, on).toFixed(3)})`;
+        S.scrim.style.opacity = prog(lt, 0.8, 1.6);
+        M.text(S.t, lt, 1.0, { x: -960 + 120 + 380, y: 40 });   // 120 px margin, like photo()
+      });
+      return;
+    }
     scene(start, end, (R, S) => {
       S.glow = div('', R); Object.assign(S.glow.style, { position: 'absolute', left: '50%', top: '52%', width: '1300px', height: '900px', margin: '-450px 0 0 -650px', borderRadius: '50%',
         background: `radial-gradient(closest-side, color-mix(in srgb, var(--accent) ${ST.light ? 10 : 16}%, transparent), transparent)`, filter: 'blur(20px)' });

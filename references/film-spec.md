@@ -69,7 +69,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `finale` | 4 | `media` = list of images | tilted wall of real screens + name + tagline |
 | `endcard` | 4 | — | logo, name, positioning, motto, contacts, chips |
 | `photo` | 2 | `media`, `base?`, `title?{zh,en}`, `focus?` (end crop), `side?: "left"\|"bottom"` | full-bleed photograph with a slow push-in; text on a soft scrim |
-| `hero` | 3 | `media` (one image or several angles), `base?`, `title{zh,en}`, `cutout?` | the reveal: the product lights up and breathes. Transparent PNGs stand on the stage with a contact shadow and reflection (auto-detected) |
+| `hero` | 3 | `media` (one image or several angles), `base?`, `title{zh,en}`, `cutout?` | the reveal: the product lights up and breathes. Transparent PNGs stand on the stage with a contact shadow and reflection (auto-detected); a single photograph fills the frame and lights up as the camera eases in |
 | `detail` | 2 | `media`, `base?`, `crops?[{rect,zh?,en?}]` ≤ 4 | macro close-ups (texture before the whole); default crops are chosen for you |
 | `lineup` | 2 | `items[{media,zh?,en?}]` ≤ 6, `title?`, `cutout?` | the range (colours, models, sizes) standing together |
 | `quote` | 2 | `zh`, `en?`, `who`, `role?` | a **real**, approved testimonial; large and quiet |
@@ -144,7 +144,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `finale` | 4 | `media` = 图片列表 | 真实界面倾斜成墙 + 名称 + 口号 |
 | `endcard` | 4 | — | Logo、名称、定位、理念、联系方式、平台标签 |
 | `photo` | 2 | `media`、`base?`、`title?{zh,en}`、`focus?`（终止裁切）、`side?` | 满幅照片缓慢推近，文字放在柔和的渐变遮罩上 |
-| `hero` | 3 | `media`（一张或多个角度）、`base?`、`title{zh,en}`、`cutout?` | 揭晓：产品亮起并轻微呼吸；透明底 PNG 会自动带接触阴影与倒影立在舞台上 |
+| `hero` | 3 | `media`（一张或多个角度）、`base?`、`title{zh,en}`、`cutout?` | 揭晓：产品亮起并轻微呼吸；透明底 PNG 会自动带接触阴影与倒影立在舞台上；单张照片则满幅铺开，随镜头缓推逐渐亮起 |
 | `detail` | 2 | `media`、`base?`、`crops?[{rect,zh?,en?}]` ≤ 4 | 微距特写（先质感，后全貌），默认自动选取裁切 |
 | `lineup` | 2 | `items[{media,zh?,en?}]` ≤ 6、`title?`、`cutout?` | 产品系列（颜色、型号、尺寸）并排展示 |
 | `quote` | 2 | `zh`、`en?`、`who`、`role?` | **真实**且经授权的用户评价，大字、安静 |
