@@ -23,7 +23,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `brand` | object | yes | see below |
 | `scenes` | list | yes | in playing order; first `cover`, last `endcard` with `"bars": "rest"` |
 | `tools.ffmpeg` / `tools.node_modules` / `tools.workers` | — | no | override tool discovery / render workers |
-| `cover_t` | number | no | second used for the cover poster (default 4.2) |
+| `cover_t` | number | no | second used for the cover poster (default: just before the cover ends, when the title has settled) |
 | `cinema` | `"auto"` / `"off"` / object | no | the director's cinema layer (default `"auto"` = on, all defaults from the style + motion). See below |
 
 ### cinema (director's layer, `references/director.md`)
@@ -56,7 +56,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 ### Scene types
 | type | min bars | fields | notes |
 | --- | --- | --- | --- |
-| `cover` | 3 | `media?` (blurred UI behind), `base?` | logo, name, positioning, chips; also the poster |
+| `cover` | 3 | `media?`, `base?`, `open?` | a cold open: the media plays full-bleed under the hook line for ~2.5 s, then recedes behind the logo, name, positioning and chips (`"open": false` = logo first); also the poster |
 | `pain` | 3 | `items?` = 4 × [zh, en] | "the old way": grey tool windows tangle and collapse |
 | `feature` | 3 (≥ 1 + points) | `media`, `base?`, `title{zh,en}`, `points[{zh,en,rect?,focus?}]` ≤ 4, `frame?: "photo"` | the workhorse; layout depends on the motion language. `rect` highlights a screen region; photos (`"frame": "photo"`) need none |
 | `carousel` | 2 | `title?`, `panels[{zh,en,media,base?,crop?}]` ≤ 6 | dialogs/tools flip in one per slice beside a menu |
@@ -98,7 +98,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `brand` | 对象 | 是 | 见下 |
 | `scenes` | 列表 | 是 | 按播放顺序；第一个是 `cover`，最后一个是 `"bars": "rest"` 的 `endcard` |
 | `tools.*` | — | 否 | 手动指定 ffmpeg、node_modules、渲染进程数 |
-| `cover_t` | 数字 | 否 | 封面海报取第几秒（默认 4.2） |
+| `cover_t` | 数字 | 否 | 封面海报取第几秒（默认：封面结束前、标题落定时） |
 | `cinema` | `"auto"` / `"off"` / 对象 | 否 | 导演电影层（默认 `"auto"` 开启，参数取自风格与动效语言），见下 |
 
 ### cinema（导演电影层，见 `references/director.md`）
@@ -131,7 +131,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 ### 场景类型
 | 类型 | 最少小节 | 字段 | 说明 |
 | --- | --- | --- | --- |
-| `cover` | 3 | `media?`（背景虚化界面）、`base?` | Logo、名称、定位、平台标签；同时是封面海报 |
+| `cover` | 3 | `media?`、`base?`、`open?` | 冷开场：素材先满幅播放约 2.5 秒、配开场句，再退到 Logo、名称、定位与平台标签之后（`"open": false` 则先出 Logo）；同时是封面海报 |
 | `pain` | 3 | `items?` = 4 组 [中文, 英文] | “传统方式”：灰色工具窗口互相牵扯后塌缩 |
 | `feature` | 3（≥ 1 + 要点数） | `media`、`base?`、`title{zh,en}`、`points[{zh,en,rect?,focus?}]` ≤ 4、`frame?: "photo"` | 主力场景；版式随动效语言变化；`rect` 用于高亮界面区域，照片（`"frame": "photo"`）不需要 |
 | `carousel` | 2 | `title?`、`panels[{zh,en,media,base?,crop?}]` ≤ 6 | 工具 / 对话框逐个翻入，左侧菜单同步高亮 |

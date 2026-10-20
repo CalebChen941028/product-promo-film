@@ -8,23 +8,34 @@ const LIB = (() => {
   const nameHTML = () => `${BR().name} <span class="accent">${BR().nameAccent || ''}</span>`;
   const chipsHTML = (list, size = 20) => (list || []).map((c, i, a) => `<span class="chip${i === a.length - 1 && /beta|preview|内测|新/i.test(c) ? ' accent' : ''}" style="font-size:${size}px;margin:0 7px">${c}</span>`).join('');
 
-  // cover { media?, base?, frame?: 'photo' } — logo, name, positioning, platform chips; blurred real UI behind.
+  // cover { media?, base?, frame?: 'photo', open?: false } — logo, name, positioning, platform chips; blurred real UI behind.
+  // Cold open (default when there is media): the image plays full-bleed and sharp under the spoken hook for ~2.5 s,
+  // then recedes as the name arrives — the film opens on the product's world, not on a logo fade-in.
   function cover(start, end, o = {}) {
+    const base = o.base || [1920, 1080];
     scene(start, end, (R, S) => {
       if (o.media) { S.back = win(R, { srcs: o.media, base: o.base, w: 1500, chrome: o.frame === 'photo' ? 'frame' : 'auto' }); S.back.root.style.filter = 'blur(3px) saturate(0.85)'; qaIgnore(S.back.root); }
+      if (o.media && o.open !== false) { S.full = backdrop(R, o.media, base); qaIgnore(S.full.root); }
       S.icon = img(BR().logo, R, 'abs'); S.icon.style.width = '250px';
       S.title = textEl(R, nameHTML(), { whiteSpace: 'nowrap' }); S.title.className += ' h-display';
       S.sub = textEl(R, BR().positioningZh || '', { whiteSpace: 'nowrap' }); S.sub.className += ' h-zh';
       S.kick = textEl(R, BR().positioningEn || '', { whiteSpace: 'nowrap' }); S.kick.className += ' kicker';
       S.chips = textEl(R, chipsHTML(BR().chips), { whiteSpace: 'nowrap' });
     }, (S, lt, d) => {
+      const H = S.full ? Math.min(2.6, d * 0.38) : 0, t = lt - Math.max(0, H - 0.7);   // t: the title sequence overlaps the end of the cold open
       const push = eio(prog(lt, d - 0.9, d + 0.3)), z = 1 + push * 0.35, out = 1 - push;
-      if (S.back) place(S.back.root, { z: -700, rx: 8 * MO.tilt, s: 1 + lt * 0.01, o: 0.28 * prog(lt, 0.2, 1.6) * out });
-      place(S.icon, { ...M.pop(lt, 0.3, { y: -250, s: z }), o: prog(lt, 0.3, 0.9) * out });
-      M.text(S.title, lt, 0.8, { y: -20, s: z, o: out });
-      M.text(S.sub, lt, 1.3, { y: 100, s: z, o: out });
-      M.text(S.kick, lt, 1.6, { y: 156, s: z, o: out });
-      place(S.chips, { ...M.pop(lt, 2.2, { y: 262 }), o: Math.min(prog(lt, 2.2, 2.8), out) });
+      if (S.full) {
+        const f = fill169(base), k = esoft(prog(lt, H - 0.7, H + 0.5));
+        setCrop(S.full, f.map((v, j) => lerp(v, zoomIn(f, 1.06, 0.5, 0.5)[j], esoft(prog(lt, 0, H + 0.5)))), 1920);
+        place(S.full.root, { o: 1 - k });
+        S.full.root.style.filter = k > 0 ? `blur(${(k * 8).toFixed(1)}px)` : '';
+      }
+      if (S.back) place(S.back.root, { z: -700, rx: 8 * MO.tilt, s: 1 + lt * 0.01, o: 0.28 * prog(t, 0.2, 1.6) * out });
+      place(S.icon, { ...M.pop(t, 0.3, { y: -250, s: z }), o: prog(t, 0.3, 0.9) * out });
+      M.text(S.title, t, 0.8, { y: -20, s: z, o: out });
+      M.text(S.sub, t, 1.3, { y: 100, s: z, o: out });
+      M.text(S.kick, t, 1.6, { y: 156, s: z, o: out });
+      place(S.chips, { ...M.pop(t, 2.2, { y: 262 }), o: Math.min(prog(t, 2.2, 2.8), out) });
     });
   }
 

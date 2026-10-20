@@ -646,7 +646,9 @@ def finish(spec, out, draft=False):
     run([ff, '-y', '-loglevel', 'error', '-f', 'concat', '-safe', '0', '-i', out / 'silent.list.txt', '-i', mix, *vf, '-map', '1:a',
          '-af', 'loudnorm=I=-14:TP=-1.0:LRA=11', '-ar', '48000', '-c:a', 'aac', '-b:a', '256k', '-movflags', '+faststart', '-shortest', mp4])
     cover = fin / f'{name}-cover-4k.png'
-    run(['node', out / 'tools' / 'cover.mjs', out / 'film' / 'film.html', cover, spec.get('cover_t', 4.2)], cwd=out)
+    sc0 = spec['scenes'][0]   # poster: the cover's settled title frame (after the cold open), unless cover_t says otherwise
+    cover_t = spec.get('cover_t') or (round(b['G'] + b['BAR'] * sc0['bars'] - 1.2, 2) if sc0.get('type') == 'cover' and isinstance(sc0.get('bars'), (int, float)) else 4.2)
+    run(['node', out / 'tools' / 'cover.mjs', out / 'film' / 'film.html', cover, cover_t], cwd=out)
     if cube:
         raw = out / 'cover-raw.png'; shutil.move(cover, raw)
         run([ff, '-y', '-loglevel', 'error', '-i', raw, '-filter_complex', grade.vf_chain(cube, cin['bloom'], 0, still=True), '-map', '[v]', cover])
