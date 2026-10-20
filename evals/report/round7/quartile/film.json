@@ -1,0 +1,219 @@
+{
+ "_how": "Written from treatment.md by the crew. Build with make_film.py once check passes.",
+ "name": "quartile-film",
+ "out": "film_out",
+ "materials": "../../materials/quartile",
+ "genre": "science-data",
+ "style": "paper-academic",
+ "motion": "precision-data",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "Quartile",
+  "nameAccent": "",
+  "logo": "../../materials/quartile/logo.png",
+  "positioningZh": "临床研究者的桌面统计工具",
+  "positioningEn": "DESKTOP STATISTICS FOR CLINICAL RESEARCHERS",
+  "taglineZh": "把每一步写清楚",
+  "taglineEn": "Show the work.",
+  "motto": [
+   "审稿人再问，",
+   "答案是一段脚本。",
+   "The reviewer asks again. The answer is a script."
+  ],
+  "contacts": [
+   [
+    "DEMO",
+    "演示",
+    "Placeholder screens, not a real product capture",
+    ""
+   ]
+  ],
+  "chips": [
+   "macOS",
+   "Windows"
+  ]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 4,
+   "media": "../../materials/quartile/forest-plot.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "say": [
+    {
+     "en": "A reviewer asks how you got that number.",
+     "zh": "审稿人问：这个数字是怎么算出来的？",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/quartile/forest-plot.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "title": {
+    "zh": "两种方式合并研究",
+    "en": "Pool the studies, two ways"
+   },
+   "points": [
+    {
+     "zh": "固定与随机效应",
+     "en": "Fixed and random effects"
+    },
+    {
+     "zh": "I² 异质性",
+     "en": "I² heterogeneity"
+    }
+   ],
+   "say": [
+    {
+     "en": "Pool the studies with a fixed or a random model, and see the heterogeneity I² beside them.",
+     "zh": "用固定或随机模型合并研究，异质性 I² 就在旁边。"
+    }
+   ],
+   "chapter": [
+    "01",
+    "荟萃分析",
+    "META-ANALYSIS"
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 4,
+   "media": "../../materials/quartile/roc-curve.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "crops": [
+    {
+     "rect": [
+      160,
+      120,
+      1540,
+      840
+     ],
+     "zh": "ROC 曲线",
+     "en": "ROC curve"
+    },
+    {
+     "rect": [
+      1100,
+      120,
+      600,
+      200
+     ],
+     "zh": "AUC 与 95% CI",
+     "en": "AUC with 95% CI"
+    }
+   ],
+   "say": [
+    {
+     "en": "The AUC, with its 95% confidence interval, on the curve you will publish.",
+     "zh": "AUC 连同 95% 置信区间，就在你要发表的曲线上。"
+    }
+   ],
+   "_shape": "a screen feature recast as a zoomed detail, so two proof beats do not share a shape"
+  },
+  {
+   "type": "statement",
+   "bars": 2,
+   "zh": "每个数字，都有来路。",
+   "en": "Every number has a path back."
+  },
+  {
+   "type": "numbers",
+   "bars": 2,
+   "stats": [
+    {
+     "value": 600,
+     "zh": "DPI 出版级图",
+     "en": "DPI figures"
+    },
+    {
+     "value": 95,
+     "suffix": "%",
+     "zh": "置信区间",
+     "en": "confidence interval"
+    }
+   ]
+  },
+  {
+   "type": "clip",
+   "bars": 2,
+   "media": "build/clips/scroll-results.webm",
+   "title": {
+    "zh": "载入表格，得到图表",
+    "en": "Load a sheet, get the figure."
+   },
+   "say": [
+    {
+     "en": "Load a sheet, pick a test, and the figure is ready.",
+     "zh": "选定检验，即得图表。"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/quartile/forest-plot.png",
+    "../../materials/quartile/phone-results.png",
+    "../../materials/quartile/roc-curve.png",
+    "../../materials/quartile/survival-curve.png",
+    "../../materials/quartile/workspace.png"
+   ],
+   "hero": "rise",
+   "_hero": "the figure for the paper rises out of the workspace it came from (treatment §3 hero moment)",
+   "image": "../../materials/quartile/forest-plot.png",
+   "base": [
+    1800,
+    1120
+   ],
+   "backdrop": "../../materials/quartile/workspace.png",
+   "backdropBase": [
+    1920,
+    1080
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Quartile. Show the work.",
+     "zh": "Quartile：把每一步写清楚",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "The reviewer asks again. The answer is a script.",
+     "zh": "审稿人再问一次，答案是一段脚本。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

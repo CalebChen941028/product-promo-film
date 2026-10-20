@@ -28,7 +28,7 @@ const LIB = (() => {
       const H = !S.full ? 0 : !named ? d + 1 : Math.max(Math.min(5.2, d - 3.3), Math.min(2.6, d * 0.38)), t = lt - Math.max(0, H - 0.7);
       const push = eio(prog(lt, d - 0.9, d + 0.3)), z = 1 + push * 0.35, out = 1 - push;
       if (S.full) {
-        const f = fill169(base), to = o.focus || zoomIn(f, 1.06, 0.5, 0.5), k = named ? esoft(prog(lt, H - 0.7, H + 0.5)) : 0;
+        const f = fill169(base), to = o.focus ? padTo169(o.focus, base, 1.0) : zoomIn(f, 1.06, 0.5, 0.5), k = named ? esoft(prog(lt, H - 0.7, H + 0.5)) : 0;
         const pushIn = o.focus ? esoft(prog(lt, 0.6, 2.2)) : esoft(prog(lt, 0, Math.min(H, d) + 0.5));   // a screen: a calm context frame, then into the readable region
         setCrop(S.full, f.map((v, j) => lerp(v, to[j], pushIn)), 1920);
         place(S.full.root, { o: 1 - k });

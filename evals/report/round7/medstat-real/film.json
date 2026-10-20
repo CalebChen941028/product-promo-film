@@ -1,0 +1,305 @@
+{
+ "_how": "Drafted by autofilm.py. The crew (references/crew.md) replaces every TODO, then: python3 <skill>/scripts/make_film.py film.json --stage check",
+ "name": "medstat-pilot-film",
+ "out": "film_out",
+ "materials": "../../materials/medstat-real",
+ "genre": "science-data",
+ "style": "paper-academic",
+ "motion": "precision-data",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "MedStat",
+  "nameAccent": "Pilot",
+  "logo": "../../materials/medstat-real/logo.png",
+  "positioningZh": "临床与公共卫生研究的统计工作台",
+  "positioningEn": "A statistics workbench for clinical and public-health research",
+  "taglineZh": "每个结果，都能重跑",
+  "taglineEn": "Results you can rerun.",
+  "motto": [
+   "每个结果，都能重跑",
+   "数据到图表，一处完成",
+   "Every result, rerunnable."
+  ],
+  "contacts": [],
+  "chips": [
+   "macOS · Apple silicon",
+   "Windows 10/11 x64",
+   "内测 Beta"
+  ]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 4,
+   "media": "../../materials/medstat-real/ai_final.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "focus": [
+    1440,
+    690,
+    460,
+    110
+   ],
+   "say": [
+    {
+     "en": "A result you cannot rerun is only an opinion.",
+     "zh": "无法重跑的结果，只是一个观点。",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/medstat-real/home.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "title": {
+    "zh": "从已有的数据文件开始",
+    "en": "Start from the file you already have"
+   },
+   "points": [
+    {
+     "zh": "读取 .sav .csv .xlsx 等格式",
+     "en": "Reads .sav, .csv, .xlsx and more",
+     "rect": [
+      790,
+      440,
+      470,
+      40
+     ]
+    },
+    {
+     "zh": "重新打开 .medstat 项目",
+     "en": "Reopen a saved .medstat project",
+     "rect": [
+      966,
+      219,
+      388,
+      163
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Upload your data and clean it, in the same workspace as the analysis.",
+     "zh": "上传数据、清洗变量，与分析在同一工作区完成。"
+    }
+   ],
+   "chapter": [
+    "01",
+    "数据",
+    "DATA"
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 5,
+   "media": "../../materials/medstat-real/tool_compute.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "crops": [
+    {
+     "rect": [
+      518,
+      428,
+      893,
+      40
+     ],
+     "zh": "快速公式，一键填充",
+     "en": "Quick formulas, one click"
+    },
+    {
+     "rect": [
+      1070,
+      620,
+      341,
+      160
+     ],
+     "zh": "行求和、Z 分数等函数",
+     "en": "Row sums, z-scores and more"
+    }
+   ],
+   "say": [
+    {
+     "en": "One line derives a new variable, with row sums and z-scores built in.",
+     "zh": "一行公式即可派生新变量，行求和与 Z 分数已内置。"
+    }
+   ],
+   "_shape": "a screen feature recast as a zoomed detail, so two proof beats do not share a shape"
+  },
+  {
+   "type": "statement",
+   "bars": 2,
+   "zh": "数据之后，才轮到判断。",
+   "en": "After the data, the judgement."
+  },
+  {
+   "type": "feature",
+   "bars": 5,
+   "media": "../../materials/medstat-real/km.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "title": {
+    "zh": "生存曲线与风险人数表",
+    "en": "Survival curves with numbers at risk"
+   },
+   "points": [
+    {
+     "zh": "曲线下方附风险人数",
+     "en": "Numbers at risk under the curves",
+     "rect": [
+      1112,
+      680,
+      300,
+      62
+     ]
+    },
+    {
+     "zh": "中位生存时间与 95% CI",
+     "en": "Median survival with 95% CI",
+     "rect": [
+      1104,
+      206,
+      800,
+      100
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Kaplan–Meier curves, with the numbers at risk printed beneath, so follow-up stays visible.",
+     "zh": "Kaplan–Meier 曲线下附风险人数表，随访人数一目了然。"
+    }
+   ],
+   "chapter": [
+    "02",
+    "生存分析",
+    "SURVIVAL"
+   ]
+  },
+  {
+   "type": "carousel",
+   "bars": 3,
+   "panels": [
+    {
+     "zh": "生存曲线",
+     "en": "Survival",
+     "media": "../../materials/medstat-real/km_plot.png",
+     "base": [
+      1920,
+      1080
+     ],
+     "crop": [
+      533,
+      173,
+      821,
+      816
+     ]
+    },
+    {
+     "zh": "森林图",
+     "en": "Forest plot",
+     "media": "../../materials/medstat-real/meta_plot.png",
+     "base": [
+      1920,
+      1080
+     ],
+     "crop": [
+      566,
+      192,
+      941,
+      706
+     ]
+    },
+    {
+     "zh": "ROC 曲线",
+     "en": "ROC curves",
+     "media": "../../materials/medstat-real/roc_plot.png",
+     "base": [
+      1920,
+      1080
+     ],
+     "crop": [
+      557,
+      134,
+      806,
+      855
+     ]
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/medstat-real/ai_final.png",
+    "../../materials/medstat-real/home.png",
+    "../../materials/medstat-real/km.png",
+    "../../materials/medstat-real/km_plot.png",
+    "../../materials/medstat-real/meta_plot.png",
+    "../../materials/medstat-real/r_code.png",
+    "../../materials/medstat-real/roc_plot.png",
+    "../../materials/medstat-real/tool_compute.png"
+   ],
+   "hero": "rise",
+   "_hero": "the one output that matters rises out of the UI (autofilm, by genre and materials). Alternatives: result · rise · stack (references/film-spec.md → finale); pick the output the concept is about.",
+   "image": "../../materials/medstat-real/km_plot.png",
+   "base": [
+    1920,
+    1080
+   ],
+   "crop": [
+    388,
+    72,
+    1144,
+    936
+   ],
+   "backdrop": "../../materials/medstat-real/ai_final.png",
+   "backdropBase": [
+    1920,
+    1080
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "MedStat Pilot. Results you can rerun.",
+     "zh": "每个结果，都能重跑",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Now anyone can rerun the result.",
+     "zh": "现在，任何人都能重跑这个结果。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

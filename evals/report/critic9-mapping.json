@@ -1,0 +1,11 @@
+{
+ "F01": "r6-medstat-real",
+ "F02": "r6-larchwood",
+ "F03": "r7-medstat-real",
+ "F04": "r6-aurel",
+ "F05": "r6-quartile",
+ "F06": "r7-quartile",
+ "F07": "ref-aurel",
+ "F08": "r7-aurel",
+ "F09": "r7-larchwood"
+}
