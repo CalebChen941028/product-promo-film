@@ -219,6 +219,8 @@ def check(spec, base_dir):
     for k in ['name', 'logo', 'positioningZh', 'positioningEn']:
         if not b.get(k):
             err(f'brand.{k} missing', 'fill it from the brief (templates/brief.example.json)')
+    if b.get('nameAccent') and b.get('name', '').strip().lower().endswith(b['nameAccent'].strip().lower()):
+        err(f"brand.name '{b['name']}' already ends with nameAccent '{b['nameAccent']}' (it would read twice)", 'name = the first word(s), nameAccent = the accented last word: "name": "Aurel", "nameAccent": "Stoneware"')
     if b.get('logo') and not (base_dir / b['logo']).exists():
         err(f"brand.logo not found: {b['logo']}", 'path is relative to film.json; put a transparent PNG there')
     mus = (spec.get('music') or {}).get('file')
