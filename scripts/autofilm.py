@@ -56,7 +56,7 @@ path_of = lambda it: rel(it['webm']) if it['kind'] == 'video' else rel(src / it[
 brief_path = Path(a.brief) if a.brief else next((p for p in (src / 'brief.json', proj / 'brief.json') if p.exists()), None)
 brief = json.load(open(brief_path)) if brief_path else {}
 docs = G.read_docs(src)
-text = json.dumps({k: v for k, v in brief.items() if k not in ('contacts', '_how')}, ensure_ascii=False) + ' ' + docs
+text = json.dumps({k: v for k, v in brief.items() if k not in ('contacts', '_how')}, ensure_ascii=False) + ' ' + docs + ' ' + re.sub(r'[_\-]+', ' ', src.resolve().name)  # the folder's name is often the product's
 ranked, mats = G.classify(text, man)
 gid = a.genre or brief.get('genre') or ranked[0]['genre']
 if gid not in G.GENRES['genres']: sys.exit(f'ERROR genre {gid} unknown.\n  FIX: python3 scripts/genres.py --list')

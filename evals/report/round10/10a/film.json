@@ -1,0 +1,139 @@
+{
+ "_how": "Drafted by autofilm.py, then written by the crew (treatment.md). Genre set to travel-hospitality-living (home) from the autofilm default food-beverage: see treatment.md §0 and the report.",
+ "name": "humidifier-film",
+ "out": "film_out",
+ "materials": "../../materials/humidifier",
+ "genre": "travel-hospitality-living",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes",
+  "_note": "the genre suggests af_heart; am_michael is used because it is already downloaded. af_heart is a ≈ 0.5 MB download: ask the user first, then set \"allow_download\": true"
+ },
+ "brand": {
+  "name": "Humidifier",
+  "nameAccent": "",
+  "positioningZh": "家居空气，柔和陪伴",
+  "positioningEn": "SOFT AIR FOR THE ROOMS YOU LIVE IN",
+  "taglineZh": "每天，一个柔和的时刻",
+  "taglineEn": "The soft hour, every day.",
+  "motto": [
+   "每个房间，",
+   "都慢慢变柔和。",
+   "Every room, a little softer."
+  ],
+  "contacts": [],
+  "chips": [],
+  "logo": "brand/placeholder-wordmark.png",
+  "_logo": "PLACEHOLDER text wordmark (Helvetica, the generic product name). No real logo was supplied. Replace with the real transparent PNG logo before any release."
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "frame": "photo",
+   "focus": [
+    960,
+    268,
+    480,
+    536
+   ],
+   "name": false,
+   "say": [
+    {
+     "en": "Does your room feel right this hour?",
+     "zh": "这个时刻，你的房间舒服吗？",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "photo",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "title": {
+    "zh": "窗边，午后慢下来",
+    "en": "By the window, the afternoon slows"
+   },
+   "say": [
+    {
+     "en": "A desk by the window, mid-afternoon.",
+     "zh": "窗边的书桌，午后时光。",
+     "at": 0.8
+    }
+   ]
+  },
+  {
+   "type": "hero",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_rhr16lrhr16lrhr1.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "title": {
+    "zh": "加湿器",
+    "en": "Humidifier"
+   },
+   "say": [
+    {
+     "en": "Humidifier. A clear dome, a soft blue light.",
+     "zh": "加湿器。透明穹顶，柔和蓝光。"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_rhr16lrhr16lrhr1.jpeg"
+   ],
+   "image": "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg",
+   "base": [
+    1920,
+    1072
+   ],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Humidifier. The soft hour, every day.",
+     "zh": "加湿器：每天一个柔和时刻。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Every room, a little softer.",
+     "zh": "每个房间，都慢慢变柔和。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

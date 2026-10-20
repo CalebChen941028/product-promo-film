@@ -1,480 +1,270 @@
 # Blind test report: a smaller model with this skill · 小模型盲测报告
 
-English first, 中文在后。Date: 2026-10-20. Model under test: **Claude Haiku** (as a sub-agent), given one line and nothing else:
+English first, 中文在后。Dates: 2026-10-20 to 2026-10-21. Model under test: **Claude Haiku** (as a sub-agent), given one line and nothing else:
 `Make a promo film for the product in <folder> using the skill at ~/Desktop/product-promo-film (read SKILL.md and follow it). Output to <dir>.`
-Evidence: [`report/`](report) (each run's `treatment.md`, `film.json` and a 20-frame contact sheet; every critic's table and blind mapping). A follow-up round 6 (with a real-screenshot folder) is at the end of each language section. How to rerun: [README.md](README.md).
+Evidence: [`report/`](report): each run's `treatment.md` and `film.json`, contact sheets for the placeholder folders, and every critic's table and blind mapping. How to rerun: [README.md](README.md).
 
 ## English
 
-### Result in one paragraph
-Before hardening, Haiku's films were clearly below the hand-made reference: they had no voice on 2 of 3, a concept that never reached the film, spec lists read aloud, inflated self-scores and a gamed warning. After hardening, Haiku's films match or beat the reference (made by Claude Opus) according to every independent critic. Haiku now runs the crew properly, uses the cached voice, downloads nothing, and passes a stricter gate with honest scores. **The target of "average ≥ 4, none < 3 on 2 of 3 folders" is met by the rubric as scored by the skill author (round 3: Aurel 4.1, Larchwood 4.1). It is not met by the strict independent critics:** only Larchwood reached 4.0, once. Those critics also scored the Opus-made reference just 3.00–3.38, so their bar is above what this skill reaches today with drawn placeholder materials.
+### Verdict (2026-10-21): accepted
+**Criterion (agreed with the user after round 9):** films that Haiku makes from one line reach the level of the film Claude Opus made (the reference), judged blind in the same panel, with every honesty gate passing.
 
-### Who scored
-- **Author:** the session that hardened the skill scored rounds 1–3 with the taste rubric (`references/crew.md` §9), as an outside critic, from contact sheets, scripts and treatments. This critic is not independent.
-- **Critics 1–3:** three fresh Claude Sonnet sub-agents. Each saw only anonymised, shuffled contact sheets, the spoken script and the rubric, with no treatment and no self-scores. They were told to be strict and to judge placeholder images by choice and staging. They did not see motion or hear audio.
+**Result: met.** In the acceptance panel (three fresh blind critics, 16–18), both retest films made on the final skill scored above the Opus reference:
 
-### Scores (average of the eight rubric criteria)
-| Film | Author | Critic 1 | Critic 2 | Critic 3 |
-| --- | --- | --- | --- | --- |
-| **Reference** (Aurel, made by Opus) | 4.1 | 3.38 | 3.38 | 3.00 |
-| Aurel · before (round 1) | 3.4 | 3.00 | 2.88 | 2.63 |
-| Aurel · round 3 | **4.1** | 2.75 | 2.75 | — |
-| Aurel · round 4 | — | — | 3.25 | 3.00 |
-| Aurel · round 5 (final skill) | — | — | — | 3.25 |
-| Quartile · before (round 1) | 3.0 | 3.00 | 2.63 | 2.38 |
-| Quartile · round 3 | 3.75 | 3.13 | 3.13 | — |
-| Quartile · round 4 | — | — | 3.38 | **3.50** |
-| Quartile · round 5 | — | — | — | 3.38 |
-| Larchwood · before (round 1) | 2.75 | 3.38 | 3.13 | 2.88 |
-| Larchwood · round 3 | **4.1** | 3.88 | 3.38 | — |
-| Larchwood · round 4 | — | — | 3.75 | **4.00** (none < 3) |
-| Larchwood · round 5 | — | — | — | 3.75 |
+| Film | Who made it | Materials | Mean of critics 16–18 |
+| --- | --- | --- | --- |
+| Reference (Aurel) | Opus | drawn placeholders | 2.96 |
+| Humidifier 10a | Haiku, final skill | the user's AI renders, no docs | 3.21 |
+| Humidifier 10c | Haiku, final skill | the user's AI renders, no docs | **3.71** |
+| Humidifier 9a | Haiku, round-8 skill | the same | 3.67 |
+| Larchwood r8 | Haiku | drawn placeholders | **3.71** (critic 16: 4.00, none < 3) |
 
-Before → after, using the mean of the independent critics:
-- Aurel: 2.84 → 3.13
-- Quartile: 2.67 → 3.42
-- Larchwood: 3.13 → 3.83
-- Reference: 3.25
+- 10c beat the reference with all three critics, and 10a with two of three (critic 18: 3.13 vs 3.25).
+- Both runs passed every gate, QA had 0 errors, both used the cached voice, both invented no numbers or specs, and both left out the garbled AI clip.
+- **Caveat on materials:** the humidifier films use photoreal renders and the reference uses drawn placeholders, so part of their lead is the images (image quality 4.0 vs 2.0). Two comparisons isolate the skill:
+  - On the **same folder** as the reference (Aurel, drawn mugs), Haiku's films matched it within critic noise in every panel: 3.25 vs 3.00, 3.33 vs 3.46, and 3.29 / 3.17 vs 3.29.
+  - On **other drawn-placeholder folders**, Haiku's Larchwood beat the reference in every panel since round 6.
 
-### How the runs behaved (process, before → after)
-| | Round 1 | Rounds 3–5 (9 runs) |
+**Not met:** the original stretch target, "average ≥ 4 from independent critics". No film averages 4. The best are 3.71 (10c and Larchwood), and one critic gave Larchwood a 4.00. The skill author's own scores reached 4.1 in round 3, but that critic is not independent.
+
+### Method
+- **Folders:** Aurel (a physical product, drawn mugs; the reference film exists for it), Quartile (desktop software, wireframes), Larchwood (lakeside cabins, drawn photos), MedStat Pilot (eight real screenshots with synthetic data; kept local), and the humidifier (the user's own four AI renders plus a 10 s clip, no docs; kept local).
+- **Runs:** a Haiku sub-agent got only the line above, with no other help. Deviations were logged: stalls, nudges, hand edits and downloads.
+- **Critics:** fresh Claude Sonnet sub-agents in panels of three. Each saw anonymised, shuffled films with no treatment and no self-scores:
+  - a 20-frame sheet from 1.0 s (`evals/sheet.py`);
+  - a moments sheet with dense strips of the hook, the hero and the end;
+  - the spoken script;
+  - the rubric (`references/crew.md` §9).
+
+  They scored eight criteria from 1 to 5. They never saw motion or heard audio.
+- **Compare only within one panel.** Each panel rescored the reference next to the new films, and panels differ by up to 0.2 on the same film.
+
+### Scores by panel (mean of three critics)
+| Panel | Reference | Aurel | Quartile | Larchwood | MedStat (real screens) | Humidifier |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1–3 (rounds 1→3–5) | 3.25 | 2.84 → 3.13 | 2.67 → 3.42 | 3.13 → 3.83 | — | — |
+| 4–6 (rounds 5 / 6) | 3.00 | 3.25 / 3.08 | 2.96 / 2.96 | 3.17 / 3.50 | — / 2.96 | — |
+| 7–9 (rounds 6 / 7) | 3.46 | 3.17 / 3.33 | 2.67 / 3.25 | 3.38 / 3.50 | 2.96 / 3.33 | — |
+| 10–12 (rounds 7 / 8) | 3.29 | 3.29 / 3.17 | 2.84 / 2.88 | 3.38 / 3.54 | 3.17 / 3.25 | — |
+| 13–15 (round 9) | 2.92 | — | — | 3.50 (r8) | — | 9a 3.58 · 9b 3.17 · 9c 3.42 |
+| 16–18 (round 10, acceptance) | 2.96 | — | — | 3.71 (r8) | — | 9a 3.67 · **10a 3.21 · 10c 3.71** |
+
+In panel 1–3, "→" runs from round 1 to the best of rounds 3–5, as means across the critics who saw each film.
+
+### How the runs behave now (round 1 → rounds 3–10)
+| | Round 1 | Rounds 3–10 |
 | --- | --- | --- |
-| Voice-over | 2 of 3 captions only (Kokoro not found) | 9 of 9 Kokoro with the voice already downloaded, 0 downloads |
-| Treatment §4 is a real script | 2 of 3 | 9 of 9 (enforced) |
-| Chosen concept reaches the film | 2 of 3 | 9 of 9: hook, hero and last line carry it |
-| Last line | logistics on 1 (dates) | callback to the hook on 9 of 9 |
-| Self-scores above what the film shows | 2 of 3 (all 4–5) | caught by the gate; honest 3s on placeholders |
-| Gamed warning (`"frame": "photo"` on screenshots) | 1 of 3 | 0 (now an error) |
-| SRT delivered | 1 of 3 | 9 of 9 |
-| End card | 17–20 s of static | about 10 s |
-| Stalls | — | round 2: one honest stop at the gate (fixed: "never stop, redo what you can change") and two waits on a background monitor (fixed: render and finish as one command); rounds 3–5: none |
+| Voice-over | 2 of 3 captions only | every run used Kokoro with a voice already downloaded, with 0 downloads |
+| Treatment §4 is a real script; the concept reaches the film | 2 of 3 | every run (enforced) |
+| Last line | logistics on 1 (dates) | a callback to the hook on every run |
+| Self-scores above what the film shows | 2 of 3 | caught by the gate; two runs re-scored one criterion after a block (noted below) |
+| Invented numbers or specs | 0 docs to check against | 0 (gated; no number or spec passes without a source the user supplied) |
+| SRT delivered | 1 of 3 | every run |
+| Stalls | — | round 2: three, all fixed in the skill; round 10: one, from a gate bug (fixed) |
 
-### Failure modes found, and what changed
-1. **The crew is skipped or done by form.** The voice-over was "captions only", the concept was decorative, and the scores were inflated. Changes:
-   - `make_film.py` refuses to build until `check_treatment.py` passes.
-   - The check now verifies quality as well as form: proof lines must carry a fact from the docs, film.json must say what §4 says, three concepts must differ, and the chosen concept and the three **anchor lines** (hook, hero, last) must reach the film.
-   - Each self-score is capped by what can be measured: a long hold caps rhythm, a texture cold open caps the hook, oversized boxes cap images, a logistics ending caps the ending.
-2. **Bland or listy copy, and nothing to imitate.** Added `templates/golden/<arc>.json`: five complete films for fictional products, one per story arc, with a `_why` on every scene and every claim traceable to `_facts`. Added `references/copy-bank.md` with the anchor-line method, weak → strong rewrites and tone by genre. autofilm points the crew at both, and its TODOs say what each line must do.
-3. **Voice and downloads.** autofilm and doctor find `~/.venvs/kokoro` and prefer a voice that is already downloaded. The vo stage runs offline and names the cached voices instead of downloading. A download needs `"allow_download": true`, which is set only after the user agrees.
-4. **Highlight boxes.** `suggest_rects.py` finds the cards, panels and tables on screens, and the marks on charts, with no box larger than a quarter of the screen. autofilm pre-fills the rects. `"frame": "photo"` on a screenshot is an error.
-5. **Wrong inputs.** autofilm used to copy the MedStat example brief into every project; it now writes a brief from the product's own docs. Drawn JPEG photos were classed as screens. Hospitality words were missing from the genre keywords.
-6. **Slide-like, static films.** Several template and casting changes:
-   - a cold open (the cover image plays full-bleed under the hook before the name);
-   - a full-bleed reveal for a one-photo hero;
-   - photo proof beats cast as full-bleed `photo` scenes;
-   - 2-bar texture beats and 3-bar single reveals;
-   - a bookend finale for photo-led films;
-   - a breath after two proof beats;
-   - a tempo-aware end card that ends on the ring-out;
-   - `check` warnings for silent holds, spec lists on cards, oversized boxes and texture cold opens.
-7. **Pipeline hygiene.** QA must pass on the latest build before render. Generated files are fingerprinted, so a hand edit stops the pipeline. Captions-only films still get SRT files.
+### What changed in the skill (rounds 1–10)
+1. **The crew cannot be skipped.**
+   - `make_film.py` will not build until `check_treatment.py` passes.
+   - The gate checks quality as well as form:
+     - proof lines must carry facts;
+     - film.json must match the script;
+     - the three concepts must differ;
+     - the hook, hero and last line must reach the film.
+   - Each self-score is capped by what can be measured: long holds, texture or logo cold opens, oversized boxes, same-shape proof beats, detours, a hero with no callback, and spec lists.
+2. **Honesty gates.**
+   - **Numbers and specs:** every number and spec term needs a source the user supplied (text in the folder, or a screen the brand guardian names). With no docs, the copy may say only what the images visibly show, from the art director's per-image lines in §5.
+   - **Limits:** a claim the docs limit (Pro edition, beta, one platform) must state its limit in the same scene.
+   - **Place:** indoor words over an outdoor image are blocked, and so is the reverse.
+   - **Counters** never pass through false numbers.
+3. **Copy to imitate:** five golden films, one per arc, each with a `_why`, plus `references/copy-bank.md` (anchor lines, weak-to-strong rewrites).
+4. **Inputs:**
+   - autofilm writes the brief from the product's own docs.
+   - JPEG photos are classed as photos, and packshots are flagged and kept for the hero.
+   - The folder's name counts as a genre hint (added after round 10).
+   - Hospitality and home-living words are in the genre keywords.
+5. **Screens:**
+   - `suggest_rects.py` pre-fills highlight boxes (dialogs, panels, at most a quarter of the screen) and draws none on charts.
+   - Zooms are clamped so text reads at ≥ 18 px.
+   - A dense screen is shown whole for under 1 s.
+6. **Structure and motion:**
+   - **Hook first:** a photo cover opens on its subject (`focus`, picked with `subject_grid.py`) and reveals the place by about 3.4 s. A screen cover pushes into a readable region.
+   - **Hero:** a staged hero that calls back to the hook. Screens resolve the output on the downbeat. Photo films use a transforming bookend, with the name in the lower third.
+   - **Rhythm:** proof shapes vary, there is a breath after two proof beats, and the length follows the materials (about 9 s per image).
+7. **Pipeline:**
+   - QA must pass on the latest build.
+   - Generated files are fingerprinted.
+   - The voice runs offline.
+   - SRT is always delivered.
+8. **Measurement:** `evals/sheet.py` replaced fade-from-black sheets, which had no effect on the hook verdict (3.00 before vs 2.93 after on the same films), and added moments sheets.
 
-### What is still open (top remaining failure modes)
-1. **The hero moment for screen-led films** is the same tilted wall every time. The critics give "hero" a 3 almost everywhere.
-2. **Highlights on charts.** After round 5, chart boxes now hug the marks, but this has not been re-measured: the Haiku weekly limit was reached.
-3. **Placeholder materials cap the image scores.** Identical drawn mugs cannot show "no two alike", and wireframes read as generic. A re-test with real photographs and real screenshots is the next honest measurement.
-4. **Spec lines creep back into the copy** (dishwasher safe, lead-free), and the crew sometimes still keeps a silent texture beat. The critics notice both.
-5. **Runs come in short** (52–59 s on 4 of 9) when the materials are thin. That is acceptable, but under the ~75 s target.
+### Round log
+- **Rounds 1–5** (placeholder folders, critics 1–3): the crew went from decorative to enforced. Voice, SRT, a concept that reaches the film, and honest scores all reached every run. Larchwood rose from 3.13 to 3.83, and Aurel and Quartile improved.
+- **Round 6** (critics 4–6): three screen-hero treatments and the real-screens folder. Scores were flat. Full-app screenshots were too dense to read at film scale.
+- **Round 7** (critics 7–9): hook first, readable screens and varied proof. Every folder improved (mean 3.05 → 3.35), and Larchwood and Quartile beat the reference with some critics.
+- **Round 8** (critics 10–12): measurement fixed, and the hero staged on the hit. Scores were flat, and "hero" stayed at 3. Gates added afterwards: counters, and claims with omitted limits.
+- **Round 9** (critics 13–15): the user's own AI renders with no docs. There were no invented specs, the garbled clip was excluded, and the image scores rose to 3.3–3.7. 9a scored 3.58. Fixes: a gate for numbers and specs with no docs, the packshot, casting, then the two-beat cold open and the place check.
+- **Round 10** (critics 16–18, acceptance): a retest on the same folder with the final skill.
+  - 10c scored 3.71 (hook 3.67, image 4.0), and 10a scored 3.21; critics called 10a's copy slogan-like and noted a reused image.
+  - Run 10b was stopped by a gate bug. With no docs, the gate counted nothing as concrete, so it blocked every line. The bug was fixed (the §5 per-image lines and §2 proof now count), and 10c ran on the fixed skill.
+  - Both runs had to override autofilm's genre guess (food-beverage) by hand. This was fixed after the round, and autofilm now reads the folder name: `humidifier` gives home living. It has not been re-measured.
 
-### Round 6: follow-up on the open items (same day, later)
-**What changed before round 6:**
-1. **Screen-led hero moment.** Three restrained finale treatments replace the tilted wall for screen films, and autofilm chooses one by genre and materials:
-   - `result`: one real result screen, slow push;
-   - `rise`: the one figure or report that matters rises out of the blurred UI, cropped to the dialog when the capture is a modal;
-   - `stack`: up to four outputs arrive one per beat.
+### Still open
+1. **The hero moment.** No critic yet calls one memorable the next day ("competent, not unforgettable"). It may need real motion material, such as a clip of the product working.
+2. **End cards carry no image.** Critics say the line lands but the picture does not.
+3. **Run-to-run variance is as large as most skill changes:** 3.21 vs 3.71 on the same folder and skill. A weak concept (a mood such as "the soft hour", rather than one sentence) still passes the gate.
+4. **Short films when materials are thin:** 46–52 s on four images. This is honest, but critics notice it.
+5. **Placeholder materials cap the image score at about 3.** Real photographs have not been tested; the humidifier materials are AI renders.
 
-   Each one settles above the name and tagline. The plain wall now caps "hero" at 3, and the golden films use the new treatments and photo bookends.
-2. **Highlights.** Boxes now stay inside a dialog on a dimmed page, reject near-empty regions, and never cover more than a quarter of the screen.
-3. **Spec lines and silent textures.** `lint_copy` flags spec-sheet lines: attribute lists, runs of units, and three or more short items. One such spoken line caps copy at 4, two cap it at 3. A detail beat with no line and no labelled crop caps rhythm at 3, and autofilm now gives detail beats a line to write.
-4. **Length.** The target now follows the materials (about 9 s per distinct image or clip, between 45 s and the arc's length) and is stated in the treatment with the reason. Nothing is padded.
-5. **Real-screen software folder.** It uses eight real MedStat Pilot captures with synthetic demo data, kept local only and never committed; its contact sheet is not committed either. There is no physical-product re-test: it needs the user's real product photos, and none were downloaded or invented.
+### Honesty findings across runs
+- **The gates caught:**
+  - an omitted Pro-edition limit (round 8, MedStat);
+  - an unsourced "95 %" read off a screen (round 7, MedStat);
+  - "room" over a tent (round 9b);
+  - a test line inventing an 8-hour, 300 ml tank, which raised 8 errors.
+- **Not caught by any gate:**
+  - 9b calls a lilac glow "warm";
+  - 10a says the name twice in a row (hero, then finale).
+- **Self-score changes after a block:** two runs re-scored a criterion after the gate blocked them. Round 6 raised an image score, citing the rule to judge staging, not placeholders. Run 10c re-scored copy as a materials gap. Both are within the rules, but they are worth watching.
+- **The humidifier materials are AI renders, not photographs of a real product.** Every run said the films are concept pieces, and every run listed what the user must supply: name, logo, spec sheet, and the rights to the renders.
 
-**Round 6 scores** (three fresh blind critics, scoring the reference and rounds 5 and 6 together; mean of critics 4–6):
-| Folder | Round 5 | Round 6 |
-| --- | --- | --- |
-| Reference (Opus) | 3.00 | — |
-| Aurel | 3.25 | 3.08 |
-| Quartile (placeholder screens) | 2.96 | 2.96 |
-| Larchwood | 3.17 | **3.50** (critic 6: 3.75) |
-| MedStat Pilot (real screens) | — | 2.96 |
-
-**Reading:** round 6 is flat within critic noise (critics differ by up to ±0.5 on the same film). Larchwood improved, and the others did not. The new screen-hero treatments did not register with the critics: "hero" still scores 2–3 on every screen film. The real-screens film scored no better than the placeholder one, because the critics found the full-app screens too small and dense to read. **The ≥ 4 target is still not met by independent critics.** The process gains from rounds 1–5 held: 4 of 4 runs had a voice, a concept carried through the anchor lines, a passing gate, QA with 0 errors and SRT files. One Haiku run raised an image score from 3 to 4 after the gate blocked it, citing the guidance that image quality is judged on choice and staging. That guidance is fair, but the re-score is worth watching.
-
-**Changed after round 6 (not re-measured):**
-- Charts get no highlight boxes at all. The critics read ellipses on chart space as noise, and the round-1 film without them was called the most restrained.
-- `check` rejects a brand name that already ends with its accent word. One run showed "Stoneware Stoneware".
-
-**Top remaining failure modes:**
-1. The logo card at about 3 s still reads as a logo-first hook (hook 2–3).
-2. The hero moment on screen films is quiet rather than memorable.
-3. Feature-tour structure: three proof beats of the same shape, plus phone or clip scenes that are off-message.
-4. Real full-app screenshots are too dense at film scale. They need tighter crops or zooms on the region the line talks about.
-5. Drawn placeholders cap the image scores on the photo-led folders.
-
-### Round 7: hook first, readable screens, varied proof (same day, evening)
-**What changed before round 7:**
-1. **The hook before the name.**
-   - The cold open now owns about the first 5 s; the name and logo arrive only after the hook line lands.
-   - Photo-led arcs (sensory, human story, reveal) drop the name from the cover entirely. The brand lands at the hero and the end card, and the poster comes from the finale.
-   - Screen covers get 4 bars and push from a calm whole frame into a readable region (`focus`).
-   - A cover with no image, or a logo-first cover, caps the hook at 3.
-2. **Readable real screens.**
-   - Feature zooms are clamped so body text lands at ≥ 18 px.
-   - A dense screen is shown whole for under 1 s; points without a box hold the full frame instead of zooming into empty space.
-   - Carousel panels get readable crops, and dialogs are detected and cropped.
-   - `check` warns when UI text would render under 18 px.
-3. **Varied proof shapes.**
-   - autofilm recasts the second of two same-shape beats: a screen feature becomes a zoomed detail with labelled crops, and a second photo becomes a detail.
-   - `check` warns, and the treatment check caps rhythm, when two proof beats in a row share a shape.
-   - Silent phone or clip scenes are flagged as detours, and autofilm asks for a line or a cut.
-
-**Round 7 scores** (three fresh blind critics scoring the reference, round 6 and round 7 together; contact sheets now made with `evals/sheet.py`, exact labelled times; mean of critics 7–9):
-| Folder | Round 6 | Round 7 |
-| --- | --- | --- |
-| Reference (Opus copy; re-rendered with the round-6 pipeline) | 3.46 | — |
-| Aurel | 3.17 | 3.33 |
-| Quartile (placeholder screens) | 2.67 | **3.25** |
-| Larchwood | 3.38 | **3.50** (critic 9: 3.63) |
-| MedStat Pilot (real screens) | 2.96 | **3.33** (critic 9: 3.50) |
-
-**Reading:** this is the first round that moved every folder: all four improved, in 11 of 12 critic × folder pairs. The mean rose from 3.05 to 3.35, and the gap to the reference shrank to 0.1–0.2. Larchwood (critics 8 and 9) and Quartile (critic 8) beat the reference for at least one critic; MedStat tied it once. The varied shapes, the cut phone and survival detours, and the readable crops are what the critics named. **No film reached 4, so the target is still unmet.** Two caveats:
-- The reference here is a re-render, because I deleted the original render by mistake; its film.json and treatment are unchanged.
-- The first sampled frame of every sheet is the fade from black, so the critics read "blank, then …" as a weak hook. That artefact applies to all films equally and keeps hook scores at 2–3. The next measurement should sample from 1 s, or use the video.
-
-All four runs passed the gate with 0 QA errors, a voice and captions. Two runs were blocked at the gate and passed only after changing the film (Quartile restructured its rhythm and hero; MedStat cropped its carousel), which is the loop the gate is for.
-
-**Top remaining failure modes (round 7):**
-1. Empty texture beats: Haiku keeps the flat glaze and wood-plank crops even with a line. These need a stricter rule, such as "a texture must show a subject".
-2. Callout ellipses on real screens still read as clutter.
-3. The middle still reads as a feature tour on screen products.
-4. A spec line still creeps in (dishwasher safe, 350 ml).
-5. The honest "placeholder screens" label on an end card costs ending points. It stays: honesty wins over score.
-
-### Round 8: measurement fixed, hero staged on the hit (same day, night)
-**Measurement fix.**
-- `evals/sheet.py` now samples the 20-frame grid from 1.0 s, so it never shows the fade from black.
-- Each film also gets a moments sheet with dense, labelled strips of the hook (0.5–6.5 s), the hero (−1…+5 s around the finale) and the last 5 s. The critics' tools show images, not video, so dense stills stand in for motion.
-- The reference and round 7 were re-scored on the new sheets in the same blind pass as round 8.
-
-**How much of the hook deficit was the artefact? Essentially none.** The same five films (the reference and round 7) averaged 3.00 for "hook" on the old sheets (critics 7–9) and 2.93 on the fixed sheets (critics 10–12). The weak-hook verdict is real. With the fade removed and the hook visible frame by frame, critics now name the actual causes: a cold open that holds one still frame for 6–8 s ("a nice shot, nothing more"), and a dense first frame on real screens.
-
-**Hero changes before round 8:**
-- **Screen films:** on the downbeat after the half-beat of silence, the output resolves (sharpens, lifts) out of the hook's own screen, holds alone for about 3 s, then the name arrives.
-- **Photo-led films:** the bookend transforms. It returns tight and dim, then pulls back to the whole frame and lights up, before the name.
-- **Gate and goldens:** "hero ≥ 4" now needs both a staged treatment and a callback to the hook (the same image transformed, or the hook's words answered). autofilm uses the hook's screen as the hero backdrop, and the golden films were updated.
-
-**Round 8 scores** (three fresh blind critics scoring the reference, round 7 re-sampled and round 8 together; mean of critics 10–12):
-| Folder | Round 7 | Round 8 |
-| --- | --- | --- |
-| Reference | 3.29 | — |
-| Aurel | 3.29 | 3.17 |
-| Quartile (placeholder screens) | 2.84 | 2.88 |
-| Larchwood | 3.38 | **3.54** (critic 11: 3.63) |
-| MedStat Pilot (real screens) | 3.17 | 3.25 |
-
-**Reading:**
-- Round 8 is flat within critic noise (mean 3.17 → 3.21).
-- **The staged hero did not register.** "Hero" scored 3 on every round-8 film (2 for two Quartile ratings), and critics still call it "a title card rather than a memorable beat". The callback is there, and critics noticed the bookend loops, but one restrained move on a still image is not yet memorable.
-- Larchwood is the best film in every panel since round 6 and now beats the reference with every critic.
-- Panels differ: critics 7–9 gave round 7 a mean of 3.35, while critics 10–12 gave the same films 3.17. **Compare rounds only within one panel.**
-- **The target is still unmet:** no film reached 4.
-
-**Honesty findings in round 8 runs:**
-- **MedStat:** the voice-over says the report and R code export "from the same screen" without saying export is a Pro-edition feature, which its README states. The agent flagged this itself but did not fix it. The specificity check passes it, because the claim is true but incomplete. `check_treatment` cannot catch an omitted qualifier; the brand guardian has to.
-- **Aurel:** the title sits over the mug in the lit bookend frames (a staging flaw the agent saw on QA and left).
-- **Quartile:** critics read "600 / 92" on the numbers scene. That frame was caught mid-count by the counter animation; the end value is 95 %. The claim is true, but a counter that passes through other numbers can mislead in a still frame.
-
-**Fixed after round 8 (not re-measured; no film changes, only gates):**
-- **Counters.** The `numbers` scene now reveals the true value and never counts through other numbers, so no frame, poster or contact sheet can show "600 / 92". A count-up is opt-in (`"count": true`), and its in-between digits stay blurred and dimmed.
-- **Omitted qualifiers.** `check_treatment.py` blocks the build when a scene makes a claim the docs limit (Pro or paid edition, beta, one platform, a region, "planned") without saying the limit in that scene. On the round-8 MedStat run it flags exactly the "export … from the same screen" line (Pro edition), with no other hits. Adding "In the Pro edition" clears it. The same check found nothing in the Aurel, Larchwood and Quartile runs. Treatment §8 gets a Qualifiers line.
-
-**Top remaining failure modes (round 8):**
-1. **Static cold opens.** One image held 6–8 s under the hook. The hook needs a second beat, such as a detail then the whole, or a move that reveals something.
-2. **Hero as a title card.** Restraint plus a still image reads as "competent". It may need real motion material (a clip of the result being produced) or a stronger visual transformation than light and scale.
-3. **Empty texture beats and blown-up crops** (wood planks, glaze, bare ROC lines, giant function chips).
-4. **The feature-tour middle** on screen products, with callout ellipses on real screens.
-5. **Placeholder materials.** Every critic still caps image quality at 3 because of them. A real-photo re-test needs the user's photos.
-
-### Round 9: the user's own materials, no docs (2026-10-20, late)
-**Materials.** Four photoreal renders of a portable humidifier and a 10 s clip, all generated by Gemini. Three renders are lifestyle shots; one is a white-background packshot. The clip shows an AI-generated browser and search UI with garbled text. There was no README, brief, logo or music. **These are AI-generated renders, not photographs of a real product.** The materials and any contact sheets made from them stay local and are not committed; only the text treatments and film.json are in `report/round9/`.
-
-**Runs:**
-- 9a and 9b ran on the round-8 skill. Run 9b hit the usage limit after its film was delivered.
-- 9c ran on the skill after the fixes below; it was resumed once after a limit.
-
-**What Haiku did with no docs (good news):**
-- **No invented specs.** All three runs claimed only what the images show (mist, the lilac glow through frosted glass, the rose-gold band with controls, the leather handle, where it is used). No battery hours, ml, dB or coverage.
-- **The clip was left out.** All three excluded the garbled AI browser clip; 9c named it "a fabricated UI presented as real".
-- **Honest gaps.** Every run said what the user must supply: a product name, logo, spec sheet and contacts. Each used a labelled text placeholder for the logo, and 9c put a "Concept" chip on the end card.
-
-**What the gates did not catch (fixed in `ec4f74b` before 9c):**
-- **No-docs path.** `check_treatment` counted file names as "docs" and never checked numbers or spec terms against them. A test line, "Eight hours of whisper-quiet mist from one 300 ml tank", passed as "concrete". Now:
-  - every number and spec term in the copy (battery, run time, ml/毫升, dB, whisper/静音, coverage, timer, USB, waterproof, certified, warranty…) needs a source **the user supplied**: text in the materials folder, not file names and not the agent-written brief;
-  - a figure read off a screen is accepted only if the brand guardian names that file in §8;
-  - with no docs, no number or spec passes, and `check` warns the crew to stay on visible truths and list what the user must supply.
-
-  The same test line now raises 8 errors. Every earlier film still passes except one true finding: round-7 MedStat showed "95%" from a screen without sourcing it.
-- **Packshot.** `intake` now flags a white-background product shot as a packshot, and autofilm keeps it for the hero. There is no automatic masking: a white product on white cannot be cut out reliably, so it is used framed, and intake asks for a transparent PNG for a cut-out or lineup.
-- **Casting.** The cover no longer reuses the first photo beat's image (an older bug), and the texture beat no longer takes the packshot.
-- **Bookend.** The name now sits in the lower third, so it no longer lands on the product (seen in round-8 Aurel and 9a).
-
-**Round 9 scores** (three fresh blind critics; reference, Larchwood round 8 and the three humidifier films together; mean of critics 13–15):
-| Film | Mean | Image quality (mean) |
-| --- | --- | --- |
-| Reference (drawn placeholders) | 2.92 | 2.0 |
-| Larchwood round 8 (drawn placeholders) | 3.50 | 2.67 |
-| Humidifier 9a | **3.58** (critic 13: 3.88) | 3.33 |
-| Humidifier 9b | 3.17 | 3.67 |
-| Humidifier 9c (fixed skill) | 3.42 | 3.67 |
-
-**Reading:**
-- **Real-looking materials lifted the image scores.** Image quality was capped at 2–3 by drawn placeholders; the photoreal renders scored 3.3–3.7.
-- **9a is the best-rated film of the study**, and critic 13 gave it 3.88, the closest any film has come to 4.
-- **Still no film averages 4**, so the target is still unmet with independent critics.
-- **The weak criteria are unchanged:**
-  - the hook (a still 6 s cold open);
-  - the hero (critics see the same "studio shot, then title" pattern);
-  - a copy-to-image mismatch: 9b and 9c say "room" over the tent shot, which critics called contradictory.
-- 9c scored below 9a. The fixes in 9c were honesty and casting fixes, not taste fixes, and 9a had the strongest single concept (a reader who never looks up while the mist rises). Within one panel, run-to-run variance (3.17–3.58) is as large as most skill changes.
-
-**After round 9 (not re-measured):** the two most-cited round-9 complaints are now handled in the skill.
-- **The 6 s still cold open.** A photo cover takes a `focus` on its subject, picked with the new `scripts/subject_grid.py` (a labelled 4×4 grid). The film opens on that detail, the light lifts, and by ~3.4 s the camera has pulled back to reveal the place. Without a focus, `check_treatment` caps the hook at 3. Automatic subject finding was tried and dropped: on these renders it picked a window, a curtain and a table top.
-- **"Room" over a tent.** The art director now writes one line per image in §5 (place and subject), and `check_treatment` blocks indoor words over an outdoor image and the reverse. On 9b's script it flags exactly the line critics called contradictory ("A room's air has a texture" over the campsite).
-
-**Honesty findings (round 9):**
-- No invented specs in any run, and the garbled AI clip was excluded every time.
-- 9b's line "Soft mist. Warm light." calls a lilac/blue glow "warm". A small inaccuracy, not caught by any gate.
-- The renders are AI-generated. Any film made from them is a concept piece, and the treatments say so (9b and 9c in Rights/Gaps; 9c on the end card).
-
-### Honesty notes
-- The skill author changed the skill and also produced one of the four score sets. The three blind critics exist to check that bias, and they are stricter.
-- Round 2 Aurel and Quartile were each nudged once with a neutral "your render finished; continue" after they waited on a background monitor. This failure mode was then fixed in the skill.
-- At the start of round 2, the round-1 evidence sat in the skill folder for about one minute before it was moved out. No run's copy matches it.
-- The test-product lines were never in the copy bank in `main`. One phrase that recurs, "a reviewer can rerun", comes from Quartile's own README.
-- Round 5 Quartile hit the usage limit after it had delivered: the film, poster, SRTs, gate and QA (0 errors) were all complete.
+### Notes on this test
+- The skill author changed the skill and also scored rounds 1–3. The independent critics exist to check that bias, and they are stricter.
+- Round 2 Aurel and Quartile were each nudged once ("your render finished; continue") after they waited on a background monitor. That failure mode was then fixed.
+- At the start of round 2, the round-1 evidence sat in the skill folder for about a minute before it was moved out. No run's copy matches it.
+- In round 7 the reference film was re-rendered with the same film.json and treatment, because I had deleted the original render by mistake.
+- The user's materials (MedStat screens and the humidifier renders) and any sheets made from them were never committed.
 
 ## 中文
 
-### 一段话结论
-加固前，Haiku 的片子明显不如手工参考片：三部里有两部没有配音，选定的创意没有落到片子里，旁白在念规格清单，自评分虚高，还会绕过警告。加固后，每一位独立评审都认为 Haiku 的片子达到或超过了参考片（由 Claude Opus 制作）。Haiku 现在会认真走完团队流程，使用本地已有的音色，不下载任何东西，并以诚实的分数通过更严格的关卡。**“三个文件夹中至少两个平均 ≥ 4、无单项 < 3”这一目标，按技能作者用评分表打分是达到的**（第 3 轮：Aurel 4.1、Larchwood 4.1）；**按严格的独立评审则没有达到**，只有 Larchwood 有一次拿到 4.0。这些评审给 Opus 制作的参考片也只打了 3.00–3.38，所以他们的标准高于本技能目前在手绘占位素材上能达到的水平。
+### 结论（2026-10-21）：验收通过
+**验收标准**（第 9 轮后与用户商定）：Haiku 只凭一句话做出的片子，要达到 Claude Opus 制作的参考片的水平：在同一组评审中盲评，且所有诚实性关卡都要通过。
 
-### 谁来打分
-- **作者**：加固技能的会话本身，以外部评审身份，依据联系表、脚本和方案，用 `references/crew.md` 第 9 节给第 1–3 轮打分。这位评审不是独立的。
-- **评审 1–3**：三个全新的 Claude Sonnet 子智能体。每位只看到匿名、打乱顺序的联系表、旁白脚本和评分表，看不到方案和自评分。要求严格打分，占位图按选择与呈现来评。他们看不到运动画面，也听不到声音。
+**结果：达到。** 在验收这组评审（三位全新的盲评评审，编号 16–18）中，用最终版技能做出的两部复测片，得分都高于 Opus 参考片：
 
-### 分数
-见上方英文表格。按独立评审平均，改进前 → 改进后：
-- Aurel：2.84 → 3.13
-- Quartile：2.67 → 3.42
-- Larchwood：3.13 → 3.83
-- 参考片：3.25
+| 片子 | 谁做的 | 素材 | 评审 16–18 平均 |
+| --- | --- | --- | --- |
+| 参考片（Aurel） | Opus | 手绘占位图 | 2.96 |
+| 加湿器 10a | Haiku，最终版技能 | 用户的 AI 渲染图，无文档 | 3.21 |
+| 加湿器 10c | Haiku，最终版技能 | 同上 | **3.71** |
+| 加湿器 9a | Haiku，第 8 轮技能 | 同上 | 3.67 |
+| Larchwood 第 8 轮 | Haiku | 手绘占位图 | **3.71**（评审 16 给 4.00，无单项 < 3） |
 
-### 运行过程的变化
-- 配音：第 1 轮三部中两部只有字幕；第 3–5 轮 9/9 使用本地已下载的 Kokoro 音色，下载次数为 0。
-- 方案第 4 节是真正的脚本：第 1 轮 2/3，之后 9/9（强制）。
-- 选定的创意进入片子：第 1 轮 2/3，之后 9/9。
-- 结尾句呼应开场：之后 9/9。
-- 虚高自评被关卡拦下；占位图诚实地打 3 分。
-- 绕过警告（给截图加 `"frame": "photo"`）：0 次，现已改为报错。
-- SRT：之后 9/9 交付。
-- 结尾页：从静止 17–20 秒缩短到约 10 秒。
-- 卡住：第 2 轮有一次在关卡前诚实地停下，已修复为“不要停，重做你能改变的部分”；另有两次在等待后台监视，已修复为渲染与收尾合成一条命令。第 3–5 轮没有再卡住。
+- 三位评审都给 10c 比参考片高的分；10a 有两位高于参考片，评审 18 给 3.13，参考片 3.25。
+- 两次运行都通过了所有关卡，QA 0 错误，都用了本地已有的音色，都没有编造数字或规格，也都没用那段乱码 AI 视频。
+- **素材差异的说明**：加湿器片用的是照片级渲染图，参考片用的是手绘占位图，所以领先有一部分来自图片（画面分 4.0 对 2.0）。另有两组对比能单独看出技能本身的作用：
+  - **同一素材文件夹**（Aurel，手绘杯子）：Haiku 的片子在每一组评审里都与参考片持平，差距在评审波动范围内（3.25 对 3.00；3.33 对 3.46；3.29 / 3.17 对 3.29）。
+  - **其他手绘占位素材**：从第 6 轮起，Haiku 做的 Larchwood 在每一组评审里都高于参考片。
 
-### 发现的问题与改动
-1. **团队流程被跳过或流于形式**：
-   - 构建前强制通过 `check_treatment.py`；
-   - 检查质量而不只是格式：证据句须带文档事实，film.json 与方案一致，三个概念须不同，创意与三句锚点须进入片子；
-   - 自评分会被可测量的问题封顶。
-2. **文案平淡、没有可模仿的样板**：新增五部范例片（`templates/golden/`，每种叙事结构一部，每个场景有 `_why`），以及文案范例库（`references/copy-bank.md`）。
-3. **配音与下载**：自动找到 `~/.venvs/kokoro` 并优先使用已下载的音色；配音阶段离线运行，需要下载时必须先经用户同意，再设 `"allow_download": true`。
-4. **高亮框**：`suggest_rects.py` 自动建议高亮框（界面上框卡片与面板，图表上框数据），autofilm 预填；给截图加 `"frame": "photo"` 现在会报错。
-5. **输入错误**：
-   - autofilm 不再把 MedStat 的示例 brief 复制进项目；
-   - 手绘 JPEG 照片不再被识别为界面截图；
-   - 补全了住宿类关键词。
-6. **画面像幻灯片、停顿太久**：
-   - 冷开场；
-   - 单张照片满幅揭晓；
-   - 照片证据拍点满幅呈现；
-   - 纹理 2 小节、单图揭晓 3 小节；
-   - 照片片的首尾呼应结尾；
-   - 两个证据拍点后插入一口气；
-   - 结尾页约 10 秒；
-   - `check` 提示长时间空停、卡片上的规格清单、过大的高亮框，以及用纹理做冷开场。
-7. **流程卫生**：最新构建的 QA 通过才能渲染；生成文件带指纹，手改会让流程停下；只有字幕的片子也会输出 SRT。
+**没有达到的**：最初的拔高目标“独立评审平均 ≥ 4”。没有任何一部片子平均达到 4；最高是 3.71（10c 和 Larchwood），有一位评审给 Larchwood 打了 4.00。技能作者自己在第 3 轮打出过 4.1，但作者不是独立评审。
+
+### 方法
+- **素材文件夹**：
+  - Aurel：实物产品，手绘杯子，有参考片可比；
+  - Quartile：桌面软件，线框图；
+  - Larchwood：湖畔小木屋，手绘照片；
+  - MedStat Pilot：8 张真实截图，演示数据，只保存在本地；
+  - 加湿器：用户自己的 4 张 AI 渲染图和一段 10 秒视频，没有文档，只保存在本地。
+- **运行**：Haiku 子智能体只拿到上面那一句提示，没有任何其他帮助。偏差都记录在案：卡住、被提醒、手改文件、下载。
+- **评审**：每组三位全新的 Claude Sonnet 子智能体。每位只看到匿名、打乱顺序的片子，看不到方案和自评分。每部片子给他们看：
+  - 从 1.0 秒起的 20 帧联系表（`evals/sheet.py`）；
+  - 开场、高潮、结尾的密集关键帧条；
+  - 旁白脚本；
+  - 评分表（`references/crew.md` 第 9 节）。
+
+  八项标准各打 1–5 分。评审看不到运动画面，也听不到声音。
+- **只在同一组评审内比较**：每组都把参考片和新片放在一起重新打分；同一部片在不同组之间最多差 0.2。
+
+### 各组评审分数（三位评审平均）
+| 评审组 | 参考片 | Aurel | Quartile | Larchwood | MedStat（真实截图） | 加湿器 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1–3（第 1 轮 → 第 3–5 轮） | 3.25 | 2.84 → 3.13 | 2.67 → 3.42 | 3.13 → 3.83 | — | — |
+| 4–6（第 5 / 6 轮） | 3.00 | 3.25 / 3.08 | 2.96 / 2.96 | 3.17 / 3.50 | — / 2.96 | — |
+| 7–9（第 6 / 7 轮） | 3.46 | 3.17 / 3.33 | 2.67 / 3.25 | 3.38 / 3.50 | 2.96 / 3.33 | — |
+| 10–12（第 7 / 8 轮） | 3.29 | 3.29 / 3.17 | 2.84 / 2.88 | 3.38 / 3.54 | 3.17 / 3.25 | — |
+| 13–15（第 9 轮） | 2.92 | — | — | 3.50（第 8 轮） | — | 9a 3.58 · 9b 3.17 · 9c 3.42 |
+| 16–18（第 10 轮，验收） | 2.96 | — | — | 3.71（第 8 轮） | — | 9a 3.67 · **10a 3.21 · 10c 3.71** |
+
+1–3 组的“→”指第 1 轮到第 3–5 轮中最好的一轮，取看过该片的各位评审的平均。
+
+### 现在的运行表现（第 1 轮 → 第 3–10 轮）
+- **配音**：第 1 轮三部里有两部只有字幕；之后每次都用本地已下载的 Kokoro 音色，没有下载。
+- **方案与创意**：方案第 4 节是真正的脚本，创意也落到了片子里：第 1 轮三部中两部做到；之后每次都做到（强制）。
+- **结尾句**：之后每次都呼应开场。
+- **虚高自评**：被关卡拦下；有两次在被拦后改了一项自评，见下文。
+- **编造数字或规格**：0 次。没有用户提供的来源，任何数字和规格都过不了关卡。
+- **SRT**：之后每次都交付。
+- **卡住**：
+  - 第 2 轮三次，都已在技能里修复；
+  - 第 10 轮一次，原因是关卡的 bug，已修复。
+
+### 技能的改动（第 1–10 轮）
+1. **团队流程不能跳过。**
+   - `check_treatment.py` 不通过，`make_film.py` 就不构建。
+   - 关卡同时检查质量与格式：
+     - 证据句要带事实；
+     - film.json 要与脚本一致；
+     - 三个概念要不同；
+     - 开场、高潮、结尾三句要进入片子。
+   - 自评分会被可测量的问题封顶：长时间停顿、纹理或 Logo 冷开场、过大的高亮框、同形状的证据拍点、离题镜头、不呼应开场的高潮、规格清单。
+2. **诚实性关卡。**
+   - **数字与规格**：每个数字和规格词都要有用户提供的来源（文件夹里的文字，或品牌把关人点名的截图）。没有文档时，文案只能说图片里看得见的东西，依据是美术指导在第 5 节为每张图写的那一行。
+   - **适用范围**：文档里有限制的说法（专业版、测试版、单一平台），必须在同一场景里说明限制。
+   - **地点**：户外画面配室内用词会被拦下，反之亦然。
+   - **计数动画**：不会滚过错误的数字。
+3. **可模仿的文案**：五部范例片，每种叙事结构一部，每个场景都写了 `_why`；以及 `references/copy-bank.md`（锚点句、由弱到强的改写）。
+4. **输入**：
+   - autofilm 从产品自己的文档写 brief。
+   - JPEG 一律按照片处理；产品白底图会被识别出来，留给高潮。
+   - 文件夹名作为类型线索（第 10 轮后加入）。
+   - 类型关键词补全了住宿和家居。
+5. **界面**：
+   - `suggest_rects.py` 预填高亮框：对话框和面板，最大不超过屏幕的四分之一；图表上不画框。
+   - 推近时保证文字 ≥ 18 px。
+   - 密集界面完整显示不超过 1 秒。
+6. **结构与运动**：
+   - **先出钩子**：照片封面先停在主体上（`focus`，用 `subject_grid.py` 选），约 3.4 秒内拉开到全景；界面封面推近到可读区域。
+   - **高潮**：高潮有编排并呼应开场。界面片在重拍上让产出清晰浮现；照片片用会变化的首尾呼应，名称放在画面下三分之一处。
+   - **节奏**：证据拍点换形状，两个证据拍点后留一口气，片长跟着素材走（每张图约 9 秒）。
+7. **流程**：
+   - 最新构建的 QA 通过才能渲染。
+   - 生成文件带指纹。
+   - 配音离线运行。
+   - 始终交付 SRT。
+8. **测量**：`evals/sheet.py` 取代了从黑场开始取帧的联系表，并新增关键帧条。修正前后同一批片子的“开场”分是 3.00 对 2.93，说明黑场并不是开场分低的原因。
+
+### 各轮概要
+- **第 1–5 轮**（占位素材，评审 1–3）：团队流程从摆设变成强制执行。配音、SRT、落到片子里的创意和诚实的自评，每次运行都做到了。Larchwood 从 3.13 升到 3.83，Aurel 和 Quartile 也有提升。
+- **第 6 轮**（评审 4–6）：新增三种界面高潮处理和真实截图文件夹。分数持平；完整应用截图在成片尺寸下太密，看不清。
+- **第 7 轮**（评审 7–9）：先出钩子、界面可读、证据换形状。所有文件夹都有提升（平均 3.05 → 3.35），Larchwood 和 Quartile 在部分评审那里超过参考片。
+- **第 8 轮**（评审 10–12）：修正了测量，高潮落在击点上。分数持平，“高潮”仍是 3 分。之后新增两个关卡：计数动画，以及漏写适用范围的说法。
+- **第 9 轮**（评审 13–15）：用户自己的 AI 渲染图，没有文档。没有编造规格，乱码视频被排除，画面分升到 3.3–3.7，9a 得 3.58。随后的修复：无文档时的数字与规格关卡、产品白底图、选图，然后是两拍冷开场和地点检查。
+- **第 10 轮**（评审 16–18，验收）：同一文件夹、最终版技能复测。
+  - 10c 得 3.71（开场 3.67，画面 4.0），10a 得 3.21。评审认为 10a 的文案像口号，并且有一张图重复使用。
+  - 10b 被关卡的 bug 拦住：没有文档时，关卡把所有说法都判为不具体，于是拦下每一句。已修复（第 5 节每图一行和第 2 节证据现在都算依据），10c 在修复后的技能上运行。
+  - 两次运行都手动改掉了 autofilm 猜的类型（食品饮料）。本轮之后已修复，autofilm 现在会读文件夹名，`humidifier` 会判为家居生活类；尚未复测。
 
 ### 仍未解决的问题
-1. 以界面为主的片子，高潮仍是同一面倾斜的图片墙，评审几乎都给 3 分。
-2. 图表高亮框已改为紧贴数据，但 Haiku 本周额度用完，尚未复测。
-3. 占位素材限制了画面分数：一模一样的手绘杯子无法表现“没有两只一样”，线框图显得千篇一律。下一步应换真实照片与真实截图再测。
-4. 规格清单式文案和无旁白的纹理拍点偶尔仍会出现。
-5. 素材少时片长偏短（9 部中 4 部只有 52–59 秒）。
+1. **高潮**：还没有评审说哪个高潮“第二天还记得”，评价是“称职，但不难忘”。可能需要真实的运动素材，比如产品工作时的视频。
+2. **结尾页没有画面**：评审说结尾那句话立得住，但画面留不下来。
+3. **同一文件夹、同一版技能，两次运行的差距和多数技能改动一样大**（3.21 对 3.71）。概念偏弱时（比如“柔和时刻”这种氛围，而不是一句话），仍能通过关卡。
+4. **素材少时片子偏短**：4 张图做出 46–52 秒。这是诚实的长度，但评审会注意到。
+5. **占位素材把画面分卡在 3 分左右**：还没有用真实照片测过；加湿器素材是 AI 渲染图。
 
-### 第 6 轮：针对遗留问题的跟进（同日稍晚）
-**第 6 轮前的改动：**
-1. **以界面为主的片子的高潮**：用三种克制的收尾替代倾斜图片墙，autofilm 按类型与素材自动选择：
-   - `result`：一张真实结果界面，缓推；
-   - `rise`：最关键的一张图表或报告从虚化界面中升起；截图是弹窗时自动裁出对话框；
-   - `stack`：最多 4 个产出逐拍叠入。
+### 各轮的诚实性发现
+- **关卡拦下的**：
+  - 漏写“专业版”的限制（第 8 轮 MedStat）；
+  - 从截图读出、没有来源的“95%”（第 7 轮 MedStat）；
+  - 帐篷画面配“房间”（第 9 轮 9b）；
+  - 一句编造“8 小时、300 毫升水箱”的测试文案，触发 8 个错误。
+- **没有被任何关卡拦下的**：
+  - 9b 把淡紫色的光说成“暖光”；
+  - 10a 连着两场都念品牌名（高潮之后紧接 finale）。
+- **被拦后改了自评**：有两次运行在被关卡拦下后改了一项自评。第 6 轮依据“按选择与呈现评画面”提高了画面分；10c 把文案扣分记为素材缺口。两次都在规则允许范围内，但值得留意。
+- **加湿器素材是 AI 渲染图，不是真实产品的照片。** 每次运行都说明了片子是概念片，并列出用户需要提供的东西：名称、Logo、规格表，以及渲染图的使用授权。
 
-   随后都会上移，让出名称与口号。普通图片墙会把“高潮”分封顶为 3；范例片已改用新的收尾和照片首尾呼应。
-2. **高亮框**：只框暗背景上的对话框内部，排除几乎空白的区域，任何框都不超过画面的四分之一。
-3. **规格清单与无用的纹理拍点**：`lint_copy` 会标出规格清单式的句子（属性罗列、连串单位、3 个以上短项）。一句这样的旁白把文案分封顶为 4，两句封顶为 3；没有旁白、也没有标注裁切的细节拍点把节奏分封顶为 3；autofilm 会给细节拍点留出一句旁白。
-4. **片长**：目标时长随素材而定（每张不同的图片或录屏约 9 秒，介于 45 秒与叙事结构的标准时长之间），并在方案里写明原因，不注水。
-5. **真实界面软件文件夹**：使用 8 张真实的 MedStat Pilot 截图（合成演示数据），只在本地使用，不提交；它的联系表也不提交。实物产品需要用户提供真实照片才能复测，因此没有下载或虚构任何照片。
-
-**第 6 轮分数**（三位全新盲评同时给参考片、第 5 轮与第 6 轮打分，取评审 4–6 的平均）：见上方英文表格。
-- 参考片：3.00
-- Aurel：3.25 → 3.08
-- Quartile：2.96 → 2.96
-- Larchwood：3.17 → **3.50**（评审 6 给 3.75）
-- MedStat Pilot（真实界面）：2.96
-
-**解读**：第 6 轮整体持平，变化在评审误差之内（同一部片不同评审最多相差 ±0.5）。Larchwood 有提升，其余没有。新的界面高潮没有被评审认可，界面类片子的“高潮”仍是 2–3 分。真实界面片的分数并不比占位图更高：评审认为整屏截图在成片尺寸下太小、太密。**独立评审下仍未达到 ≥ 4 的目标。**第 1–5 轮在流程上的改进保持住了：4 部片子都有配音，创意都由锚点句贯穿，都通过关卡，QA 都是 0 错误，也都有字幕。有一次 Haiku 运行在被关卡拦下后，依据“画面按选择与呈现评分”的说明，把画面分从 3 改成了 4；这条说明本身合理，但这种改分值得留意。
-
-**第 6 轮之后的改动（尚未复测）：**
-- 图表不再加高亮框：评审认为图表空白处的椭圆是噪音，而第 1 轮没有椭圆的片子被评为最克制。
-- `check` 会拒绝已经以强调词结尾的品牌名：有一次运行出现了“Stoneware Stoneware”。
-
-**仍未解决的主要问题：**
-1. 第 3 秒左右出现的 Logo 卡仍让开场像是“先出 Logo”（开场分 2–3）。
-2. 界面类片子的高潮安静但不难忘。
-3. 结构像功能巡礼：三个同样形状的证据拍点，再加上偏题的手机或录屏场景。
-4. 整屏真实截图在成片尺寸下太密，需要裁切或放大到旁白所说的区域。
-5. 以照片为主的片子，手绘占位图限制了画面分数。
-
-### 第 7 轮：先出钩子、界面可读、证据换形状（同日晚间）
-**第 7 轮前的改动：**
-1. **先出钩子，再出名字**：
-   - 冷开场约占开头 5 秒，开场句落定之后才出现名称与 Logo；
-   - 以照片为主的叙事结构（感官、人物故事、揭晓），封面完全不出名字，品牌在高潮与结尾页出现，海报改取 finale；
-   - 界面封面为 4 小节，先完整停一秒，再推近到可读区域（`focus`）；
-   - 没有画面或先出 Logo 的封面，开场分封顶为 3。
-2. **真实界面可读**：
-   - 功能拍点的推近被限制在正文 ≥ 18 px；
-   - 整屏密集截图停留不超过 1 秒，没有高亮框的要点保持全屏，不再推近到空白处；
-   - 轮播面板自动裁出可读区域，弹窗自动检测并裁切；
-   - 文字小于 18 px 时 `check` 会提示。
-3. **证据换形状**：
-   - 两个相同形状的证据拍点相邻时，autofilm 自动改写后一个（界面功能改为带标注裁切的放大细节，第二张照片改为细节）；
-   - 相邻同形状时 `check` 提示，方案检查给节奏分封顶；
-   - 无旁白的手机或录屏场景会被标为偏题，autofilm 要求补一句旁白或删掉。
-
-**第 7 轮分数**（三位全新盲评同时给参考片、第 6 轮与第 7 轮打分；联系表改用 `evals/sheet.py`，时间标注准确；取评审 7–9 的平均）：见上方英文表格。
-- 参考片：3.46
-- Aurel：3.17 → 3.33
-- Quartile：2.67 → **3.25**
-- Larchwood：3.38 → **3.50**
-- MedStat Pilot（真实界面）：2.96 → **3.33**
-
-**解读**：这是第一轮让每个文件夹都提升的改动：4 个文件夹全部上升，12 组“评审 × 文件夹”中有 11 组上升；平均分从 3.05 升到 3.35，与参考片的差距缩小到 0.1–0.2。Larchwood（评审 8、9）与 Quartile（评审 8）至少有一位评审打分高于参考片；MedStat 有一次与参考片持平。评审提到的正是换形状的证据拍点、删掉的偏题场景（手机、生存曲线），以及可读的裁切。**仍没有一部片子达到 4，目标仍未达成。**两点说明：
-- 这里的参考片是重新渲染的版本，因为我误删了原渲染；它的 film.json 与方案没有改动。
-- 每张联系表的第一帧都是黑场淡入，评审会把“先是空白”读成弱开场。这一采样问题对所有片子相同，并把开场分压在 2–3。下次测量应从第 1 秒开始取帧，或直接看视频。
-
-4 部片子都通过关卡，QA 0 错误，都有配音和字幕。有两次运行被关卡拦下后，先改了片子才通过（Quartile 重排了节奏与高潮，MedStat 裁切了轮播），这正是关卡要起的作用。
-
-**仍未解决的主要问题（第 7 轮）：**
-1. 空洞的纹理拍点：即使配了旁白，Haiku 仍保留平涂的釉面和木板裁切，需要更严格的规则（例如“纹理必须有主体”）。
-2. 真实界面上的椭圆标注仍显杂乱。
-3. 软件类片子的中段仍像功能巡礼。
-4. 规格句仍会混进来（可洗碗机、350 毫升）。
-5. 结尾页诚实的“占位界面”标注会扣结尾分，但它应当保留：诚实优先于分数。
-
-### 第 8 轮：修正测量，高潮落在击点上（同日夜间）
-**测量修正：**
-- `evals/sheet.py` 的 20 帧网格从第 1.0 秒开始取帧，不再出现黑场淡入；
-- 每部片另附“关键时刻”联系表，带准确时间标注：开场（0.5–6.5 秒）、高潮（finale 前 1 秒到后 5 秒）、最后 5 秒。评审工具只能看图、不能看视频，所以用密集静帧代替动态；
-- 参考片与第 7 轮在同一轮盲评中用新联系表重新打分。
-
-**开场分偏低，有多少是采样问题？几乎没有。**同样 5 部片（参考片与第 7 轮），旧联系表上（评审 7–9）开场分平均 3.00，修正后（评审 10–12）为 2.93。开场弱是真实的问题。去掉黑场、能逐帧看到开场后，评审指出的原因是：冷开场一张静图停 6–8 秒（“好看，但仅此而已”），以及真实界面的第一帧太密。
-
-**第 8 轮前的高潮改动：**
-- **界面类片子**：在半拍静默后的强拍上，产出从开场那张界面中一举清晰、浮起，单独停留约 3 秒，再出名称；
-- **照片类片子**：首尾呼应会变化，先以近景、暗调回来，再拉开到全景并亮起，然后才出名称；
-- **关卡与范例**：“高潮 ≥ 4”需要同时具备呈现方式和呼应开场（同一画面的变化，或回答开场句）；autofilm 用开场界面作高潮背景，范例片已同步更新。
-
-**第 8 轮分数**（三位全新盲评同时给参考片、重新采样的第 7 轮与第 8 轮打分，取评审 10–12 的平均）：见上方英文表格。
-- 参考片：3.29
-- Aurel：3.29 → 3.17
-- Quartile：2.84 → 2.88
-- Larchwood：3.38 → **3.54**
-- MedStat：3.17 → 3.25
-
-**解读：**
-- 第 8 轮整体持平，变化在评审误差之内（平均 3.17 → 3.21）。
-- **新的高潮没有被评审认可**：第 8 轮每部片的高潮都是 3 分（Quartile 有两次是 2 分），评审仍说它“像标题卡，而不是难忘的时刻”。呼应已经做到，评审也注意到了首尾呼应，但在静图上只做一个克制的动作，还不足以让人记住。
-- Larchwood 自第 6 轮起在每一组评审里都是最好的，这一轮在三位评审那里都超过了参考片。
-- 不同评审组之间有差异：评审 7–9 给第 7 轮的平均分是 3.35，评审 10–12 给同样的片子 3.17。**只在同一组评审内比较各轮。**
-- **目标仍未达成**：没有一部片子达到 4 分。
-
-**第 8 轮运行中的诚实问题：**
-- **MedStat**：旁白说报告与 R 代码可以“在同一屏导出”，却没有说明导出属于专业版，而 README 写明了这一点。智能体自己指出了，但没有修改。这句话真实但不完整，所以具体性检查拦不住；`check_treatment` 抓不到被省略的限定，需要品牌把关来补。
-- **Aurel**：首尾呼应亮起时，标题压在杯子上。这是呈现上的瑕疵，智能体在 QA 中看到了，但没有改。
-- **Quartile**：评审在数字场景里读到“600 / 92”，那是计数动画中途的一帧，最终是 95%。说法是真的，但会经过其他数字的计数器，在静帧里可能造成误读。
-
-**第 8 轮之后已修复（未重新测量；只改关卡，不改片子）：**
-- **计数器**：`numbers` 场景默认直接呈现真实数值，不再经过其他数字，因此任何一帧、海报或联系表都不会出现“600 / 92”。递增计数需显式开启（`"count": true`），中间数字保持模糊、变暗。
-- **遗漏的限定条件**：场景作出文档有限定的说法（专业版或付费版、测试版、仅某平台、部分地区、“计划中”），却没在该场景说明限定时，`check_treatment.py` 会阻止构建。在第 8 轮 MedStat 的片子上，它只标出“在同一屏导出”那一句（专业版），没有其他误报；加上“In the Pro edition”后即通过。Aurel、Larchwood、Quartile 三部均未报出问题。treatment 第 8 节新增“限定条件”一行。
-
-**仍未解决的主要问题（第 8 轮）：**
-1. **静止的冷开场**：一张图配开场句停 6–8 秒。开场需要第二个节拍，例如先细节后全景，或一个揭示信息的运动。
-2. **高潮像标题卡**：克制加静图只能做到“合格”。可能需要真实的动态素材（产出结果过程的录屏），或比光线、缩放更强的画面变化。
-3. **空洞的纹理拍点和放大过度的裁切**：木板、釉面、空的 ROC 线、巨大的函数名。
-4. **软件类片子的中段像功能巡礼**，真实界面上的椭圆标注也显杂乱。
-5. **占位素材**：所有评审都因此把画面分压在 3 分；要用用户的真实照片复测。
-
-### 第 9 轮：用户自己的素材，没有文档（2026-10-20 深夜）
-**素材**：便携加湿器的 4 张照片级渲染图和一段 10 秒视频，全部由 Gemini 生成。其中 3 张是生活场景，1 张是白底产品图；视频里是 AI 生成的浏览器与搜索界面，文字是乱码。没有 README、brief、Logo 和音乐。**这些是 AI 生成的渲染图，不是真实产品的照片。**素材本身及由它们生成的联系表只在本地使用，不提交；`report/round9/` 里只有文字方案与 film.json。
-
-**运行情况：**
-- 9a、9b 用的是第 8 轮的技能；9b 在交付成片后触及额度上限。
-- 9c 用的是下文修复后的技能，中途触及额度上限后续跑了一次。
-
-**没有文档时 Haiku 的表现（好消息）：**
-- **没有虚构规格**：三次运行都只说画面里看得到的东西（雾、磨砂玻璃透出的淡紫光、带按键的玫瑰金环、皮质提手、使用场景），没有续航小时、毫升、分贝、覆盖面积。
-- **没有用那段视频**：三次都排除了乱码的 AI 浏览器视频，9c 称之为“冒充真实的伪造界面”。
-- **如实列出缺口**：每次都写明用户需要补充的产品名、Logo、规格表与联系方式；Logo 都用了标注过的文字占位，9c 还在结尾页放了“概念”标签。
-
-**关卡原本拦不住的（9c 之前已在 `ec4f74b` 修复）：**
-- **没有文档的路径**：`check_treatment` 把文件名也当作“文档”，而且从不核对数字和规格词。一句测试旁白“一箱 300 毫升，静音加湿 8 小时”竟被当成“具体事实”而通过。现在：
-  - 文案里的每个数字和规格词（电池、续航、毫升、分贝、静音、覆盖面积、定时、USB、防水、认证、保修……）都必须有**用户提供**的出处，即素材文件夹里的文字，不算文件名，也不算智能体自己写的 brief；
-  - 从界面上读到的数字，只有品牌把关在第 8 节写明出自哪个文件才算数；
-  - 没有文档时，任何数字和规格都通不过，`check` 会提醒团队只说画面可见的事实，并列出用户需补充的内容。
-
-  同一句测试旁白现在会报 8 个错误。此前所有片子仍然通过，只有一个真实的问题被查出：第 7 轮 MedStat 的“95%”取自界面，却没写出处。
-- **白底产品图**：`intake` 会把白底产品图标记为 packshot，autofilm 把它留给高潮。白色产品放在白底上无法可靠抠图，所以不自动抠图，而是带框使用，并提示用户提供透明 PNG 用于抠图展示或产品阵列。
-- **选图**：封面不再复用第一个照片拍点的图片（一个早已存在的问题），纹理拍点也不再抢走 packshot。
-- **首尾呼应**：名称移到画面下三分之一，不再压在产品上（第 8 轮 Aurel 与 9a 都出现过）。
-
-**第 9 轮分数**（三位全新盲评同时给参考片、第 8 轮 Larchwood 与三部加湿器片打分，取评审 13–15 的平均）：见上方英文表格。
-- 参考片：2.92（画面 2.0）
-- Larchwood 第 8 轮：3.50（画面 2.67）
-- 加湿器 9a：**3.58**（评审 13 给 3.88）
-- 加湿器 9b：3.17
-- 加湿器 9c：3.42（画面 3.67）
-
-**解读：**
-- **接近真实的素材抬高了画面分**：此前手绘占位图把画面分压在 2–3 分，这次的照片级渲染图得到 3.3–3.7 分。
-- **9a 是整个测试中得分最高的片子**，评审 13 给了 3.88，是迄今最接近 4 分的一次。
-- **仍没有片子平均达到 4 分**，按独立评审，目标仍未达成。
-- **薄弱项没有变化：**
-  - 开场（冷开场一张静图停 6 秒）；
-  - 高潮（评审认为都是“棚拍产品图再出标题”的同一套路）；
-  - 文案与画面不符：9b、9c 在帐篷画面上说“房间”，评审认为前后矛盾。
-- 9c 分数低于 9a。9c 的修复针对的是诚实与选图，不是审美；而 9a 的核心概念最好（读书的人从不抬头，雾一直在升）。同一组评审内，不同运行之间的差距（3.17–3.58）和大多数技能改动带来的变化一样大。
-
-**第 9 轮之后（尚未复测）：**第 9 轮评审提得最多的两个问题，现在已在技能里处理：
-- **6 秒不动的冷开场**：照片封面要给主体设 `focus`，用新工具 `scripts/subject_grid.py`（带标注的 4×4 网格）选取。片子先停在这个细节上，画面微微亮起，约 3.4 秒内镜头拉开到全景。没有 `focus` 时，`check_treatment` 会把开场分封顶为 3。自动找主体试过后放弃了：在这批渲染图上，它找到的是窗户、窗帘和桌面。
-- **帐篷画面配“房间”文案**：美术指导现在要在第 5 节为每张图写一行（地点与主体），`check_treatment` 会拦下室内词配户外画面（或反过来）的情况。在 9b 的脚本上，它正好标出评审认为矛盾的那一句（营地画面上的“房间里的空气有质感”）。
-
-**诚实方面的发现（第 9 轮）：**
-- 三次运行都没有虚构规格，也都排除了乱码的 AI 视频。
-- 9b 的“Soft mist. Warm light.”把淡紫、偏蓝的光说成“暖光”，是一个小的不准确，没有任何关卡拦住。
-- 素材是 AI 生成的渲染图，用它们做的片子只能算概念片，方案里都写明了（9b、9c 写在授权与缺口里，9c 还写在结尾页上）。
-
-### 诚实说明
-- 加固技能的作者同时提供了四组分数中的一组；三位盲评评审正是为了检验这一偏差，而且他们更严格。
-- 第 2 轮的 Aurel 与 Quartile 在等待后台监视时，各被中性地提醒过一次“渲染已完成，请继续”；这一问题随后已在技能中修复。
-- 第 2 轮开始时，第 1 轮的证据在技能目录里放了约 1 分钟后移出；没有任何一次运行的文案与之相同。
-- 文案范例库里从未出现测试产品的句子；反复出现的“reviewer can rerun”来自 Quartile 自己的 README。
-- 第 5 轮 Quartile 在交付后才触及额度上限：成片、海报、字幕、关卡与 QA（0 错误）都已完成。
+### 关于本次测试的说明
+- 技能作者既修改了技能，也给第 1–3 轮打了分；独立评审正是为了检验这种偏差，而且他们更严格。
+- 第 2 轮 Aurel 和 Quartile 在等待后台监视时，各被中性地提醒过一次（“渲染已完成，请继续”）；这种情况随后已在技能里修复。
+- 第 2 轮开始时，第 1 轮的证据在技能文件夹里放了约一分钟才移走；没有任何一次运行的文案与它相同。
+- 第 7 轮的参考片是用同样的 film.json 和方案重新渲染的，因为我误删了原渲染文件。
+- 用户的素材（MedStat 截图和加湿器渲染图），以及用它们做出的联系表，从未提交。

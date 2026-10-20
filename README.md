@@ -39,7 +39,7 @@ It works for software, apps, hardware, fashion, food, services, places and brand
 - **Automatic layout QA** measures overlaps, off-frame content and caption collisions, so mid-sized models ship clean frames.
 - **Highlight boxes without measuring:** `suggest_rects.py` finds the cards, panels, charts and tables in a screenshot; autofilm pre-fills feature points with them.
 - **Enforced gates:** no build before the treatment passes, no render before QA passes, no hand edits in `film_out/`, no downloads without the user's OK.
-- **Measured on smaller models:** `evals/` holds three blind-test folders and the before/after report ([evals/REPORT.md](evals/REPORT.md)).
+- **Measured on smaller models:** given one line, Claude Haiku's films matched the film Claude Opus made on the same materials (within critic noise) and beat it on others, in blind panels of three independent critics, with every honesty gate passing. `evals/` holds the test folders, the method and the full report ([evals/REPORT.md](evals/REPORT.md)).
 
 ### 8 visual styles × 6 motion languages
 The look and the movement are chosen separately. Both follow the product's genre and theme.
@@ -147,7 +147,7 @@ Examples:
 - **自动版式 QA**：用数值检测重叠、出画、字幕冲突，中等规模的模型也能交出干净的画面。
 - **高亮框不用手量**：`suggest_rects.py` 自动找出截图里的卡片、面板、图表和表格，autofilm 用它预填功能要点。
 - **强制关卡**：方案未通过不构建，QA 未通过不渲染，不许手改 `film_out/`，未经用户同意不下载。
-- **在较小模型上实测**：`evals/` 里有三个盲测素材文件夹和改进前后的报告（[evals/REPORT.md](evals/REPORT.md)）。
+- **在较小模型上实测**：只给一句提示，Claude Haiku 做出的片子在三位独立评审的盲评中，同一素材上与 Claude Opus 制作的片子持平（在评审波动范围内），其他素材上超过它，且所有诚实性关卡都通过。`evals/` 里有测试素材、方法和完整报告（[evals/REPORT.md](evals/REPORT.md)）。
 
 ### 8 种视觉风格 × 6 种动效语言
 风格与动效分开选择，都依据产品类型与主题；对照表与预览见上方英文部分。新增 `luxe-noir`（安静的奢华感：时尚、美妆、珠宝、高端硬件）与 `natural-fresh`（日光与材质：食品、身心健康、旅行、家居、亲子）。

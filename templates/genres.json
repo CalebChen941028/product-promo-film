@@ -578,7 +578,7 @@
     "木屋",
     "客栈",
     "营地",
-    "入住"
+    "入住", "humidifier", "diffuser", "air purifier", "candle", "lamp", "加湿器", "香薰", "净化器", "台灯"
    ],
    "signals": {
     "photo": 4

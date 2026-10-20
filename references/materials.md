@@ -17,12 +17,16 @@ English first, 中文在后。One folder in, a drafted film out: `python3 script
 
 What `intake.py` (run by autofilm) recognises:
 - **desktop** / **phone**: screens, from flat pixel areas and sharp text edges.
-- **photo**: natural images.
+- **photo**: natural images (JPEG photos are always photos, even drawn ones).
+- **packshot**: a product on a bright, flat background. autofilm keeps it for the hero, framed; it is not masked automatically, so ask for a transparent PNG if a cut-out or lineup is wanted.
 - **cutout**: an object on transparency.
 - **figure**: charts and plots.
 - **logo**, clips, music, voice and docs.
 
-File names help: `*detail*`, `*texture*` and `*macro*` go to detail beats, `*lifestyle*` and `*scene*` to photo beats, and `*screen*` or `*ui*` mark screens. Role guesses are heuristics, so check the summary it prints.
+File names help: `*detail*`, `*texture*` and `*macro*` go to detail beats, `*lifestyle*` and `*scene*` to photo beats, and `*screen*` or `*ui*` mark screens. The folder's name counts as a hint for the genre (a folder called `humidifier` reads as home living). Role guesses are heuristics, so check the summary it prints.
+
+### Images only, no words
+The film can still be made, but it may claim only what the images visibly show: the crew writes one line per image in treatment §5 (place and subject), and that is the source for concrete copy. Every number and spec term (battery, ml, dB, coverage, waterproof, certified…) needs text the user supplied in the folder; with none, `check_treatment` blocks it. Indoor words over an outdoor image (and the reverse) are blocked too. The report lists what the user must still supply: name, logo, a README or spec sheet, contacts. AI-generated renders and clips with garbled UI are flagged, not presented as real.
 
 ### The brief (optional, makes everything better)
 `templates/brief.example.json` → `brief.json` in the folder. The fields autofilm uses:
@@ -58,12 +62,16 @@ File names help: `*detail*`, `*texture*` and `*macro*` go to detail beats, `*lif
 
 `intake.py`（autofilm 会调用）能识别：
 - **desktop** / **phone**：界面截图，依据平坦像素区域和清晰的文字边缘判断。
-- **photo**：自然照片。
+- **photo**：自然照片（JPEG 一律按照片处理，手绘的也一样）。
+- **packshot**：浅色纯背景上的产品图。autofilm 把它留给高潮，带框使用；不会自动抠图，需要透明底或阵列展示时请向用户要透明 PNG。
 - **cutout**：透明底物体。
 - **figure**：图表。
 - **logo**，以及录屏、音乐、配音、文档。
 
-文件名也有帮助：`*detail*`、`*texture*`、`*macro*` 会进入细节拍点，`*lifestyle*`、`*scene*` 进入照片拍点，`*screen*`、`*ui*` 标记为界面。分类是启发式的，请核对打印出的汇总。
+文件名也有帮助：`*detail*`、`*texture*`、`*macro*` 会进入细节拍点，`*lifestyle*`、`*scene*` 进入照片拍点，`*screen*`、`*ui*` 标记为界面。文件夹名也是类型的线索（叫 `humidifier` 的文件夹会被判为家居生活类）。分类是启发式的，请核对打印出的汇总。
+
+### 只有图片、没有文字
+照样可以做，但只能说图片里看得见的东西：团队在方案第 5 节为每张图写一行（地点与主体），这就是具体文案的依据。任何数字和规格词（续航、毫升、分贝、覆盖面积、防水、认证……）都需要用户放进文件夹的文字作来源，没有就会被 `check_treatment` 拦下；室内用词配户外画面（或反之）也会被拦下。报告会列出用户还需提供的东西：名称、Logo、README 或规格表、联系方式。AI 生成的渲染图、带乱码界面的视频会被标明，不当作真实素材呈现。
 
 ### Brief（可选，但会让一切更好）
 把 `templates/brief.example.json` 复制为素材文件夹里的 `brief.json`。autofilm 会用到：

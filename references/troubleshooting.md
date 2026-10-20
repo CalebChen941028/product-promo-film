@@ -18,7 +18,7 @@ English first, 中文在后。
 | `scenes need N bars but the music has M` | film longer than the music | shorten scenes or `music.extend` |
 | Speech hard to hear | peak normalisation | keep mix_audio.py defaults (RMS −17 dBFS, duck 0.72) |
 | Caption says "three hundred DPI" | spoken text used as caption | add `"cap": "300 DPI"` to that `say` line |
-| Highlight box misses the target | rect measured in the wrong space | rects are in `base` units; measure on `grid_overlay.py` output |
+| Highlight box misses the target | rect measured in the wrong space | rects are in `base` units; start from `suggest_rects.py` (autofilm pre-fills them), check on `grid_overlay.py` output |
 | Dialog won't close during capture | app ignores Escape | new browser context per scenario, or click its close button |
 | User pasted a real API key | — | do not enter it anywhere; suggest revoking it; use the local/mock route |
 | Final render is slow | motion blur renders 4 samples per frame | use `--draft` while iterating; `"cinema": {"motion_blur": 2}` for a faster final |
@@ -46,7 +46,7 @@ English first, 中文在后。
 | 报“场景需要 N 小节，音乐只有 M 小节” | 片子比音乐长 | 缩短场景，或用 `music.extend` |
 | 人声听不清 | 按峰值归一化 | 保持 mix_audio.py 默认值（RMS −17 dBFS，闪避 0.72） |
 | 字幕出现 "three hundred DPI" | 字幕直接用了念出来的文字 | 给该句加 `"cap": "300 DPI"` |
-| 高亮框没对准 | 坐标量错了空间 | rect 用 `base` 单位，在 `grid_overlay.py` 的网格图上量 |
+| 高亮框没对准 | 坐标量错了空间 | rect 用 `base` 单位；先用 `suggest_rects.py`（autofilm 已预填），再在 `grid_overlay.py` 的网格图上核对 |
 | 采集时弹窗关不掉 | 应用不响应 Escape | 每个场景开新的浏览器上下文，或点关闭按钮 |
 | 用户在对话里发了真实 API Key | — | 不要填写到任何地方，建议对方吊销，改走本地 / mock 路线 |
 | 终版渲染很慢 | 运动模糊每帧渲染 4 次 | 调试时用 `--draft`；或 `"cinema": {"motion_blur": 2}` 加快终版 |

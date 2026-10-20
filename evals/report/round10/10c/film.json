@@ -1,0 +1,137 @@
+{
+ "_how": "Written from treatment.md (crew). Next: python3 <skill>/scripts/make_film.py film.json --stage check",
+ "name": "humidifier-film",
+ "out": "film_out",
+ "materials": "../../materials/humidifier",
+ "genre": "travel-hospitality-living",
+ "style": "natural-fresh",
+ "motion": "gentle-story",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "ambient-air",
+   "bpm": 88
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a",
+  "python": "~/.venvs/kokoro/bin/python",
+  "espeak_data": "~/.cache/kes"
+ },
+ "brand": {
+  "name": "Humidifier",
+  "nameAccent": "",
+  "logo": "placeholder-logo.png",
+  "positioningZh": "加湿器 · 柔雾",
+  "positioningEn": "HUMIDIFIER · SOFT MIST",
+  "taglineZh": "哪里坐下，哪里就有柔雾",
+  "taglineEn": "Soft air, wherever you sit.",
+  "motto": [
+   "哪里坐下，",
+   "哪里就有柔雾。",
+   "Sit down. The mist is already rising."
+  ],
+  "contacts": [],
+  "chips": []
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_7qz0iq7qz0iq7qz0.jpeg",
+   "base": [1920, 1072],
+   "frame": "photo",
+   "focus": [1060, 300, 460, 620],
+   "name": false,
+   "say": [
+    {
+     "en": "Before anyone speaks, the mist is already rising.",
+     "zh": "还没人开口，雾已经升起。",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "photo",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+   "base": [1920, 1072],
+   "title": {
+    "zh": "窗边书桌",
+    "en": "By the window, a desk"
+   },
+   "say": [
+    {
+     "en": "Pages turn slowly beside the window. The mist rises with them.",
+     "zh": "书页在窗边慢慢翻，雾跟着升起。"
+    }
+   ]
+  },
+  {
+   "type": "detail",
+   "bars": 2,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_rhr16lrhr16lrhr1.jpeg",
+   "base": [1920, 1072],
+   "crops": [
+    {"rect": [770, 180, 400, 220]},
+    {"rect": [700, 560, 240, 110]}
+   ],
+   "say": [
+    {
+     "en": "A fine mesh crown. Three quiet controls, in rose gold.",
+     "zh": "细密的网罩，三个安静的按键，玫瑰金色。"
+    }
+   ]
+  },
+  {
+   "type": "hero",
+   "bars": 3,
+   "media": "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg",
+   "base": [1920, 1072],
+   "title": {
+    "zh": "加湿器",
+    "en": "Humidifier"
+   },
+   "say": [
+    {
+     "en": "The same soft mist, now on a sideboard by the sofa.",
+     "zh": "同一缕柔雾，此刻落在沙发旁的矮柜上。"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "media": [
+    "../../materials/humidifier/Gemini_Generated_Image_7qz0iq7qz0iq7qz0.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_eus5wheus5wheus5.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_rhr16lrhr16lrhr1.jpeg",
+    "../../materials/humidifier/Gemini_Generated_Image_vhvjcbvhvjcbvhvj.jpeg"
+   ],
+   "image": "../../materials/humidifier/Gemini_Generated_Image_7qz0iq7qz0iq7qz0.jpeg",
+   "base": [1920, 1072],
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Humidifier. Soft air, wherever you sit.",
+     "zh": "加湿器：哪里坐下，哪里就有柔雾。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Sit down. The mist is already rising.",
+     "zh": "坐下吧，雾已经升起。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}
