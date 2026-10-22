@@ -37,7 +37,23 @@ TYPES = {
     # any product: photographs, cut-outs (transparent PNG), people and places
     'photo': (2, ['media'], {}), 'hero': (3, ['media'], {}), 'detail': (2, ['media'], {'crops': 4}),
     'lineup': (2, ['items'], {'items': 6}), 'quote': (2, ['zh', 'who'], {}),
+    # motion graphics built in code (story glue; no materials): a journey map, many-into-one, kinetic type, a real chart
+    'footage': (2, ['media'], {}),   # real camera footage (.webm from intake), full-bleed or framed
+    'custom': (1, ['fn'], {}),       # the director's cut: a scene the film writes itself (film.json "scripts"; references/custom-scenes.md)
+    'flow': (2, ['steps'], {'steps': 5}), 'hub': (3, ['items'], {'items': 6}), 'type': (2, ['lines'], {'lines': 4}), 'chart': (3, ['data'], {'data': 8}),
 }
+
+
+def resolve_flow(spec):
+    """A flow with "steps": "chapters" maps the film's own chapters (in order, once each), so the map always agrees."""
+    chs, seen = [], set()
+    for sc in spec.get('scenes', []):
+        c = sc.get('chapter')
+        if c and c[0] not in seen: seen.add(c[0]); chs.append({'zh': c[1], 'en': c[2]})
+    for sc in spec.get('scenes', []):
+        if sc.get('type') == 'flow' and sc.get('steps') == 'chapters':
+            sc['steps'] = chs[:5]
+            sc['_from_chapters'] = True
 GENRES = json.load(open(Path(__file__).resolve().parent.parent / 'templates' / 'genres.json'))['genres']
 REST_BARS = 5   # legacy constant; use rest_bars(bpm)
 
@@ -46,7 +62,9 @@ def rest_bars(bpm):
     """End-card length when the music is composed: about 8 s (3–4 bars), plus one ring-out bar. Longer is dead air."""
     return max(3, round(8 / (240 / float(bpm or 100))))
 MOODS = ['cold', 'neutral', 'peak', 'warm', 'night']
-CUT_TYPES = ['style', 'whip', 'push']
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import director as DIR   # noqa: E402  (the shot plan: layouts, camera moves, cuts — scripts/director.py)
+CUT_TYPES, CAMERAS, LAYOUTS, FEATURE_W = DIR.CUT_TYPES, DIR.CAMERAS, DIR.LAYOUTS, DIR.FEATURE_W
 LOOKS = ['teal-night', 'clean-bright', 'bleach-print', 'pastel-glow', 'neon-night', 'warm-print', 'noir-gold', 'sunlit', 'teal-orange', 'none']
 errors, warns = [], []
 
@@ -62,13 +80,22 @@ def style_profile(style):
     return out
 
 
-def resolve_look(spec):
-    """Fill style/motion from the genre when they are "auto" or missing (genres.json), in place."""
+def resolve_look(spec, base_dir=None):
+    """Fill style/motion when they are "auto" or missing: the director's look.py on the materials, in place."""
     g = GENRES.get(spec.get('genre') or '', None)
-    if spec.get('style') in (None, '', 'auto'):
-        spec['style'] = g['style'][0] if g else 'midnight-tech'
-    if spec.get('motion') in (None, 'auto'):
-        spec['motion'] = g['motion'] if g else ''
+    if spec.get('style') in (None, '', 'auto') or spec.get('motion') in (None, 'auto'):
+        lk = None
+        try:   # the director reads the materials (scripts/look.py); only when there is nothing to read does the genre's first look stand in
+            import look as LOOK, json as _j
+            man = Path(base_dir or '.') / 'build' / 'manifest.json'
+            m_ = _j.load(open(man)) if man.exists() else {}
+            if m_.get('items') and Path(m_.get('materials', '')).is_dir(): lk = LOOK.choose(m_['items'], m_['materials'], spec.get('genre') or '', '', '')
+        except Exception:
+            lk = None
+        if spec.get('style') in (None, '', 'auto'):
+            spec['style'] = lk['style'] if lk else (g['style'][0] if g else 'midnight-tech')
+        if spec.get('motion') in (None, 'auto'):
+            spec['motion'] = lk['motion'] if lk else (g['motion'] if g else '')
     return spec
 
 
@@ -106,7 +133,8 @@ def cinema_spec(spec):
             'bloom': sp['bloom'] if c.get('bloom', 'auto') == 'auto' else float(c['bloom']),
             'grain': sp['grain'] if c.get('grain', 'auto') == 'auto' else float(c['grain']),
             'motion_blur': int(c.get('motion_blur', 4)), 'sfx': c.get('sfx', 'auto'), 'sfx_gain_db': float(c.get('sfx_gain_db', -2)),
-            'lens': c.get('lens', {}), 'motion': spec.get('motion') or sp['motionDefault'] or 'cinematic-3d'}
+            'lens': c.get('lens', {}), 'motion': spec.get('motion') or sp['motionDefault'] or 'cinematic-3d',
+            'like': ((spec.get('motions') or {}).get(spec.get('motion') or '') or {}).get('like')}
 
 
 def err(msg, fix): errors.append(f'ERROR {msg}\n  FIX: {fix}')
@@ -216,13 +244,106 @@ def run(cmd, **kw):
 
 
 # ---------------------------------------------------------------- check
+def script_names(spec, base_dir, registry):
+    """Names the film's own scripts register: CUSTOM.x / CAMERA.x / CUT.x = … (or CUT['x'] = …)."""
+    src = ''.join((base_dir / p_).read_text() for p_ in spec.get('scripts', []) or [] if (base_dir / p_).exists())
+    return {a or b for a, b in re.findall(registry + r'\s*(?:\.\s*(\w+)|\[\s*[\'"]([\w-]+)[\'"]\s*\])\s*=(?!=)', src)}
+
+
+def material_roles(base_dir):
+    """intake's role per material (desktop/phone/photo/cutout…), when autofilm/intake ran."""
+    man = base_dir / 'build' / 'manifest.json'
+    if not man.exists(): return {}
+    m = json.load(open(man))
+    return {str((Path(m['materials']) / it['file']).resolve()): it.get('role') for it in m.get('items', [])}
+
+
+def pad169(r, base, k=1.0, min_frac=0.0):
+    """Python twin of patterns.js padTo169: the 16:9 crop the film actually shows around a region."""
+    x, y, w, h = r
+    W = min(max(w * k, h * k * 16 / 9, base[0] * min_frac), base[0])
+    return W
+
+
+_PX = {}
+
+
+def px_width(path):
+    if path not in _PX:
+        try:
+            from PIL import Image
+            _PX[path] = Image.open(path).size[0]
+        except Exception:
+            _PX[path] = None
+    return _PX[path]
+
+
+def sharpness(spec, base_dir, plan, roles):
+    """How far each picture is enlarged on screen (display px ÷ source px). Above 1.5× it looks soft; a whole dense
+    screen shown small cannot be read. Returns warnings (msg, fix)."""
+    out = []
+    FIX = ('capture at 2× (3840 wide — capture_app.mjs does), give the zoom a wider region, or a layout that shows it '
+           'smaller; never upscale a small crop to fill the frame')
+    for i, (sc, p_) in enumerate(zip(spec.get('scenes', []), plan)):
+        t, base = sc.get('type'), sc.get('base') or [1920, 1080]
+        def look(m, disp, crop_w=None, what=''):
+            if not m or not str(m).lower().endswith(('.png', '.jpg', '.jpeg', '.webp')): return
+            pw = px_width(base_dir / m)
+            if not pw: return
+            bw = base[0] if sc.get('base') or roles.get(str((base_dir / m).resolve())) in ('desktop', 'figure', 'phone') else pw
+            src = pw * (crop_w or bw) / bw
+            up = disp / max(1, src)
+            if up > 1.5:
+                out.append((f'scenes[{i}] ({t}){what}: {Path(m).name} is enlarged {up:.1f}× ({src:.0f} source px fill {disp:.0f} px) — it will look soft', FIX))
+        m = sc.get('media') if isinstance(sc.get('media'), str) else None
+        if t == 'feature' and m:
+            w = FEATURE_W.get(p_['layout'] or '', 1320)
+            look(m, w, None, ' whole')
+            rects = [pt['rect'] for pt in sc.get('points', []) if pt.get('rect')]
+            if rects: look(m, w, min(pad169(r, base, 2.2, 0.42) for r in rects), ' zoomed to a point')
+        elif t == 'detail' and m:
+            disp = 960 if p_['layout'] == 'split' else 1920
+            for c in sc.get('crops', []) or []:
+                if c.get('rect'): look(m, disp, pad169(c['rect'], base, 1.0, 0.36), ' close-up')
+        elif t == 'cover' and m:
+            look(m, 1920, None, ' full frame')
+            if sc.get('focus'): look(m, 1920, pad169(sc['focus'], base, 1.0), ' opening on its focus')
+        elif t in ('photo', 'hero') and m:
+            look(m, 1920, None)
+        elif t == 'carousel':
+            for j, pnl in enumerate(sc.get('panels', [])):
+                c = pnl.get('crop'); pb = pnl.get('base') or [1920, 1080]
+                if c: look(pnl.get('media'), min(1000, 680 / c[3] * c[2]), c[2] * base[0] / pb[0], f'.panels[{j}]')
+        elif t == 'gallery':
+            for j, it in enumerate(sc.get('items', [])):
+                mm = it.get('media') if isinstance(it, dict) else None
+                if mm and roles.get(str((base_dir / mm).resolve())) == 'desktop' and not chart_media(base_dir, {'media': mm}):
+                    out.append((f'scenes[{i}] (gallery).items[{j}]: {Path(mm).name} is a whole dense screen on a small card — its text is unreadable',
+                                'a gallery is for outputs (plots, reports, photos); show a dense screen in a feature that zooms, or crop it first'))
+    return out
+
+
 def check(spec, base_dir):
     if spec.get('genre') and spec['genre'] != 'auto' and spec['genre'] not in GENRES:
         err(f"genre '{spec['genre']}' unknown", f'use one of {list(GENRES)} (scripts/genres.py --list)')
-    resolve_look(spec)
+    resolve_look(spec, base_dir)
     if spec.get('style') not in STYLES:
         err(f"style '{spec.get('style')}' unknown", f'use one of {STYLES} (scripts/recommend_style.py suggests one)')
-    if spec.get('motion') and spec['motion'] not in MOTIONS:
+    pal = spec.get('palette')
+    if pal:
+        import palette as PAL
+        bad = [k for k in ('accent', 'accent2') if pal.get(k) and not re.fullmatch(r'#[0-9a-fA-F]{6}', str(pal[k]))]
+        if bad: err(f'palette.{bad[0]} = {pal[bad[0]]!r}', 'use a hex colour like "#2ee6c5" (or remove "palette" to keep the style\'s)')
+        elif pal.get('accent') and spec.get('style') in STYLES:
+            c = PAL.contrast(PAL.rgb_of(pal['accent']), PAL.rgb_of(PAL.style_bg(spec['style'])[0]))
+            if c < 3.0: warn(f'palette.accent {pal["accent"]} has {c:.1f}:1 contrast with the {spec["style"]} background (< 3:1)',
+                             f'python3 scripts/palette.py <materials> --genre {spec.get("genre") or "<genre>"} --style {spec["style"]} suggests a legible tone of the same hue')
+    for p_ in spec.get('css', []) or []:
+        if not (base_dir / p_).exists(): err(f'css not found: {p_}', '"css" paths are relative to film.json')
+    own_motions = set((spec.get('motions') or {}).keys())
+    for mid, m in (spec.get('motions') or {}).items():
+        if m.get('like') and m['like'] not in MOTIONS: err(f'motions.{mid}.like = {m["like"]!r}', f'build on one of {MOTIONS}')
+    if spec.get('motion') and spec['motion'] not in MOTIONS and spec['motion'] not in own_motions:
         err(f"motion '{spec.get('motion')}' unknown", f"use one of {MOTIONS} or leave it empty for the style's default")
     b = spec.get('brand', {})
     for k in ['name', 'logo', 'positioningZh', 'positioningEn']:
@@ -264,11 +385,12 @@ def check(spec, base_dir):
         warn('first scene is not a cover', 'put {"type": "cover", "bars": 3} first — the cover frame is also the poster')
     if scenes and scenes[-1].get('type') != 'endcard':
         warn('last scene is not an endcard', 'end with {"type": "endcard", "bars": "rest"}')
-    roles = {}   # intake's role per material (desktop/phone/photo/cutout…), when autofilm/intake ran
-    man = base_dir / 'build' / 'manifest.json'
-    if man.exists():
-        m = json.load(open(man))
-        roles = {str((Path(m['materials']) / it['file']).resolve()): it.get('role') for it in m.get('items', [])}
+    roles = material_roles(base_dir)
+    own_cuts, own_cams = script_names(spec, base_dir, 'CUT'), script_names(spec, base_dir, 'CAMERA')
+    plan, design_warns = DIR.plan_shots(spec, base_dir, roles)
+    for i, msg, fix in design_warns: warn(f'scenes[{i}] ({scenes[i].get("type")}): {msg}', fix)
+    for msg, fix in sharpness(spec, base_dir, plan, roles): warn(msg, fix)
+    for i, msg, fix in DIR.rect_warnings(spec, base_dir): warn(f'scenes[{i}] ({scenes[i].get("type")}): {msg}', fix)
     for i, sc in enumerate(scenes):
         t, where = sc.get('type'), f'scenes[{i}] ({sc.get("type")})'
         if t not in TYPES:
@@ -278,11 +400,35 @@ def check(spec, base_dir):
             err(f"{where}: mood '{sc['mood']}' unknown", f'use one of {MOODS} (colour script, references/director.md)')
         if 'hit' in sc and sc['hit'] not in (True, False, 'hero'):
             err(f"{where}: hit = {sc['hit']!r}", 'use true, false, or "hero" (the one biggest beat of the film)')
-        if sc.get('cut') and sc['cut'] not in CUT_TYPES:
-            err(f"{where}: cut '{sc['cut']}' unknown", f'use one of {CUT_TYPES}')
+        if sc.get('cut') and sc['cut'] not in CUT_TYPES and sc['cut'] not in own_cuts:
+            err(f"{where}: cut '{sc['cut']}' unknown", f'use one of {CUT_TYPES}, or define CUT.{sc["cut"]} in a film script (references/custom-scenes.md)')
+        if sc.get('camera') and sc['camera'] not in CAMERAS and sc['camera'] not in own_cams:
+            err(f"{where}: camera '{sc['camera']}' unknown", f'use one of {CAMERAS}, or define CAMERA.{sc["camera"]} in a film script (references/custom-scenes.md)')
+        if sc.get('motion') and sc['motion'] not in MOTIONS and sc['motion'] not in own_motions:
+            err(f"{where}: motion '{sc['motion']}' unknown", f'use one of {MOTIONS} (this scene only; the film keeps its own)')
+        if sc.get('layout') and sc['layout'] not in LAYOUTS.get(t, []):
+            err(f"{where}: layout '{sc['layout']}' unknown for {t}", f'use one of {LAYOUTS.get(t) or "— (this type has one layout)"}')
         bars = sc.get('bars')
         if bars != 'rest' and (not isinstance(bars, (int, float)) or bars < mn):
             err(f'{where}: bars={bars} (minimum {mn})', f'set "bars" to ≥ {mn} (1 bar = 4 beats; 120 BPM → 2 s)')
+        if t == 'custom':
+            srcs = ''.join((base_dir / p_).read_text() for p_ in spec.get('scripts', []) or [] if (base_dir / p_).exists())
+            for p_ in spec.get('scripts', []) or []:
+                if not (base_dir / p_).exists(): err(f'script not found: {p_}', '"scripts" paths are relative to film.json')
+            if sc.get('fn') and not re.search(r'CUSTOM\s*(?:\.\s*' + re.escape(sc['fn']) + r'|\[\s*[\'"]' + re.escape(sc['fn']) + r'[\'"]\s*\])\s*=', srcs):
+                err(f'{where}: custom scene "{sc["fn"]}" is not defined', f'define CUSTOM.{sc["fn"]} = (start, end, o) => {{ scene(start, end, init, update); }} in a file listed in "scripts" (references/custom-scenes.md)')
+            for k, v in (sc.get('assets') or {}).items():
+                if not (base_dir / v).exists(): err(f'{where}: assets.{k} not found: {v}', 'paths are relative to film.json')
+        if t == 'compare' and isinstance(bars, (int, float)) and (bars > 8 or len(sc.get('rows', [])) > 5):
+            warn(f'{where}: a comparison of {len(sc.get("rows", []))} rows held {bars} bars reads as a slide',
+                 'keep the 3–4 rows that prove the proposition, ≤ 8 bars (a row per bar); the rest belongs in the docs, not the film')
+        if t == 'flow' and sc.get('_from_chapters') and len(sc.get('steps', [])) < 2:
+            err(f'{where}: "steps": "chapters" but the film has {len(sc.get("steps", []))} chapter(s)', 'give the scenes "chapter" labels, or list the steps')
+        if t == 'chart':
+            if not all(isinstance(x, dict) and isinstance(x.get('value'), (int, float)) and x.get('label') for x in sc.get('data', [])):
+                err(f'{where}: every chart datum needs a "label" and a numeric "value"', 'data: [{"label": "2024", "value": 12}, …] — real numbers from the docs')
+            elif len(sc.get('data', [])) < 2:
+                err(f'{where}: a chart needs ≥ 2 values', 'show one number with a "numbers" scene instead')
         if t == 'feature' and isinstance(bars, (int, float)) and bars < 1 + len(sc.get('points', [])):
             err(f'{where}: {len(sc.get("points", []))} points need ≥ {1 + len(sc.get("points", []))} bars', 'add bars or remove points')
         for k in req:
@@ -303,7 +449,7 @@ def check(spec, base_dir):
         for m in filter(None, media):
             if not (base_dir / m).exists():
                 err(f'{where}: media not found: {m}', 'path is relative to film.json; run intake.py and use its paths')
-            elif t == 'clip' and not m.endswith('.webm'):
+            elif t in ('clip', 'footage') and not m.endswith('.webm'):
                 err(f'{where}: clip must be .webm (Chromium cannot decode H.264)', 'run intake.py — it converts videos to build/clips/*.webm')
         basewh = sc.get('base', [1920, 1080])
         # holds that read as empty: silent texture, one object held long, a spec list on a photo card, a cold open on a texture
@@ -314,10 +460,9 @@ def check(spec, base_dir):
         if t == 'feature' and sc.get('frame') == 'photo' and len(sc.get('points', [])) > 2:
             warn(f'{where}: {len(sc["points"])} points on a photo', 'a spec list dilutes the idea: keep ≤ 2 points that serve it, or use a "photo" scene with one line')
         # legibility: UI text on a whole dense screen is too small at film scale (≥ 18 px at 1080p is the floor)
-        FEATURE_W = {'cinematic-3d': 1320, 'precision-data': 1120, 'kinetic-launch': 1400, 'gentle-story': 1120, 'playful-pop': 1180, 'editorial-type': 1000}
         is_screen = isinstance(sc.get('media'), str) and roles.get(str((base_dir / sc['media']).resolve())) in ('desktop', 'figure') and not chart_media(base_dir, sc)
         if t == 'feature' and is_screen and sc.get('frame') != 'photo':
-            px = 13 * FEATURE_W.get(spec.get('motion') or '', 1400) / basewh[0]
+            px = 13 * FEATURE_W.get(plan[i]['layout'] or '', 1400) / basewh[0]
             if px < 18 and any(not p.get('rect') and not p.get('focus') for p in sc.get('points', [])):
                 warn(f'{where}: a point on the whole screen — UI text renders at ~{px:.0f} px (< 18)', 'give the point a rect (suggest_rects.py) so the beat zooms to a readable region, or a "focus" crop')
         if t == 'carousel':
@@ -435,9 +580,22 @@ def build(spec, base_dir, out):
     # copy engine + media, lay scenes on bars, collect narration
     for f in ['film.html', 'engine.js', 'cinema.js', 'patterns.js', 'library.js']:
         shutil.copy(TPL / f, film / f)
+    # the film's own look (film.json "css"): copied next to film.html, linked after the style
+    css_links = []
+    for k, p_ in enumerate(spec.get('css', []) or []):
+        dst = film / f'look-{k}-{Path(p_).name}'; shutil.copy(base_dir / p_, dst); css_links.append(dst.name)
+    # the director's cut: the film's own scene scripts, after the library (CUSTOM.<name> = (start, end, o) => {…})
+    (film / 'custom.js').write_text("'use strict';\n" + '\n'.join(f'// ---- {p}\n' + (base_dir / p).read_text() for p in spec.get('scripts', []) or []) + '\n')
     for f in (TPL / 'styles').glob('*'):
         shutil.copy(f, film / 'styles' / f.name)
     copied = {}
+
+    # pictures the film zooms into (focus, crops, highlight zooms, detail close-ups, the hero's rise): keep full resolution
+    zoomed = set()
+    for sc in spec['scenes']:
+        if sc.get('focus') or sc.get('crop') or sc.get('crops') or sc['type'] in ('detail', 'cover', 'photo', 'hero') or any(p_.get('rect') or p_.get('focus') for p_ in sc.get('points', [])):
+            zoomed |= {m for m in ([sc.get('media')] if isinstance(sc.get('media'), str) else []) + [sc.get('image')] if m}
+        zoomed |= {p_.get('media') for p_ in sc.get('panels', []) if p_.get('crop')}
 
     def media(p, trim=False):
         if not p: return p
@@ -456,8 +614,9 @@ def build(spec, base_dir, out):
                         pad = int(0.04 * max(bb[2] - bb[0], bb[3] - bb[1]))
                         im = im.crop((max(0, bb[0] - pad), max(0, bb[1] - pad), min(im.width, bb[2] + pad), min(im.height, bb[3] + pad)))
                         im.save(dst); copied[key] = 'media/' + dst.name; return copied[key]
-                if im.width > 2400 and im.width >= im.height:
-                    im = im.resize((2400, round(im.height * 2400 / im.width)), Image.LANCZOS)
+                cap = 3840 if p in zoomed else 2400   # a zoomed picture keeps its pixels: a 2× capture stays sharp at 2× zoom
+                if im.width > cap and im.width >= im.height:
+                    im = im.resize((cap, round(im.height * cap / im.width)), Image.LANCZOS)
                     im.save(dst, quality=92) if dst.suffix.lower() in ('.jpg', '.jpeg') else im.save(dst)
                 else:
                     shutil.copy(src, dst)
@@ -467,11 +626,12 @@ def build(spec, base_dir, out):
         return copied[key]
     brand = dict(spec['brand']); brand['logo'] = media(brand['logo'])
     lines, calls, chapters, b0, segs = [], [], [], 0, []
+    plan, _ = DIR.plan_shots(spec, base_dir, material_roles(base_dir))
     for i, sc in enumerate(spec['scenes']):
         nb = each_rest if sc.get('bars') == 'rest' else sc['bars']
         b1 = b0 + nb
         segs.append((sc, b0, b1))
-        o = {k: v for k, v in sc.items() if k not in ('type', 'bars', 'say', 'chapter', 'mood', 'cut', 'hit', 'energy')}
+        o = {k: v for k, v in sc.items() if k not in ('type', 'bars', 'say', 'chapter', 'mood', 'cut', 'hit', 'energy', 'layout', 'camera', 'motion')}
         if sc['type'] in ('hero', 'lineup') and 'cutout' not in o:   # transparent PNG → stand it on the stage
             first = ([sc.get('media')] if isinstance(sc.get('media'), str) else (sc.get('media') or [])) + [it.get('media') for it in sc.get('items', [])]
             o['cutout'] = bool(first and first[0] and has_alpha(base_dir / first[0]))
@@ -483,7 +643,16 @@ def build(spec, base_dir, out):
         for p in o.get('panels', []): p['media'] = media(p['media'])
         for it in o.get('items', []):
             if isinstance(it, dict) and it.get('media'): it['media'] = media(it['media'], tr)
-        calls.append(f"LIB.{sc['type']}(bar({b0}), {'CONFIG.DUR' if i == len(spec['scenes']) - 1 else f'bar({b1})'}, {json.dumps(o, ensure_ascii=False)});")
+        sh = {k: v for k, v in plan[i].items() if k in ('layout', 'camera', 'motion') and v}
+        sh.update({k: sc[k] for k in ('offset', 'rate') if isinstance(sc.get(k), (int, float))})   # where footage plays from
+        calls.append(f"shot({json.dumps(sh, ensure_ascii=False)});")
+        if sc['type'] == 'custom':
+            for k, v in list((o.get('assets') or {}).items()): o['assets'][k] = media(v)   # pictures a custom scene uses
+            o.pop('fn', None)
+            calls.append(f"if (!CUSTOM[{json.dumps(sc['fn'])}]) throw new Error('custom scene {sc['fn']} is not defined in the film\\'s scripts');")
+            calls.append(f"CUSTOM[{json.dumps(sc['fn'])}](bar({b0}), {'CONFIG.DUR' if i == len(spec['scenes']) - 1 else f'bar({b1})'}, {json.dumps(o, ensure_ascii=False)});")
+        else:
+            calls.append(f"LIB.{sc['type']}(bar({b0}), {'CONFIG.DUR' if i == len(spec['scenes']) - 1 else f'bar({b1})'}, {json.dumps(o, ensure_ascii=False)});")
         if sc.get('chapter'):
             n, zh, en = sc['chapter']; chapters.append([b0, b1, n, zh, en])
         says = sc.get('say', [])
@@ -498,13 +667,14 @@ def build(spec, base_dir, out):
         else: merged.append(c)
     onscreen = [l['id'] for l in lines if l['id'] in ('tagline', 'motto')]
     cin = cinema_spec(spec)
-    cin_cfg, cues = direct(cin, segs, G, BAR, dur)
+    cin_cfg, cues = direct(cin, segs, G, BAR, dur, plan)
+    print(DIR.shot_table(spec, plan))
     cfg = {'STYLE': spec['style'], 'MOTION': spec.get('motion', ''), 'G': G, 'BAR': BAR, 'DUR': round(dur, 3), 'FADE_OUT': 2.6,
            'CHORUS_BARS': chorus, 'CHAPTERS': merged, 'ONSCREEN': onscreen, 'SHOTS': 'media/', 'ASSETS': 'media/', 'BRAND': brand,
-           'CINEMA': cin_cfg}
+           'MOTIONS_EXTRA': spec.get('motions') or {}, 'CSS': css_links, 'CINEMA': cin_cfg, 'PALETTE': {k: v for k, v in (spec.get('palette') or {}).items() if k in ('accent', 'accent2')}}
     json.dump(cues, open(aud / 'sfx_cues.json', 'w'), indent=1)
     (film / 'config.js').write_text('const CONFIG = ' + json.dumps(cfg, ensure_ascii=False, indent=1) + ';\nconst bar = (b) => CONFIG.G + CONFIG.BAR * b;\nObject.assign(window, { CONFIG, bar });\n')
-    (film / 'scenes.js').write_text("'use strict';\n// generated by make_film.py from film.json — edit film.json, not this file\n" + '\n'.join(calls) + '\n')
+    (film / 'scenes.js').write_text("'use strict';\n// generated by make_film.py from film.json — edit film.json, not this file\n" + '\n'.join(calls) + '\nshot({});\n')
     lines.sort(key=lambda l: l['bar'])
     json.dump(lines, open(out / 'narration.json', 'w'), ensure_ascii=False, indent=1)
     if not (film / 'vo_timing.js').exists():  # captions-only placeholder until the vo stage runs
@@ -521,7 +691,7 @@ def build(spec, base_dir, out):
     if cin['on']:
         print(f"cinema: grade {cin['grade']} ×{cin['grade_strength']} · bloom {cin['bloom']} · grain {cin['grain']} · motion blur {cin['motion_blur']} · "
               f"{len(cin_cfg['hits'])} hits · cuts {sum(c != 'style' for c in cin_cfg['cuts'])} camera · {len(cues)} sound cues")
-    print(f'built {len(calls)} scenes on {b0} bars · music {dur:.1f} s · BPM {grid["bpm"]} · {len(lines)} narration lines → {film}/film.html')
+    print(f'built {len(spec["scenes"])} scenes on {b0} bars · music {dur:.1f} s · BPM {grid["bpm"]} · {len(lines)} narration lines → {film}/film.html')
 
 
 # ---------------------------------------------------------------- direction (colour script, hits, cuts, light, sound)
@@ -537,12 +707,12 @@ PALETTE = {
 }
 
 
-def direct(cin, segs, G, BAR, dur):
+def direct(cin, segs, G, BAR, dur, plan=None):
     """The director's pass: moods, hit points, camera cuts, light rays and the sound-design cue sheet."""
     if not cin['on']:
         return {'on': False}, []
     T = lambda b: round(G + BAR * b, 4)
-    mo = cin['motion']; pal = PALETTE.get(mo, PALETTE['cinematic-3d'])
+    mo = cin['motion']; pal = PALETTE.get(mo) or PALETTE.get(cin.get('like') or '', PALETTE['cinematic-3d'])
     moods, hits, rays, cuts, cues = [], [], [], [], []
     # restraint: ONE hero moment carries the flare, the impact and the riser; everything else stays quiet
     types = [sc['type'] for sc, _, _ in segs]
@@ -559,7 +729,8 @@ def direct(cin, segs, G, BAR, dur):
         if hit or hero: hits.append(t0)
         ch = (sc.get('chapter') or [None])[0]
         new_ch = bool(ch and ch != prev_ch)
-        if i == 0: cut = 'style'
+        if plan: cut = plan[i]['cut']   # the shot plan (plan_shots) chose every cut
+        elif i == 0: cut = 'style'
         elif sc.get('cut'): cut = sc['cut']
         elif typ == 'endcard': cut = 'style'
         elif mo == 'kinetic-launch': cut = 'whip' if (hero or new_ch) else 'style'
@@ -724,7 +895,9 @@ if __name__ == '__main__':
     a = ap.parse_args()
     spec_path = Path(a.spec).resolve()
     spec = json.load(open(spec_path))
+    resolve_flow(spec)
     base = spec_path.parent
+    for msg, fix in DIR.resolve_rects(spec, base): err(msg, fix)   # "rect": "@APA 三线表" → the exact panel box
     out = (base / spec.get('out', 'film_out')).resolve()
     out.mkdir(parents=True, exist_ok=True)
     check(spec, base)
@@ -735,6 +908,7 @@ if __name__ == '__main__':
           f'music {"file" if (spec.get("music") or {}).get("file") else "composed " + music_mood(spec)[0]})')
     order = ['build', 'vo', 'qa', 'render', 'finish']
     stages = order if a.stage == 'all' else ([] if a.stage == 'check' else [a.stage])
+    if a.stage == 'check': print(DIR.shot_table(spec, DIR.plan_shots(spec, base, material_roles(base))[0]))
     if 'build' in stages:
         treatment_gate(spec, spec_path)
     for st in stages:

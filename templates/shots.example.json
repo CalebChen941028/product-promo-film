@@ -1,0 +1,169 @@
+{
+  "_how": "Shot list for scripts/capture_app.mjs. Copy it next to your demo data, replace every text with what `capture_app.mjs explore` printed for YOUR app (exact spelling), then: node scripts/capture_app.mjs shoot shots.json. One scenario per film beat; each starts from a fresh launch. Name every shot NN-chapter-what (01-data-import, 05-analysis-result, 06-outputs-plot): the number is the film order, the chapter word groups shots into chapters, and the last words tell autofilm what the shot is (plot/chart/result rank highest, home/settings/save prompts lowest). Aim for 12–25 shots: the film is ~9 s per image, so 8 images make a thin 70 s film. Keep dense screens (results pages, workspaces): the film zooms into readable regions. The run ends with a coverage line: under 12 shots or 3 outputs, add scenarios.",
+  "app": "/Applications/Your App.app",
+  "out": "materials",
+  "profile": "copy",
+  "storage": {},
+  "mock_llm": null,
+  "macros": {
+    "load": [
+      {
+        "upload": "data/demo.csv"
+      },
+      {
+        "click": "Import"
+      },
+      {
+        "wait_for": "Variables",
+        "timeout": 120000
+      }
+    ]
+  },
+  "scenarios": [
+    {
+      "name": "start",
+      "_why": "The first screen and the moment the user's own data arrives: the film's 'before → after' starts here.",
+      "steps": [
+        {
+          "shot": "01-data-home"
+        },
+        {
+          "upload": "data/demo.csv"
+        },
+        {
+          "click": "Import"
+        },
+        {
+          "wait_for": "Variables",
+          "timeout": 120000
+        },
+        {
+          "shot": "02-data-recognised"
+        }
+      ]
+    },
+    {
+      "name": "work",
+      "_why": "The core job, one step per shot: pick a method, assign inputs, run. Tight, readable panels beat the whole window.",
+      "steps": [
+        {
+          "use": "load"
+        },
+        {
+          "click": "Analyse"
+        },
+        {
+          "shot": "03-analysis-workspace"
+        },
+        {
+          "click": "t-test",
+          "exact": false
+        },
+        {
+          "shot": "04-analysis-method"
+        },
+        {
+          "click": "Run"
+        },
+        {
+          "wait_for": "Results",
+          "timeout": 180000
+        },
+        {
+          "shot": "05-analysis-result"
+        }
+      ]
+    },
+    {
+      "name": "analysis-2",
+      "_why": "Breadth: repeat this scenario for each feature family the product is known for (3–5 analyses or jobs), each run to its result and its enlarged output. Copy it, change the method and the inputs, and number the shots on.",
+      "steps": [
+        {
+          "use": "load"
+        },
+        {
+          "click": "Analyse"
+        },
+        {
+          "click": "Survival analysis",
+          "exact": false
+        },
+        {
+          "click": "time"
+        },
+        {
+          "click": "Time variable"
+        },
+        {
+          "click": "Run"
+        },
+        {
+          "wait_for": "Results",
+          "timeout": 180000
+        },
+        {
+          "click": "Enlarge",
+          "exact": false
+        },
+        {
+          "shot": "06-analysis-survival-plot"
+        }
+      ]
+    },
+    {
+      "name": "outputs",
+      "_why": "The hero lives here: the real output the user takes away (plot, table, report). Enlarge it before the shot. The download step saves the product's own export on this computer; it is not an internet download.",
+      "steps": [
+        {
+          "use": "load"
+        },
+        {
+          "click": "Run"
+        },
+        {
+          "wait_for": "Results",
+          "timeout": 180000
+        },
+        {
+          "click": "Enlarge",
+          "exact": false
+        },
+        {
+          "shot": "07-outputs-plot"
+        },
+        {
+          "key": "Escape"
+        },
+        {
+          "download": "Export report",
+          "file": "08-outputs-report.docx"
+        }
+      ]
+    },
+    {
+      "name": "ai",
+      "_why": "Only if the product has AI features and the user did not set a model up. mock_llm must be set above, with replies written from the REAL results of this demo data; tell the user the AI text was scripted.",
+      "steps": [
+        {
+          "click": "Ask AI",
+          "exact": false
+        },
+        {
+          "type": "Which test should I use to compare two groups?",
+          "into": "Ask"
+        },
+        {
+          "key": "Enter"
+        },
+        {
+          "wait_for": "t-test",
+          "timeout": 60000
+        },
+        {
+          "shot": "09-ai-answer"
+        }
+      ]
+    }
+  ],
+  "_mock_llm": "For AI features with no model set up: \"mock_llm\": {\"port\": 11434, \"replies\": \"replies.json\"} and seed \"storage\" with the app's AI settings key (explore prints it) pointing at http://localhost:11434/v1 with an empty key."
+}

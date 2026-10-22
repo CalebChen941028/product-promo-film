@@ -25,6 +25,7 @@ def read_docs(folder, limit=60000):
     if not folder:
         return ''
     for p in sorted(Path(folder).rglob('*')):
+        if p.name.endswith('.regions.json'): continue   # capture_app's panel maps: screen geometry, not the product's docs
         if p.is_file() and p.suffix.lower() in TEXT_EXT and p.stat().st_size < 400000 and 'node_modules' not in p.parts:
             try:
                 out.append(p.read_text(errors='ignore')[:20000])

@@ -74,8 +74,26 @@ const MOTIONS = {
   // manifestos / brand / opinionated research: hard slides from the edge, mask-up type, no 3D, thick bars
   'editorial-type': { enter: 'slide', tilt: 0, drift: 0.1, text: 'maskup', hl: 'draw', focus: { dur: 0.4, ease: ex }, camera: 'none', pop: 'snap' },
 };
-const MO_ID = CONFIG.MOTION || ST.motionDefault || 'cinematic-3d';
-const MO = MOTIONS[MO_ID] || MOTIONS['cinematic-3d'];
+// The film has ONE motion language (its grammar); a scene may borrow another for itself ("motion" in film.json).
+// scenes.js calls shot({motion, camera, layout}) before each LIB call; scene() keeps it, and the frame loop switches
+// MO/MO_ID to the scene's own before init and update, so every M.* call inside a scene speaks its language.
+// the film's own motion languages (film.json "motions": {"id": {"like": "gentle-story", enter, text, hl, pop, camera, tilt,
+// drift, focus: {dur, ease}}}): built on a language it names in "like", overriding any of its parts
+const EASES = { eio: (t) => eio(t), eo: (t) => eo(t), ex: (t) => ex(t), esoft: (t) => esoft(t), eback: (t) => eback(t), linear: (t) => t };
+for (const [id, m] of Object.entries(CONFIG.MOTIONS_EXTRA || {})) {
+  const like = MOTIONS[m.like] || MOTIONS['cinematic-3d'], f = Object.assign({}, like.focus, m.focus || {});
+  if (typeof f.ease === 'string') f.ease = EASES[f.ease] || like.focus.ease;
+  MOTIONS[id] = Object.assign({}, like, m, { focus: f });
+}
+// the film's own camera moves and cuts, registered by its scripts (references/custom-scenes.md):
+//   CAMERA.<name> = ({t, lt, dur, p, beat, bar}) => 'css transform'        p = eased 0→1 over the scene
+//   CUT.<name> = ({p, inc}) => ({transform?, opacity?, filter?, clipPath?})  (optional CUT.<name>.len = × crossfade)
+const CAMERA = {}, CUT = {};
+const FILM_MO = MOTIONS[CONFIG.MOTION] ? CONFIG.MOTION : (MOTIONS[ST.motionDefault] ? ST.motionDefault : 'cinematic-3d');
+let MO_ID = FILM_MO, MO = MOTIONS[FILM_MO];
+let SHOT = {};
+function useShot(sh) { MO_ID = (sh && MOTIONS[sh.motion]) ? sh.motion : FILM_MO; MO = MOTIONS[MO_ID]; }
+function shot(o) { SHOT = o || {}; useShot(SHOT); }
 const elastic = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * (2 * Math.PI / 3)) + 1);
 
 const M = {
@@ -133,10 +151,27 @@ const M = {
     for (let i = 1; i < steps.length; i++) { const [t1, b] = steps[i]; const a = prog(lt, t1 - dur, t1); if (a > 0) r = r.map((v, j) => lerp(v, b[j], ease(a))); }
     return r;
   },
-  // per-frame camera on the whole scene (beat-aware). Returns a CSS transform string.
-  camera(t, lt, dur) {
+  // per-frame camera on the whole scene (beat-aware). Returns a CSS transform string. cam = the scene's own move
+  // ("camera" in film.json, chosen by the director) or the motion language's default. Moves are slow and small:
+  // felt, not seen (director.md) — a push is 5 %, a pan 70 px over the whole scene.
+  camera(t, lt, dur, cam) {
     const beat = CONFIG.BAR / 4, ph = (((t - CONFIG.G) % beat) + beat) % beat, barPh = (((t - CONFIG.G) % CONFIG.BAR) + CONFIG.BAR) % CONFIG.BAR;
-    switch (MO.camera) {
+    const p = esoft(prog(lt, 0, dur));
+    if (CAMERA[cam || MO.camera]) return CAMERA[cam || MO.camera]({ t, lt, dur, p, beat: ph, bar: barPh }) || '';
+    switch (cam || MO.camera) {
+      case 'push': return `scale(${(1 + 0.05 * p).toFixed(4)})`;
+      case 'pull': return `scale(${(1.06 - 0.06 * p).toFixed(4)})`;
+      case 'pan-l': return `translateX(${lerp(36, -36, p).toFixed(2)}px) scale(1.03)`;
+      case 'pan-r': return `translateX(${lerp(-36, 36, p).toFixed(2)}px) scale(1.03)`;
+      case 'crane': return `translateY(${lerp(26, -26, p).toFixed(2)}px) scale(1.03)`;
+      case 'tilt': return `rotateX(${lerp(2.2, -1.2, p).toFixed(3)}deg) scale(1.02)`;
+      case 'arc': return `rotateY(${lerp(-2.6, 2.6, p).toFixed(3)}deg) translateX(${lerp(-20, 20, p).toFixed(2)}px)`;
+      // dolly zoom ("vertigo"): the frame pushes in while the 3D depth flattens — space seems to stretch, subject holds
+      case 'vertigo': return `perspective(${lerp(900, 2600, p).toFixed(0)}px) scale(${(1 + 0.07 * p).toFixed(4)})`;
+      // handheld: a slow, small breathing float (two incommensurate sines), never a jitter
+      case 'handheld': return `translate(${(Math.sin(t * 0.9) * 5 + Math.sin(t * 2.3) * 2).toFixed(2)}px, ${(Math.cos(t * 0.7) * 4 + Math.sin(t * 1.9) * 1.5).toFixed(2)}px) rotate(${(Math.sin(t * 0.5) * 0.25).toFixed(3)}deg) scale(1.02)`;
+      // reveal: starts high and close, settles down and out onto the whole frame (a tilt-down reveal)
+      case 'reveal': return `translateY(${lerp(-40, 0, p).toFixed(2)}px) scale(${(1.08 - 0.08 * p).toFixed(4)})`;
       case 'orbit': return `rotateY(${Math.sin(lt * 0.25) * 0.8}deg) rotateX(${Math.cos(lt * 0.2) * 0.4}deg)`;
       case 'punch': return `scale(${1 + 0.028 * Math.exp(-barPh * 7) + 0.008 * Math.exp(-ph * 10)})`;
       case 'dolly': return `scale(${1 + prog(lt, 0, dur) * 0.035})`;
@@ -162,7 +197,8 @@ function win(parent, { srcs, crop, w, base = [1920, 1080], chrome = 'auto', titl
   root.insertAdjacentHTML('beforeend', CHROME[kind] ? CHROME[kind](title) : '');
   const body = div('win-body', root);
   const W = { root, body, layers: [], base };
-  for (const s of [].concat(srcs)) W.layers.push(typeof s === 'string' ? img(s, body, 'shot') : vid(s.video, body, 'shot'));
+  // a .webm path is footage: it plays in place of a still (cover, photo, hero, footage…); scenes seek it each frame
+  for (const s of [].concat(srcs)) W.layers.push(typeof s === 'string' ? (/\.webm$/i.test(s) ? vid(s, body, 'shot') : img(s, body, 'shot')) : vid(s.video, body, 'shot'));
   W.ov = div('ov', body);
   div('glint', root);   // light sweep (cinema.js)
   W.time = (sec) => W.layers.forEach((l) => { if (l.tagName === 'VIDEO') seekVideo(l, sec); });
@@ -279,24 +315,64 @@ const BG = {
 
 // ---------- scenes + engine ----------
 const SCENES = [];
-function scene(s, e, init, update) { SCENES.push({ s, e, init, update }); }
+// the director's cut: scenes the film writes itself (film.json "scripts"), registered as CUSTOM.<name> = (start, end, o) => {…}
+// with the same API as the library (scene, win, setCrop, place, textEl, M.*, svg…); used as {"type": "custom", "fn": "<name>"}
+const CUSTOM = {};
+function scene(s, e, init, update) { SCENES.push({ s, e, init, update, shot: SHOT }); }
 
-// camera cuts shared by all styles: a whip pan, or a push through the frame. p: 0→1 across the cut; inc = incoming
+// camera cuts shared by all styles. p: 0→1 across the cut; inc = the incoming scene (drawn above the outgoing one)
+//   whip  pan with motion blur      push   fly through the frame      slide-up  the next scene rises from below
+//   wipe  a hard edge sweeps across  iris  a circle opens from the centre   zoom  the next scene settles from 125 %
+//   blur  a defocus dissolve         dip   out to the background, then in (a breath)
+//   doors split open: the next scene appears in a centre slit that opens to both edges
+//   light a warm light leak blooms over the cut and the next scene appears through it    rack  focus pulls from the
+//         outgoing scene (it blurs away) to the incoming one (it sharpens), with a slight scale breath
+const CUT_KINDS = ['style', 'whip', 'push', 'slide-up', 'wipe', 'iris', 'zoom', 'blur', 'dip', 'doors', 'light', 'rack'];
 function cutFX(root, kind, p, inc) {
-  let tf = '', o = 1, filter = '';
-  if (kind === 'whip') {
+  let tf = '', o = 1, filter = '', clip = '';
+  if (CUT[kind]) {   // the film's own cut
+    const r = CUT[kind]({ p, inc }) || {};
+    root.style.opacity = r.opacity ?? 1; root.style.transform = r.transform || ''; root.style.filter = r.filter || ''; root.style.clipPath = r.clipPath || '';
+    return;
+  }
+  if (kind === 'slide-up') {
+    const e = eio(p); tf = `translateY(${inc ? (1 - e) * 1080 : -e * 540}px)`; o = inc ? 1 : 1 - prog(p, 0.3, 1);
+    const sp = Math.sin(Math.PI * p); if (sp > 0.05) filter = `blur(${(sp * 5).toFixed(1)}px)`;
+  } else if (kind === 'wipe') {
+    if (inc) clip = `inset(0 0 0 ${((1 - eio(p)) * 100).toFixed(2)}%)`;
+  } else if (kind === 'iris') {
+    if (inc) clip = `circle(${(eio(p) * 115).toFixed(2)}% at 50% 50%)`;
+  } else if (kind === 'zoom') {
+    if (inc) { tf = `scale(${lerp(1.25, 1, eo(p)).toFixed(4)})`; o = prog(p, 0, 0.6); }
+    else { tf = `scale(${lerp(1, 0.92, eio(p)).toFixed(4)})`; o = 1 - prog(p, 0.3, 1); }
+  } else if (kind === 'blur') {
+    const sp = Math.sin(Math.PI * p); filter = `blur(${(sp * 16).toFixed(1)}px)`; o = inc ? prog(p, 0.25, 0.75) : 1 - prog(p, 0.25, 0.75);
+  } else if (kind === 'dip') {
+    o = inc ? prog(p, 0.55, 1) : 1 - prog(p, 0, 0.45);
+  } else if (kind === 'doors') {   // split open: the incoming scene appears in a centre slit that opens to both edges
+    if (inc) { const x = ((1 - eio(p)) * 50).toFixed(2); clip = `inset(0 ${x}% 0 ${x}%)`; }
+    else tf = `scale(${lerp(1, 0.97, eio(p)).toFixed(4)})`;
+  } else if (kind === 'light') {   // brightness bloom on both sides of the cut, the light carries the change
+    const sp = Math.sin(Math.PI * p); filter = `brightness(${(1 + sp * 1.4).toFixed(3)}) saturate(${(1 - sp * 0.3).toFixed(3)}) blur(${(sp * 3).toFixed(1)}px)`;
+    o = inc ? prog(p, 0.4, 0.6) : 1 - prog(p, 0.4, 0.6);
+  } else if (kind === 'rack') {
+    const b = inc ? (1 - prog(p, 0.4, 1)) * 14 : prog(p, 0, 0.6) * 14; filter = `blur(${b.toFixed(1)}px)`;
+    tf = `scale(${inc ? lerp(1.03, 1, eo(prog(p, 0.4, 1))).toFixed(4) : lerp(1, 0.985, p).toFixed(4)})`; o = inc ? prog(p, 0.3, 0.6) : 1 - prog(p, 0.45, 0.75);
+  } else if (kind === 'whip') {
     const e = eio(p); tf = `translateX(${inc ? (1 - e) * 1920 : -e * 1920}px)`;
     const sp = Math.sin(Math.PI * p); if (sp > 0.05) filter = `blur(${(sp * (CONFIG.CINEMA && CONFIG.CINEMA.mb > 1 ? 4 : 10)).toFixed(1)}px)`;  // smooths the steps between motion-blur samples
   } else {  // push
     if (inc) { tf = `scale(${lerp(0.8, 1, eo(prog(p, 0.3, 1)))})`; o = prog(p, 0.35, 0.75); filter = `blur(${((1 - prog(p, 0.35, 0.9)) * 8).toFixed(1)}px)`; }
     else { tf = `scale(${lerp(1, 1.7, Math.pow(p, 1.6))})`; o = 1 - prog(p, 0.3, 0.65); filter = `blur(${(prog(p, 0.2, 0.7) * 10).toFixed(1)}px)`; }
   }
-  root.style.opacity = o; root.style.transform = tf; root.style.filter = filter; root.style.clipPath = '';
+  root.style.opacity = o; root.style.transform = tf; root.style.filter = filter; root.style.clipPath = clip;
 }
+const CUT_LEN = { whip: 1, push: 1, 'slide-up': 1.2, wipe: 1.4, iris: 1.5, zoom: 1.2, blur: 1.6, dip: 2, doors: 1.5, light: 1.6, rack: 1.8 };   // × the style's crossfade
 function transitionFX(root, t, s, e, DUR, kIn = 'style', kOut = 'style') { // per-style look of a scene's in/out edge
-  const w = ST.xf * 0.9;
-  if (s > 0 && kIn !== 'style' && t < s + w) return cutFX(root, kIn, prog(t, s - w, s + w), true);
-  if (e < DUR && kOut !== 'style' && t > e - w) return cutFX(root, kOut, prog(t, e - w, e + w), false);
+  const len = (k) => (CUT[k] && CUT[k].len) || CUT_LEN[k] || 1;
+  const wi = ST.xf * 0.9 * len(kIn), wo = ST.xf * 0.9 * len(kOut);
+  if (s > 0 && kIn !== 'style' && t < s + wi) return cutFX(root, kIn, prog(t, s - wi, s + wi), true);
+  if (e < DUR && kOut !== 'style' && t > e - wo) return cutFX(root, kOut, prog(t, e - wo, e + wo), false);
   const xf = ST.xf, inP = s === 0 ? 1 : prog(t, s - xf, s + xf * 0.4), outP = e >= DUR ? 1 : 1 - prog(t, e - xf * 0.4, e + xf);
   let o = Math.min(inP, outP), tf = '', filter = '', clipPath = '';
   const edgeIn = 1 - inP, edgeOut = 1 - outP;
@@ -318,9 +394,14 @@ const FILM = {
     const chapters = (CHAPTERS || []).map(([a, b, n, z, e]) => [bar(a), bar(b), n, z, e]);
     const $ = (id) => document.getElementById(id);
     document.body.dataset.style = ST.id || CONFIG.STYLE; document.body.dataset.motion = MO_ID;
+    // the colour director's palette (film.json "palette", scripts/palette.py) replaces the style's accents; background and ink stay
+    const PAL = CONFIG.PALETTE || {};
+    if (PAL.accent) document.documentElement.style.setProperty('--accent', PAL.accent);
+    if (PAL.accent2) document.documentElement.style.setProperty('--accent-2', PAL.accent2);
     const bgUpdate = (BG[ST.background] || BG.grid)($('bg'));
     const host = $('scenes');
-    for (const sc of SCENES) { sc.root = div('scene', host); sc.S = {}; sc.init(sc.root, sc.S); }
+    for (const sc of SCENES) { sc.root = div('scene', host); sc.S = {}; useShot(sc.shot); const v0 = VIDS.length; sc.init(sc.root, sc.S); sc.vids = VIDS.slice(v0); }
+    useShot(null);
     FX.init.forEach((f) => f());
     const chapter = $('chapter'), capzh = $('capzh'), capen = $('capen'), capband = $('capband'), flash = $('flash'), pulse = $('pulse');
     const cuts = SCENES.map((s) => s.s).filter((s) => s > 0);
@@ -328,15 +409,19 @@ const FILM = {
       PENDING.length = 0;
       for (let i = 0; i < SCENES.length; i++) {
         const sc = SCENES[i];
-        const vis = t >= sc.s - ST.xf && t < sc.e + ST.xf;
+        const vis = t >= sc.s - ST.xf * 2 && t < sc.e + ST.xf * 2;   // long cuts (dip, blur) reach ~2× the crossfade
         sc.root.style.display = vis ? 'block' : 'none';
         if (!vis) continue;
+        useShot(sc.shot);
         transitionFX(sc.root, t, sc.s, sc.e, DUR, CUTS[i] || 'style', CUTS[i + 1] || 'style');
-        const cam = M.camera(t, t - sc.s, sc.e - sc.s);
+        const cam = M.camera(t, t - sc.s, sc.e - sc.s, sc.shot.camera);
         if (cam) sc.root.style.transform = (sc.root.style.transform || '') + ' ' + cam;
         sc.update(sc.S, t - sc.s, sc.e - sc.s, t);
+        // footage plays with the scene, from the moment the director picked ("offset", scripts/footage.py), at "rate"
+        if (!sc.S.ownVideo) for (const v of sc.vids) seekVideo(v, Math.max(0, (sc.shot.offset || 0) + (t - sc.s) * (sc.shot.rate || 1)));
         FX.scene.forEach((f) => f(sc, t, t - sc.s));
       }
+      useShot(null);
       const ch = chapters.find(([a, b]) => t >= a && t < b);
       bgUpdate(t, ch);
       FX.frame.forEach((f) => f(t));

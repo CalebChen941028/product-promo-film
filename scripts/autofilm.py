@@ -30,8 +30,9 @@ import make_film as MF  # noqa: E402
 import suggest_rects as SR  # noqa: E402
 
 ap = argparse.ArgumentParser()
-ap.add_argument('materials'); ap.add_argument('--out'); ap.add_argument('--brief'); ap.add_argument('--genre'); ap.add_argument('--style'); ap.add_argument('--motion')
+ap.add_argument('materials'); ap.add_argument('--out'); ap.add_argument('--brief'); ap.add_argument('--genre'); ap.add_argument('--style'); ap.add_argument('--motion'); ap.add_argument('--mood', default='', help="the user's own words for the feel (e.g. '大气 商业 科技感', 'warm, human, quiet'); steers the look")
 ap.add_argument('--music', default='auto'); ap.add_argument('--seconds', type=float, default=0); ap.add_argument('--voice', default='auto'); ap.add_argument('--fill-copy', action='store_true')
+ap.add_argument('--allow-thin', action='store_true', help='accept fewer than 8 screens captured from an app (only when the app truly has no more to show)')
 a = ap.parse_args()
 src = Path(a.materials).resolve()
 if not src.is_dir(): sys.exit(f'ERROR {src} is not a folder.\n  FIX: pass the folder that holds the screenshots/photos/clips/logo/docs')
@@ -47,7 +48,38 @@ print('== intake'); subprocess.run([sys.executable, HERE / 'intake.py', src, '--
 man = json.load(open(build / 'manifest.json'))
 items = man['items']
 pool = {r: [i for i in items if i['kind'] == 'image' and i.get('role') == r] for r in ('desktop', 'phone', 'photo', 'cutout', 'figure', 'logo')}
-pool['video'] = [i for i in items if i['kind'] == 'video' and i.get('webm')]
+pool['video'] = [i for i in items if i['kind'] == 'video' and i.get('webm') and i.get('role', 'screen') == 'screen']     # screen recordings
+pool['footage'] = [i for i in items if i['kind'] == 'video' and i.get('webm') and i.get('role') == 'footage']          # real camera footage
+import footage as FOOT  # noqa: E402
+
+
+def footage_scene(it, seconds, kind='footage'):
+    """Fields for a beat played from a clip: the webm, its base, the best moment (footage.py) and a still for analysis."""
+    b = FOOT.best(it['webm'], seconds, ff)
+    w, h = it.get('size') or [1920, 1080]
+    out = {'media': rel(it['webm']), 'base': [1920, round(1920 * h / w)] if w else [1920, 1080], 'offset': b['offset']}
+    if it.get('poster'): out['poster'] = rel(it['poster'])
+    out['_footage'] = f"plays from {b['offset']} s (best moment, score {b['score']})" + (' — ' + '; '.join(b['notes']) if b['notes'] else '')
+    return out
+
+# Screens are cast by what they show, not by file order: real outputs first, then the work, then data; first-run, home,
+# save prompts, settings and failed captures last (a home screen is a weak hook and a weak proof).
+LOW = re.compile(r'home|welcome|login|sign.?in|splash|save|prompt|confirm|settings?|wizard|empty|blank|loading|licen[cs]e|about|explore|^_|_fail|首页|欢迎|设置|保存', re.I)
+OUTPUT = re.compile(r'plot|chart|figure|graph|curve|forest|roc|km|result|report|export|output|summary|answer|reply|response|图|结果|报告|回答', re.I)
+WORK = re.compile(r'workspace|method|assign|run|analy|editor|canvas|board|chat|answer|\bai\b|ai[-_]|compose|build|工作台|方法|分析|助手', re.I)
+
+
+PLOT = re.compile(r'plot|chart|graph|curve|forest|roc|km|survival|figure|图', re.I)
+RESULT = re.compile(r'result|结果', re.I)
+
+
+def value(it):
+    n = Path(it['file']).stem
+    out = 4 if PLOT.search(n) else 3 if RESULT.search(n) else 2 if OUTPUT.search(n) else 0
+    return out + (1 if WORK.search(n) else 0) + (1 if it.get('role') == 'figure' else 0) - (4 if LOW.search(n) else 0)
+
+
+for r in ('desktop', 'figure'): pool[r].sort(key=lambda i: -value(i))   # stable: equal values keep the story order of their names
 music_files = [i for i in items if i['kind'] == 'audio' and i['role'] == 'music']
 voice_files = [i for i in items if i['kind'] == 'audio' and i['role'] == 'voice']
 path_of = lambda it: rel(it['webm']) if it['kind'] == 'video' else rel(src / it['file'])
@@ -62,8 +94,12 @@ gid = a.genre or brief.get('genre') or ranked[0]['genre']
 if gid not in G.GENRES['genres']: sys.exit(f'ERROR genre {gid} unknown.\n  FIX: python3 scripts/genres.py --list')
 genre = G.GENRES['genres'][gid]
 close = (ranked[0]['score'] == 0 or (len(ranked) > 1 and ranked[0]['score'] - ranked[1]['score'] < 1.0)) and not a.genre and not brief.get('genre')
-style = a.style or (brief.get('style') if brief.get('style') not in (None, '', 'auto') else genre['style'][0])
-motion = a.motion or genre['motion']
+# the look (style + motion) is the director's call from the materials, made after the pictures are classified (below); --style / --motion / brief override
+import look as LOOK  # noqa: E402
+LK = LOOK.choose(items, src, gid, text, a.mood + ' ' + str(brief.get('tone') or brief.get('mood') or ''))
+forced = a.style or (brief.get('style') if brief.get('style') not in (None, '', 'auto') else None)
+style = forced or LK['style']
+motion = a.motion or (LK['motion'] if not forced or forced == LK['style'] else LOOK.STYLE_MOTION.get(style, LK['motion']))
 mo = brief.get('motto') or {}
 motto = (mo['zh'][:2] if isinstance(mo.get('zh'), list) and len(mo['zh']) >= 2 else [TODO('理念第一行'), TODO('理念第二行')]) + [mo.get('en') or TODO('motto in English')]
 
@@ -126,15 +162,14 @@ def need_ok(need):
     return False
 
 
-OUTPUT = re.compile(r'plot|chart|figure|graph|curve|forest|roc|km|result|report|export|output|summary|图|结果|报告', re.I)
-
-
 def screen_hero(cover=None):
     """Hero treatment for a screen-led film: real outputs carry the hero moment (templates/library.js screenHero).
     result = one real result screen; rise = the one output that matters rises out of the UI; stack = a calm cascade of outputs."""
     screens = pool['desktop'] + pool['figure']
     crops = {i['file']: SR.modal_crop(src / i['file'], i.get('base')) for i in screens}
-    outs = sorted([i for i in screens if OUTPUT.search(i['file']) or crops[i['file']]], key=lambda i: crops[i['file']] is None)   # real figures (dialogs) first
+    hook_media = cover.get('media') if cover else None
+    outs = sorted([i for i in screens if OUTPUT.search(i['file']) or crops[i['file']]],   # the most valuable output first, then dialogs; not the hook's own screen
+                  key=lambda i: (path_of(i) == hook_media, -value(i), crops[i['file']] is None))
     want = {'science-data': 'rise', 'developer-ai': 'stack', 'mobile-consumer-app': 'stack', 'game-entertainment-event': 'stack'}.get(gid, 'result')
     if want == 'stack' and len(outs) < 3: want = 'rise' if outs else 'result'
     if want == 'rise' and not outs: want = 'result'
@@ -158,6 +193,24 @@ def screen_hero(cover=None):
     return h
 
 
+import director as DIR  # noqa: E402
+
+
+def prefill_points(fs, it):
+    """Highlight targets for a screen's points. A capture_app shot knows its own panels (<shot>.regions.json): the points
+    name them ("rect": "@AI 解读") and the build swaps in the exact box — no coordinates guessed by eye. Other screens
+    get suggest_rects.py's boxes, to be checked on its preview."""
+    reg = DIR.regions_for(src, it['file'])
+    names = DIR.named_panels(reg)
+    if names:
+        for pt, n in zip(fs['points'], names): pt['rect'] = '@' + n
+        fs['_targets'] = 'named regions on this screen (point each line at the card it talks about): ' + ', '.join('@' + n for n in names)
+        return
+    _, rects = SR.suggest(src / it['file'], fs['base'], 2)
+    for pt, rc in zip(fs['points'], rects): pt['rect'] = rc
+    if rects: fs['_rects'] = 'auto-suggested by suggest_rects.py: match each point to the region it names (preview: python3 scripts/suggest_rects.py <image> --preview .)'
+
+
 def readable_crop(it, maxw):
     """A 16:9 crop of a screen (base units) around its main region, at most maxw wide so UI text stays readable."""
     try:
@@ -172,6 +225,43 @@ def readable_crop(it, maxw):
         return None
 
 
+# Tour: a software product with many real screens gets a chaptered film (like examples/medstat-pilot) instead of
+# three features: one chapter per stage of the job, named by the shots ("03-analysis-result.png" → chapter "analysis",
+# or a sub-folder), each a feature on its best screen plus the rest of the chapter as a carousel or a gallery of outputs.
+def chapter_of(it):
+    """'03-analysis-result' → analysis · a sub-folder → its name · 'tool_merge' → tool · 'variables' → variables."""
+    parts = Path(it['file']).parts
+    if len(parts) > 1: return parts[-2]
+    stem = Path(it['file']).stem
+    m = re.match(r'^\d+[-_ ]+([^-_ \d][^-_ ]*)', stem) or re.match(r'^([^\W\d_]+)', stem)
+    return m.group(1).lower() if m else stem
+
+
+TOUR_MIN = 8
+screens_all = [i for i in pool['desktop'] + pool['figure'] if value(i) > -2]
+if (src / 'app-info.md').exists() and len(screens_all) < TOUR_MIN and not a.allow_thin:   # captured from a running app: more can always be shot
+    sys.exit(f'ERROR only {len(screens_all)} usable screens were captured from the app (home screens and prompts do not count); a film needs at least {TOUR_MIN}, ideally 12–25.\n'
+             '  FIX: add scenarios to the shot list and shoot again (references/capture.md): every feature family the product is known for, each run to its result and its enlarged output; '
+             'the exports (report, code); the AI feature with mock_llm. Name shots NN-chapter-what. Only if the app truly has nothing more to show: --allow-thin')
+tour = None
+if genre['arc'] in ('problem-solution', 'hype') and len(screens_all) >= TOUR_MIN and len(pool['photo']) < 3:
+    story = sorted(screens_all, key=lambda i: i['file'])          # the story order of the shot list
+    groups = []                                                    # one group per chapter name, in order of first appearance
+    for i in story:
+        k = chapter_of(i)
+        g = next((g for g in groups if g[0] == k), None)
+        if g: g[1].append(i)
+        else: groups.append((k, [i]))
+    merged = []                                                    # a lone shot joins the chapter before it
+    for k, its in groups:
+        if len(its) == 1 and merged: merged[-1][1].extend(its)
+        else: merged.append((k, list(its)))
+    if len(merged) > 1 and len(merged[0][1]) == 1: merged[1] = (merged[1][0], merged[0][1] + merged[1][1]); merged.pop(0)
+    tour = {}
+    for k, its in merged:                                          # at most 5 shots a chapter: one feature + a carousel of 4
+        n = -(-len(its) // 5)
+        for c in range(n): tour[k if n == 1 else f'{k}{c + 1}'] = its[c * len(its) // n:(c + 1) * len(its) // n]
+
 # 3 · cast: arc beats → scenes ------------------------------------------------------------------------
 used, scenes, fill = set(), [], a.fill_copy
 logo = pool['logo'][0] if pool['logo'] else None
@@ -183,7 +273,12 @@ for beat in G.GENRES['arcs'][genre['arc']]:
     sc = {'type': t, 'bars': beat['bars']}
     if t == 'cover':
         nonpack = lambda i: not MACRO.search(i['file']) and not i.get('packshot')   # the cold open needs a scene, not a packshot or a texture
-        bg = take(['photo', 'desktop', 'figure'], used, 1, prefer=nonpack) or take(['photo', 'desktop', 'figure'], used, 1)
+        moving = genre['arc'] in ('sensory', 'reveal', 'human-story', 'hype') and take(['footage'], used, 1)
+        bg = None if moving else (take(['photo', 'desktop', 'figure'], used, 1, prefer=nonpack) or take(['photo', 'desktop', 'figure'], used, 1))
+        if moving:   # real footage opens the film: a moving cold open beats a still one
+            sc.update(footage_scene(moving[0], sc['bars'] * 240 / genre['music']['bpm']))
+            sc['frame'] = 'photo'
+            if genre['arc'] in ('sensory', 'human-story', 'reveal'): sc['name'] = False
         if bg:
             sc.update({'media': path_of(bg[0]), 'base': bg[0].get('base', [1920, 1080])})
             if bg[0].get('role') == 'photo':
@@ -202,6 +297,10 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         ins = brief.get('insight') or {}
         sc.update({'zh': ins.get('zh') if fill and ins.get('zh') else TODO('洞察 / 情感真相（≤ 16 字）'), 'en': ins.get('en') if fill and ins.get('en') else TODO('the human truth, one line')})
     elif t == 'photo':
+        clipit = take(['footage'], used, 1)
+        if clipit:   # motion beats a still: the photo beat plays a clip
+            sc.update({'type': 'footage', **footage_scene(clipit[0], sc['bars'] * 240 / genre['music']['bpm']), 'title': {'zh': TODO('画面一句（≤ 10 字）'), 'en': TODO('one line over the footage')}})
+            scenes.append(sc); continue
         it = take(['photo'], used, 1, prefer=lambda i: not MACRO.search(i['file'])) or take(['photo'], used, 1)
         if not it: continue
         sc.update({'media': path_of(it[0]), 'base': it[0]['base'], 'title': {'zh': TODO('画面一句（≤ 10 字）'), 'en': TODO('one line over the photo')}})
@@ -218,6 +317,41 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         sc.update({'media': [path_of(i) for i in its] if len(its) > 1 else path_of(its[0]), 'base': its[0]['base'],
                    'title': {'zh': (P.get('tagline') or {}).get('zh') if fill and (P.get('tagline') or {}).get('zh') else TODO('揭晓标题（≤ 10 字）'), 'en': name}})
         sc['say'] = [{'en': TODO('the reveal line: the name + one fact from the docs (≤ 12 words)'), 'zh': TODO('揭晓旁白')}]
+    elif t == 'feature' and tour:
+        cover_media = scenes[0].get('media') if scenes and scenes[0]['type'] == 'cover' else None
+        for c, (key, its) in enumerate(tour.items()):
+            its = [i for i in its if path_of(i) != cover_media] or its
+            best = max(its, key=value); used.add(best['file'])
+            rest = [i for i in its if i is not best and i['file'] not in used][:5]
+            fs = {'type': 'feature', 'bars': 4, 'media': path_of(best), 'base': best.get('base', [1920, 1080]),
+                  'chapter': [f'{c + 1:02d}', TODO(f'章节名（≤ 4 字，镜头组 {key}）'), TODO(f'CHAPTER ({key})')],
+                  'title': {'zh': TODO('这一章的结果（≤ 12 字）'), 'en': TODO('what this stage gives the user (≤ 42 chars)')},
+                  'points': [{'zh': TODO('要点（≤ 12 字）'), 'en': TODO('point')} for _ in range(2)],
+                  'say': [{'en': TODO(f'chapter {key}: one fact from the docs, said as what it means for the viewer'), 'zh': TODO('旁白中文字幕')}]}
+            try:
+                prefill_points(fs, best)
+            except Exception as e:
+                print(f'  (no rect suggestion for {best["file"]}: {e})')
+            scenes.append(fs)
+            if len(rest) >= 2:
+                for i in rest: used.add(i['file'])
+                if all(OUTPUT.search(Path(i['file']).stem) or i.get('role') == 'figure' for i in rest):
+                    scenes.append({'type': 'gallery', 'bars': max(2, len(rest)), 'items': [{'media': path_of(i), 'zh': TODO('名称'), 'en': TODO('name')} for i in rest],
+                                   'say': [{'en': TODO('name the outputs, one short line'), 'zh': TODO('旁白中文字幕')}]})
+                else:
+                    scenes.append({'type': 'carousel', 'bars': max(3, len(rest[:4])), 'title': {'zh': TODO('这一组的名字'), 'en': TODO('name of this set')},
+                                   'panels': [{'zh': TODO('名称'), 'en': TODO('name'), 'media': path_of(i), 'base': i.get('base', [1920, 1080]),
+                                               **({'crop': cr} if (cr := readable_crop(i, 1000)) else {})} for i in rest[:4]],
+                                   'say': [{'en': TODO('what this set lets the user do, one line'), 'zh': TODO('旁白中文字幕')}]})
+            elif rest:
+                i = rest[0]; used.add(i['file'])
+                scenes.append({'type': 'feature', 'bars': 3, 'media': path_of(i), 'base': i.get('base', [1920, 1080]),
+                               'title': {'zh': TODO('功能标题（≤ 12 字）'), 'en': TODO('feature title (≤ 42 chars)')},
+                               'points': [{'zh': TODO('要点（≤ 12 字）'), 'en': TODO('point')}],
+                               'say': [{'en': TODO('one fact from the docs'), 'zh': TODO('旁白中文字幕')}]})
+        continue
+    elif t in ('carousel', 'gallery') and tour:
+        continue   # the chapters already show every screen
     elif t == 'feature':
         for k, f in enumerate(features[:4]):
             mats_f = [m for m in match(f.get('materials')) if m['file'] not in used] or take(['desktop', 'photo', 'cutout', 'phone'], used, 1)
@@ -236,9 +370,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
             if not is_ui: fs['frame'] = 'photo'
             elif m0['kind'] == 'image':   # screens: pre-suggest the highlight boxes (check them: suggest_rects.py --preview)
                 try:
-                    _, rects = SR.suggest(src / m0['file'], fs['base'], 2)
-                    for pt, rc in zip(fs['points'], rects): pt['rect'] = rc
-                    if rects: fs['_rects'] = 'auto-suggested by suggest_rects.py: match each point to the region it names (preview: python3 scripts/suggest_rects.py <image> --preview .)'
+                    prefill_points(fs, m0)
                 except Exception as e:
                     print(f'  (no rect suggestion for {m0["file"]}: {e})')
             if k == 0 and t == 'feature' and genre['arc'] == 'problem-solution': fs['chapter'] = ['01', TODO('章节'), TODO('CHAPTER')]
@@ -274,7 +406,7 @@ for beat in G.GENRES['arcs'][genre['arc']]:
         q = brief['testimonials'][0]
         sc.update({'zh': q.get('zh', ''), 'en': q.get('en', ''), 'who': q.get('who', ''), 'role': q.get('role', '')})
     elif t == 'finale':
-        wall = [path_of(i) for i in items if i['kind'] == 'image' and i.get('role') in ('desktop', 'photo', 'cutout', 'figure', 'phone')][:8]
+        wall = [path_of(i) for i in sorted((i for i in items if i['kind'] == 'image' and i.get('role') in ('desktop', 'photo', 'cutout', 'figure', 'phone')), key=lambda i: -value(i))][:8]
         if not wall: continue
         sc['media'] = wall
         first = scenes[0] if scenes and scenes[0]['type'] == 'cover' else None
@@ -294,8 +426,9 @@ for k in range(1, len(scenes)):
         scenes[k] = {'type': 'detail', 'bars': b_['bars'], 'media': b_['media'], 'base': b_['base'], 'say': b_['say'],
                      '_shape': 'a photo beat recast as a detail, so two proof beats do not share a shape'}
         continue
-    if a_['type'] == b_['type'] == 'feature' and b_.get('frame') != 'photo' and not str(b_.get('media', '')).endswith('.webm'):
-        pts = [p for p in b_.get('points', []) if p.get('rect')]
+    if a_['type'] == b_['type'] == 'feature' and b_.get('frame') != 'photo' and not str(b_.get('media', '')).endswith('.webm') and not b_.get('chapter'):
+        pts = [{**p, 'rect': DIR.rect_of(proj, b_['media'], p['rect'])} for p in b_.get('points', []) if p.get('rect')]
+        pts = [p for p in pts if p['rect']]
         if True:   # rects → crops on them; a chart (no rects) → the detail's own slow crops
             bw, bh = b_.get('base', [1920, 1080])
             crops = []
@@ -312,6 +445,49 @@ for k in range(len(scenes) - 2):
         scenes.insert(k + 2, {'type': 'statement', 'bars': 2, 'zh': TODO('一口气：点出感受，不加新事实（≤ 16 字）'), 'en': TODO('a breath between proofs: the feeling, no new fact')})
         break
 
+# footage that no beat used: one more moving beat right before the finale (real material in motion is the best proof)
+left = [i for i in pool['footage'] if i['file'] not in used]
+if left:
+    fin_k = next((k for k, x in enumerate(scenes) if x['type'] == 'finale'), len(scenes))
+    used.add(left[0]['file'])
+    scenes.insert(fin_k, {'type': 'footage', 'bars': 3, **footage_scene(left[0], 3 * 240 / genre['music']['bpm']),
+                          'title': {'zh': TODO('画面一句（≤ 10 字）'), 'en': TODO('one line over the footage')},
+                          'say': [{'en': TODO('what we see it doing, as what it means for the viewer'), 'zh': TODO('旁白中文字幕')}]})
+c0 = scenes[0] if scenes and scenes[0]['type'] == 'cover' else None
+if c0 and str(c0.get('media', '')).endswith('.webm'):
+    for x in scenes:
+        if x['type'] == 'finale' and x.get('image') == c0['media']:
+            if c0.get('poster'): x['image'] = c0['poster']   # the bookend returns as a still from the opening clip
+            else: x.pop('image', None)
+
+# motion graphics: story glue drawn in code (library.js flow / hub; references/director.md §7)
+#   a chaptered tour gets a journey map right after the opening (cover, or the pain): the chapters to come, in order
+#   a problem-solution film with a pain beat gets a hub right after it: the scattered old way, gathered into one place
+after = next((k + 1 for k, x in enumerate(scenes) if x['type'] == 'pain'), 1 if scenes and scenes[0]['type'] == 'cover' else 0)
+if tour and len(tour) >= 3:
+    scenes.insert(after, {'type': 'flow', 'bars': max(3, round(len(tour) * 0.8)), 'steps': 'chapters',
+                          'title': {'zh': TODO('这一路的样子（≤ 12 字）'), 'en': TODO('the journey in one line')},
+                          'say': [{'en': TODO('the whole journey in one sentence: from what the user has to what they get'), 'zh': TODO('旁白中文字幕')}],
+                          '_story': 'a map of the chapters to come (filled from the chapter names at build); say the journey once'})
+elif genre['arc'] == 'human-story' and n_vis >= 4:
+    k_ = next((k + 1 for k, x in enumerate(scenes) if x['type'] in ('photo', 'footage', 'statement')), after)
+    scenes.insert(k_, {'type': 'flow', 'bars': 3, 'steps': [{'zh': TODO('一天/一段旅程中的一刻（≤ 6 字）'), 'en': TODO('a moment')} for _ in range(3)],
+                       'say': [{'en': TODO('the shape of their day (or journey) with the product, one line'), 'zh': TODO('旁白中文字幕')}],
+                       '_story': 'the person\'s day or journey in three moments; the photos and footage around it show each moment'})
+elif genre['arc'] == 'problem-solution' and any(x['type'] == 'pain' for x in scenes):
+    scenes.insert(after, {'type': 'hub', 'bars': 3, 'center': {'zh': name, 'en': ''},
+                          'items': [{'zh': TODO('旧方式里的一件事（≤ 6 字）'), 'en': TODO('a chore')} for _ in range(4)],
+                          'say': [{'en': TODO('the turn: everything the pain listed, now in one place'), 'zh': TODO('旁白中文字幕')}],
+                          '_story': 'the scattered tools of the pain gather into the product: name the same chores the pain named'})
+
+# a physical or emotional film says its truth as kinetic type: the one-line breath becomes words that rise on the beat
+if genre['arc'] in ('sensory', 'reveal', 'human-story'):
+    for x in scenes:
+        if x['type'] == 'statement':
+            x.clear(); x.update({'type': 'type', 'bars': 3, 'lines': [{'zh': TODO('第一句：画面之外的真相（≤ 14 字）'), 'en': TODO('line one')}, {'zh': TODO('第二句：落在 *一个词* 上（≤ 14 字）'), 'en': TODO('line two, *one word* in accent')}],
+                              '_story': 'kinetic type: two short lines, the second turns on one *accented* word; no new fact'})
+            break
+
 # hero moment: the finale (make_film.py defaults to it); duration budget
 music = None
 if a.music not in ('auto', 'generate') and Path(a.music).exists(): music = {'file': rel(a.music)}
@@ -319,12 +495,15 @@ elif a.music == 'auto' and music_files: music = {'file': rel(src / music_files[0
 if music is None: music = {'generate': {'mood': 'auto'}}
 bpm = genre['music']['bpm']; bar_s = 240 / bpm
 arc_target = {'problem-solution': 100, 'reveal': 80, 'sensory': 75, 'human-story': 90, 'hype': 70}[genre['arc']]
-n_vis = sum(len(pool[r]) for r in ('desktop', 'phone', 'photo', 'cutout', 'figure', 'video'))
+n_vis = sum(len(pool[r]) for r in ('desktop', 'phone', 'photo', 'cutout', 'figure', 'video', 'footage'))
 mat_target = max(45, 20 + 9 * n_vis)   # the length follows the materials: about 9 s per distinct image or clip, never padded
+if tour:   # a chaptered tour runs as long as its chapters need (≈ 2–4 min), like the 3:26 reference
+    arc_target = max(arc_target, min(240, 40 + sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s))
+    mat_target = max(mat_target, arc_target)
 target = a.seconds or min(arc_target, mat_target)
 LENGTH_NOTE = (f'~{target:.0f} s — {n_vis} images/clips carry about {mat_target} s; the {genre["arc"]} arc would run {arc_target} s with more material. Do not pad: no repeats, no long holds'
                if not a.seconds and mat_target < arc_target else f'~{target:.0f} s')
-optional = ['quote', 'lineup', 'gallery', 'carousel', 'phone', 'photo', 'clip', 'compare', 'detail', 'statement']
+optional = ['quote', 'lineup', 'gallery', 'carousel', 'phone', 'photo', 'clip', 'compare', 'detail', 'statement', 'type', 'hub', 'flow']
 while sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s + MF.rest_bars(bpm) * bar_s > target + bar_s * 2:
     drop = next((s for t in optional for s in scenes if s['type'] == t), None)
     feats = [s for s in scenes if s['type'] == 'feature']
@@ -345,31 +524,58 @@ elif a.voice in ('auto', 'kokoro') and (kpy or a.voice == 'kokoro'):
     elif not model or want not in cached:
         voice['_note'] = 'the Kokoro model or voice is not downloaded yet: ask the user first, then set "allow_download": true'
 
+# colour: the colour director (scripts/palette.py) picks the accents from the brand, colour psychology for this genre,
+# and the materials' own hues; the style keeps background and ink. A brand colour in brief.json ("brand_color") wins.
+import palette as PAL  # noqa: E402
+pics = [src / i['file'] for i in items if i['kind'] == 'image' and i.get('role') in ('desktop', 'photo', 'cutout', 'figure', 'phone')]
+pal = PAL.choose(gid, style, (src / logo['file']) if logo else None, pics, brand_hex=brief.get('brand_color'))
+pal.pop('style_accent', None)
+temp = pal.pop('temperature', 'neutral')
+cinema = 'auto'
+g_new = PAL.grade_for(temp, MF.style_profile(style).get('grade'), style)
+if g_new:   # the colorist: the grade's temperature follows the palette (warm product, warm look)
+    cinema = {'grade': g_new, '_why': f'{temp} palette on a {MF.style_profile(style).get("grade")} style grade → {g_new}'}
+    pal['why'] += f'; grade {g_new} so the look is {temp} like the palette'
+
 film = {
     '_how': 'Drafted by autofilm.py. The crew (references/crew.md) replaces every TODO, then: python3 <skill>/scripts/make_film.py film.json --stage check',
     'name': re.sub(r'[^a-z0-9]+', '-', name.lower()).strip('-') + '-film', 'out': 'film_out',
-    'materials': rel(src), 'genre': gid, 'style': style, 'motion': motion, 'cinema': 'auto', 'music': music, 'voice': voice,
+    'materials': rel(src), 'genre': gid, 'style': style, 'motion': motion, 'palette': pal, 'cinema': cinema, 'music': music, 'voice': voice,
     'brand': {'name': name, 'nameAccent': P.get('nameAccent', ''), 'logo': path_of(logo) if logo else TODO('transparent PNG logo path'),
               'positioningZh': (P.get('positioning') or {}).get('zh') or TODO('一句话定位'), 'positioningEn': (P.get('positioning') or {}).get('en') or TODO('ONE-LINE POSITIONING'),
               'taglineZh': (P.get('tagline') or {}).get('zh') or TODO('口号'), 'taglineEn': (P.get('tagline') or {}).get('en') or TODO('TAGLINE'),
               'motto': motto,
-              'contacts': brief.get('contacts', []), 'chips': P.get('platforms', []) + ([P['status']] if P.get('status') else [])},
+              'contacts': brief.get('contacts', []), 'chips': P.get('platforms', []) + ([P['status']] if P.get('status') else []),
+              **({'cta': P['cta']} if isinstance(P.get('cta'), dict) else {})},   # the call to action, only from the brief (true next step)
     'scenes': scenes,
 }
+# 3b · direct: the director reads every picture and designs each scene's frame, camera move and cut BEFORE any copy is
+# written (scripts/director.py). The plan lands in the scenes with its reason ("_shot") and in treatment.md §6.
+import director as DIR  # noqa: E402
+roles_abs = {str((proj / path_of(i)).resolve()): i.get('role') for i in items if i['kind'] in ('image', 'video')}
+shots = DIR.apply(film, proj, roles_abs)
 json.dump(film, open(proj / 'film.json', 'w'), ensure_ascii=False, indent=1)
 if not brief_path:   # a brief for THIS product from its docs (never another product's example)
     json.dump({'_how': 'Drafted by autofilm.py from the docs. Fill what is missing from the user\'s docs; every claim must be checkable. Field guide: templates/brief.example.json',
                'product': {'name': name, 'positioning': {'zh': '', 'en': ''}, 'tagline': {'zh': '', 'en': ''}},
                'genre': gid, 'facts': FACTS, 'features': [], 'contacts': []}, open(proj / 'brief.json', 'w'), ensure_ascii=False, indent=1)
 
+# 3c · shot wishlist: what the user (or a real crew) could shoot to lift the film, with specs and labelled AI mood prompts
+counts = {'screens': len(pool['desktop']) + len(pool['phone']), 'outputs': sum(1 for i in pool['desktop'] + pool['figure'] if OUTPUT.search(i['file'])),
+          'photos': len(pool['photo']), 'footage': len(pool['footage']), 'cutouts': len(pool['cutout']), 'recordings': len(pool['video']),
+          'macro': sum(1 for i in pool['photo'] if MACRO.search(i['file'])), 'packshot': sum(1 for i in pool['photo'] if i.get('packshot'))}
+(proj / 'shot_wishlist.md').write_text(DIR.wishlist(gid, counts, name))
+
 # 4 · treatment scaffold for the crew --------------------------------------------------------------------
 tpl = (SKILL / 'templates' / 'treatment.template.md').read_text()
-beats = '\n'.join(f"| {i + 1} | `{s['type']}` | {s['bars'] if s['bars'] != 'rest' else MF.rest_bars(bpm)} | {next((b['role'] for b in G.GENRES['arcs'][genre['arc']] if b['type'] == s['type']), '')} | |" for i, s in enumerate(scenes))
-fills = {'{{PRODUCT}}': name, '{{GENRE}}': f"{gid} — {genre['en']} / {genre['zh']}", '{{STYLE}}': style, '{{MOTION}}': motion, '{{ARC}}': genre['arc'],
+frame = lambda p_: ' · '.join(x for x in [p_['layout'] or '', f"cam {p_['camera']}" if p_['camera'] else '', f"cut {p_['cut']}" if p_['cut'] != 'style' else ''] if x) or 'defaults'
+beats = '\n'.join(f"| {i + 1} | `{s['type']}` | {s['bars'] if s['bars'] != 'rest' else MF.rest_bars(bpm)} | {next((b['role'] for b in G.GENRES['arcs'][genre['arc']] if b['type'] == s['type']), '')} | {frame(p_)} | {p_['why']} |"
+                  for i, (s, p_) in enumerate(zip(scenes, shots)))
+fills = {'{{PRODUCT}}': name, '{{GENRE}}': f"{gid} — {genre['en']} / {genre['zh']}", '{{STYLE}}': style, '{{LOOKS}}': '\n  - '.join(['the director read the materials: ' + LK['facts']] + LK['why']), '{{MOTION}}': motion, '{{ARC}}': genre['arc'],
          '{{MUSIC}}': music.get('file') or f"composed: {genre['music']['mood']} ~{bpm} BPM (original, royalty-free)", '{{TONE}}': genre['tone'],
          '{{MATERIALS}}': ', '.join(f'{k} {v}' for k, v in sorted(mats.items()) if v), '{{BEATS}}': beats, '{{SECONDS}}': LENGTH_NOTE,
          '{{IMAGE_LIST}}': '\n'.join(f"  - `{Path(i['file']).name}` → <write: place and subject, e.g. outdoors, a campsite table by a tent>" for i in items if i['kind'] in ('image', 'video') and i.get('role') != 'logo') or '  - (no images)',
-         '{{GOLDEN}}': f"templates/golden/{genre['arc']}.json", '{{FACTS}}': ' · '.join(FACTS) or '(no docs — ask the user for a README or brief)'}
+         '{{PALETTE}}': f"accent {pal['accent']} · second {pal['accent2']} — {pal['why']}", '{{GOLDEN}}': f"templates/golden/{'tour' if tour else genre['arc']}.json", '{{FACTS}}': ' · '.join(FACTS) or '(no docs — ask the user for a README or brief)'}
 for k, v in fills.items(): tpl = tpl.replace(k, str(v))
 (proj / 'treatment.md').write_text(tpl)
 
@@ -377,9 +583,11 @@ todo = sum(1 for _ in MF._strings(film) if 'TODO' in _[1])
 print(f"\n== draft ready → {proj}")
 print(f"genre   {gid} ({genre['en']})" + (f"   ⚠ close call with {ranked[1]['genre']} — confirm with the user" if close else ''))
 print(f"look    {style} · motion {motion} · arc {genre['arc']} · music {music.get('file') or 'composed ' + genre['music']['mood']}")
+print(DIR.shot_table(film, shots))
 print(f"scenes  {len(scenes)} ({', '.join(s['type'] for s in scenes)}) ≈ {sum(s['bars'] for s in scenes if s['bars'] != 'rest') * bar_s + MF.rest_bars(bpm) * bar_s:.0f} s")
 print(f"copy    {todo} TODO fields — the crew writes them (references/crew.md), starting with treatment.md")
 print(f"length  {LENGTH_NOTE}")
 print(f"voice   {voice['engine']}" + (f" {voice.get('voice')}" if voice['engine'] == 'kokoro' else '') + (f"  ({voice['_note']})" if voice.get('_note') else ''))
-print(f"study   {SKILL / 'templates' / 'golden' / (genre['arc'] + '.json')} and references/copy-bank.md before writing a word")
+print(f"study   {SKILL / 'templates' / 'golden' / (('tour' if tour else genre['arc']) + '.json')} and references/copy-bank.md before writing a word")
+if tour: print(f"tour    {len(tour)} chapters from the shot names ({', '.join(tour)}): name each chapter (≤ 4 字) and give it one result line; merge or drop a chapter that says nothing new")
 print("next    1) run the crew: fill treatment.md (anchor lines first)   2) replace every TODO in film.json   3) python3 scripts/make_film.py film.json --stage check")

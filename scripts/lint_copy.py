@@ -32,16 +32,21 @@ SUPERLATIVE = re.compile(r"(\bthe (best|fastest|only|most \w+)\b|#1|\bnumber one
 zhlen = lambda s: sum(1 for ch in s or '' if '　' <= ch <= '鿿' or '＀' <= ch <= '￯')
 
 
+MEDIA_PATH = re.compile(r'^\S+\.(?:png|jpe?g|webp|gif|webm|mp4|mov|svg)$', re.I)
+
+
 def walk(o, path=''):
     if isinstance(o, dict):
         for k, v in o.items():
-            if k.startswith('_') or k in ('media', 'file', 'logo', 'type', 'style', 'motion', 'genre', 'contacts', 'chips', 'voice', 'music', 'tools', 'out', 'name', 'id', 'cinema', 'cut', 'mood'):
+            if k.startswith('_') or k in ('media', 'image', 'backdrop', 'materials', 'treatment', 'file', 'logo', 'type', 'style', 'motion', 'genre', 'contacts', 'chips', 'voice', 'music', 'tools', 'out', 'name', 'id', 'cinema', 'cut', 'mood', 'hero',
+                                          'rect', 'focus', 'crop', 'layout', 'camera', 'palette', 'direction', 'poster', 'kind', 'unit', 'source', 'fn', 'assets', 'scripts', 'css', 'motions', 'code', 'hot', 'file', 'size', 'side', 'view'):
                 continue
+            if k == 'steps' and isinstance(v, str): continue   # "steps": "chapters" is an instruction, not copy
             yield from walk(v, f'{path}.{k}' if path else k)
     elif isinstance(o, list):
         for i, v in enumerate(o):
             yield from walk(v, f'{path}[{i}]')
-    elif isinstance(o, str):
+    elif isinstance(o, str) and not MEDIA_PATH.search(o):   # a file path ("materials/01-data.png") is not copy
         yield path, o
 
 

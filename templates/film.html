@@ -65,6 +65,8 @@
 <script>
   // Style loader: styles/<id>.css + styles/<id>.js (window.STYLE profile). Synchronous, so it is ready before scenes.
   document.write(`<link rel="stylesheet" href="styles/${CONFIG.STYLE}.css"><script src="styles/${CONFIG.STYLE}.js"><\/script>`);
+  // the film's own look on top of the style (film.json "css"): variables, fonts, any rule — loaded last, so it wins
+  for (const href of CONFIG.CSS || []) document.write(`<link rel="stylesheet" href="${href}">`);
 </script>
 </head>
 <body>
@@ -82,6 +84,7 @@
 <script src="cinema.js"></script>
 <script src="patterns.js"></script>
 <script src="library.js"></script>
+<script src="custom.js"></script>
 <script src="scenes.js"></script>
 <script>FILM.start();</script>
 </body>

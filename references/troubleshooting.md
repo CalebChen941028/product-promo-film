@@ -20,6 +20,9 @@ English first, 中文在后。
 | Caption says "three hundred DPI" | spoken text used as caption | add `"cap": "300 DPI"` to that `say` line |
 | Highlight box misses the target | rect measured in the wrong space | rects are in `base` units; start from `suggest_rects.py` (autofilm pre-fills them), check on `grid_overlay.py` output |
 | Dialog won't close during capture | app ignores Escape | new browser context per scenario, or click its close button |
+| Capture hangs on "starting service" / a backend never comes up | another copy of the app (often the user's own, still open) holds its port | ask the user to quit the app; never `pkill`/`killall` it |
+| `capture_app.mjs`: "not an Electron app" | a native app cannot be driven | ask the user for screenshots, or film the web build with `--url` |
+| A step fails in `capture_app.mjs` | the text differs (spelling, emoji, icon) or the screen was not ready | open `_fail-<scenario>.png`, copy a text from the printed list, add `"exact": false` or a `wait_for` before it, rerun with `--only <scenario>` |
 | User pasted a real API key | — | do not enter it anywhere; suggest revoking it; use the local/mock route |
 | Final render is slow | motion blur renders 4 samples per frame | use `--draft` while iterating; `"cinema": {"motion_blur": 2}` for a faster final |
 | An effect looks flashy / cheap | an effect is noticeable on its own | lower it: `cinema.lens` (e.g. `{"flare": 0, "shake": 0}`), `bloom`, `grain`, `sfx_gain_db: -6`; or `"cinema": "off"` |
@@ -48,6 +51,9 @@ English first, 中文在后。
 | 字幕出现 "three hundred DPI" | 字幕直接用了念出来的文字 | 给该句加 `"cap": "300 DPI"` |
 | 高亮框没对准 | 坐标量错了空间 | rect 用 `base` 单位；先用 `suggest_rects.py`（autofilm 已预填），再在 `grid_overlay.py` 的网格图上核对 |
 | 采集时弹窗关不掉 | 应用不响应 Escape | 每个场景开新的浏览器上下文，或点关闭按钮 |
+| 采集卡在“启动服务中”，后台服务起不来 | 另一个应用实例（通常是用户自己开着的）占用了端口 | 请用户退出应用；不要 `pkill`/`killall` |
+| `capture_app.mjs` 提示 “not an Electron app” | 原生应用无法自动操作 | 请用户提供截图，或用 `--url` 拍网页版 |
+| `capture_app.mjs` 某一步失败 | 文字不一致（拼写、emoji、图标）或界面还没就绪 | 打开 `_fail-<场景>.png`，从打印的列表里复制文字，加 `"exact": false` 或在前面加 `wait_for`，再用 `--only <场景>` 重拍 |
 | 用户在对话里发了真实 API Key | — | 不要填写到任何地方，建议对方吊销，改走本地 / mock 路线 |
 | 终版渲染很慢 | 运动模糊每帧渲染 4 次 | 调试时用 `--draft`；或 `"cinema": {"motion_blur": 2}` 加快终版 |
 | 某个效果显得花哨 / 廉价 | 效果单独就能被注意到 | 调低：`cinema.lens`（如 `{"flare": 0, "shake": 0}`）、`bloom`、`grain`、`sfx_gain_db: -6`；或 `"cinema": "off"` |

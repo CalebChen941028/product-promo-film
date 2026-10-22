@@ -99,6 +99,7 @@ def suggest(path, base=None, n=4):
     e[1:, :] = np.maximum(e[1:, :], np.abs(np.diff(g, axis=0)))
     edge = e > 3
     edge[:2, :] = edge[-2:, :] = False; edge[:, :2] = edge[:, -2:] = False   # screen border is not content
+    dmask = None
     # a dialog on a dimmed page: only the dialog counts (the dimmed panels behind it are not what the point is about)
     bright = g > 236
     rows, cols = np.where(bright.mean(1) > 0.25)[0], np.where(bright.mean(0) > 0.25)[0]
@@ -108,7 +109,7 @@ def suggest(path, base=None, n=4):
         outside = np.concatenate([g[:my0].ravel(), g[my1:].ravel(), g[:, :mx0].ravel(), g[:, mx1:].ravel()])
         floats = my0 > 0.02 * H and my1 < 0.98 * H and mx0 > 0.02 * W and mx1 < 0.98 * W   # a dialog has a margin on all four sides
         if floats and (my1 - my0) * (mx1 - mx0) < 0.8 * W * H and len(outside) and outside.mean() < inner - 25:
-            m = np.zeros_like(edge); m[my0 + max(3, (my1 - my0) // 12):my1 - 3, mx0 + 3:mx1 - 3] = True; edge &= m   # skip the dialog's toolbar row
+            m = np.zeros_like(edge); m[my0 + max(3, (my1 - my0) // 12):my1 - 3, mx0 + 3:mx1 - 3] = True; edge &= m; dmask = m   # skip the dialog's toolbar row
     area = W * H
 
     def spread(x0, y0, x1, y1, k=6):
@@ -135,6 +136,14 @@ def suggest(path, base=None, n=4):
 
     want, n = n, max(n, 2)   # the chart test needs two regions, whatever was asked for
     picked = pick((2, 5), 0.015, 0.25)
+    # a dense light UI: faint card borders and shadows join every panel into one region at the fine threshold; at
+    # stricter thresholds the panels separate. Tried only when the fine pass found fewer than two regions.
+    for th, radii in ((8, (3, 5, 8)), (16, (3, 5, 8))):
+        if len(picked) >= 2: break
+        edge = e > th
+        edge[:2, :] = edge[-2:, :] = False; edge[:, :2] = edge[:, -2:] = False
+        if dmask is not None: edge &= dmask
+        picked = pick(radii, 0.015, 0.3)
     if len(picked) < 2:   # a chart (sparse marks on white): no boxes. Blind critics read ellipses on chart space as noise;
         return [bw, bh], []   # the chart is the image, the points stay as on-screen labels
     picked = picked[:want]
