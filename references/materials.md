@@ -9,7 +9,7 @@ English first, 中文在后。One folder in, a drafted film out: `python3 script
 | --- | --- | --- | --- |
 | **Hero visuals** | 6–20 real screenshots, ideally 2× (3840×2160); phone captures | product cut-outs (transparent PNG, one per colour/model/angle) | photographs of the place, the people (with consent), the work |
 | **Texture / detail** | crops come from screenshots | macro photos (material, finish, stitching, glaze…) | close-ups of hands, tools, ingredients |
-| **Context** | screen recordings (any format → WebM) | lifestyle photos (in use, in a room, on a table) | wide establishing shots |
+| **Context** | screen recordings (any format → WebM) | lifestyle photos (in use, in a room, on a table); **real footage** (the product working, being used, poured, worn), any format | wide establishing shots; footage of the place and the work |
 | **Logo** | transparent PNG ≥ 512 px (name it `logo.png`) | same | same |
 | **Music** (optional) | the user's licensed track | same | same; without one an original underscore is composed |
 | **Voice** (optional) | `vo_*.wav` recordings, or Kokoro TTS | same | same |
@@ -21,7 +21,8 @@ What `intake.py` (run by autofilm) recognises:
 - **packshot**: a product on a bright, flat background. autofilm keeps it for the hero, framed; it is not masked automatically, so ask for a transparent PNG if a cut-out or lineup is wanted.
 - **cutout**: an object on transparency.
 - **figure**: charts and plots.
-- **logo**, clips, music, voice and docs.
+- **footage** vs **screen** recordings: one frame from the middle of each clip decides. Footage can open the film, stand in for a photo beat, or get its own beat; it plays from its best moment (`scripts/footage.py`: sharp, exposed, moving but not shaking). Screen recordings go to `clip` scenes. Name a clip `*screen*` / `*record*` to force a screen, `*footage*` / `*shot*` for footage.
+- **logo**, music, voice and docs.
 
 File names help: `*detail*`, `*texture*` and `*macro*` go to detail beats, `*lifestyle*` and `*scene*` to photo beats, and `*screen*` or `*ui*` mark screens. The folder's name counts as a hint for the genre (a folder called `humidifier` reads as home living). Role guesses are heuristics, so check the summary it prints.
 
@@ -54,7 +55,7 @@ The film can still be made, but it may claim only what the images visibly show: 
 | --- | --- | --- | --- |
 | **主视觉** | 6–20 张真实截图，最好 2 倍分辨率；手机截图 | 透明底产品图（每个颜色 / 型号 / 角度一张） | 场所、人物（需同意）、工作过程的照片 |
 | **质感 / 细节** | 从截图中裁取 | 微距照片（材质、工艺、缝线、釉面……） | 手、工具、原料的特写 |
-| **情境** | 录屏（任意格式，自动转 WebM） | 使用场景照片（在用、在房间、在桌上） | 全景照片 |
+| **情境** | 录屏（任意格式，自动转 WebM） | 使用场景照片（在用、在房间、在桌上）；**实拍视频**（产品运转、被使用、倒入、穿戴），任意格式 | 全景照片；场所与工作过程的实拍视频 |
 | **Logo** | 透明 PNG，≥ 512 px（命名为 `logo.png`） | 同左 | 同左 |
 | **音乐**（可选） | 用户授权的曲子 | 同左 | 同左；没有时自动原创配乐 |
 | **配音**（可选） | `vo_*.wav` 录音，或 Kokoro 合成 | 同左 | 同左 |
@@ -66,7 +67,8 @@ The film can still be made, but it may claim only what the images visibly show: 
 - **packshot**：浅色纯背景上的产品图。autofilm 把它留给高潮，带框使用；不会自动抠图，需要透明底或阵列展示时请向用户要透明 PNG。
 - **cutout**：透明底物体。
 - **figure**：图表。
-- **logo**，以及录屏、音乐、配音、文档。
+- **实拍视频**与**录屏**：取每段视频中间的一帧来判断。实拍视频可以做开场、替代照片拍点，或单独成为一拍，并从最好的片段开始播放（`scripts/footage.py`：清晰、曝光正常、有动作但不抖）。录屏用于 `clip` 场景。文件名含 `screen` / `record` 强制当录屏，含 `footage` / `shot` 当实拍。
+- **logo**，以及音乐、配音、文档。
 
 文件名也有帮助：`*detail*`、`*texture*`、`*macro*` 会进入细节拍点，`*lifestyle*`、`*scene*` 进入照片拍点，`*screen*`、`*ui*` 标记为界面。文件夹名也是类型的线索（叫 `humidifier` 的文件夹会被判为家居生活类）。分类是启发式的，请核对打印出的汇总。
 

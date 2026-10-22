@@ -23,7 +23,7 @@ const CIN = (() => {
     'playful-pop':    { shake: 0.35, hz: 0.45, dof: 1.5, pull: 0, glint: 0.6, flare: 0.35, kick: 0.016, leak: 0, bokeh: 0 },
     'editorial-type': { shake: 0,    hz: 0,    dof: 0,   pull: 0, glint: 0,   flare: 0,    kick: 0.005, leak: 0, bokeh: 0 },
   };
-  const L = Object.assign({}, LENS[MO_ID] || LENS['cinematic-3d'], C.lens || {});
+  const L = Object.assign({}, LENS[MO_ID] || LENS[(MOTIONS[MO_ID] || {}).like] || LENS['cinematic-3d'], C.lens || {});
   const light = !!ST.light;   // light-background styles: light effects are tinted and gentler
   // moods: saturation, brightness, contrast, tint colour (soft-light) and tint strength
   const MOODS = {

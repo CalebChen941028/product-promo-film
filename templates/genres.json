@@ -128,8 +128,8 @@
     "figure": 3
    },
    "style": [
-    "paper-academic",
     "midnight-tech",
+    "paper-academic",
     "keynote-light"
    ],
    "motion": "precision-data",

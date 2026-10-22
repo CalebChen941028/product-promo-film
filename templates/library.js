@@ -82,6 +82,7 @@ const LIB = (() => {
   // carousel { title?: {zh, en}, panels: [{zh, en, media, base?, crop?}] } — one panel per equal slice, menu tracks it.
   function carousel(start, end, o) {
     const P = o.panels || [];
+    if (layoutOf(o, ['menu', 'stack'], 'menu') === 'stack') return carouselStack(start, end, o);
     scene(start, end, (R, S) => {
       S.menu = div('abs', R); S.menu.style.width = '340px';
       if (o.title) S.head = textEl(R, `<div class="h-zh" style="font-size:28px;letter-spacing:4px">${o.title.zh}</div><div class="kicker" style="margin-top:8px;font-size:15px">${o.title.en || ''}</div>`, { width: '340px' });
@@ -96,6 +97,28 @@ const LIB = (() => {
         const l = lt - i * step, leave = i < n - 1 ? eio(prog(l, step, step + 0.45)) : 0, e = M.enter(l, { x: 170 });
         place(C.root, { ...e, x: e.x - leave * 420, z: e.z - leave * 300, ry: (e.ry || 0) - leave * 30 * Math.max(MO.tilt, 0.3), o: l < 0 ? 0 : e.o * (1 - leave) });
       });
+    });
+  }
+
+  // carousel layout 'stack': no menu — panels land one per slice on a deck in the centre, the earlier ones step back
+  // and up behind it; the current panel's name sits just above it (never in the caption band). Reads as "and this, and this" — breadth, calmly.
+  function carouselStack(start, end, o) {
+    const P = o.panels || [];
+    scene(start, end, (R, S) => {
+      if (o.title) S.head = textEl(R, `<div class="h-zh" style="font-size:30px;letter-spacing:4px;text-align:center">${o.title.zh}</div><div class="kicker" style="margin-top:8px;font-size:15px;text-align:center">${o.title.en || ''}</div>`, { whiteSpace: 'nowrap' });
+      S.cards = P.map((p) => { const base = p.base || [1920, 1080], crop = p.crop || [0, 0, base[0], base[1]]; const w = Math.min(1180, (600 / crop[3]) * crop[2]); return win(R, { srcs: p.media, base, crop, w, chrome: 'none', radius: 18 }); });
+      S.names = P.map((p) => textEl(R, `<span class="chip">${p.zh}${p.en ? ` <span class="muted" style="font:600 14px var(--en);letter-spacing:3px">${p.en.toUpperCase()}</span>` : ''}</span>`, { whiteSpace: 'nowrap' }));
+    }, (S, lt, d) => {
+      const n = Math.max(1, P.length), step = d / n, cur = clamp(Math.floor(lt / step), 0, n - 1);
+      if (S.head) M.text(S.head, lt, 0, { y: -430 });
+      S.cards.forEach((C, i) => {
+        const l = lt - i * step, back = clamp((lt - (i + 1) * step) / step, 0, 3), e = M.enter(l, { y: 30 });
+        const depth = i < cur ? cur - i : 0;
+        place(C.root, { ...e, y: 30 + e.y - eio(clamp(back)) * 40 - depth * 34, z: e.z - depth * 160, s: (e.s || 1) * (1 - depth * 0.04), o: l < 0 ? 0 : Math.min(1, e.o * 2.5) * (depth > 2 ? 0 : depth === 2 ? 1 - eio(clamp(back - 1)) : 1) });
+        // cards stay opaque (no ghost of the card behind); the ones that step back darken instead
+        C.root.style.filter = back > 0 ? `brightness(${(1 - eio(clamp(back / 2)) * 0.6).toFixed(3)})` : '';
+      });
+      S.names.forEach((el, i) => M.text(el, lt, i * step + 0.3, { y: 30 - (S.cards[i].h || 600) / 2 - 46, z: 40, o: i === cur ? 1 - prog(lt, (i + 1) * step - 0.25, (i + 1) * step) : 0 }));
     });
   }
 
@@ -124,21 +147,37 @@ const LIB = (() => {
     });
   }
 
-  // gallery { items: [{media, zh?, en?}] } — coverflow, one item per equal slice (name each in the voice-over).
+  // gallery { items: [{media, zh?, en?}], layout?: 'coverflow'|'grid'|'strip' } — one item per equal slice (name each in the voice-over).
+  //   coverflow: the current item centre, its neighbours turned away · grid: all items on a calm grid, the current one
+  //   lifts forward and the rest dim · strip: a film strip that slides left, the current frame large in the middle
   function gallery(start, end, o) {
-    const I = o.items || [];
-    scene(start, end, (R, S) => {
-      S.cards = I.map((it) => { const c = pic(R, it.media, 960, 600); if (it.zh) { const L = div('', c, `<div style="font:600 24px var(--zh)">${it.zh}</div><div style="font:700 13px var(--en);letter-spacing:4px;opacity:0.7;margin-top:2px">${(it.en || '').toUpperCase()}</div>`); Object.assign(L.style, { position: 'absolute', left: '22px', top: '18px', padding: '10px 18px', borderRadius: '12px', background: 'rgba(255,255,255,0.94)', color: '#1c2533' }); } return c; });
-    }, (S, lt, d) => {
-      const n = Math.max(1, I.length), step = d / n, { dur, ease } = MO.focus;
+    const I = o.items || [], lay = layoutOf(o, ['coverflow', 'grid', 'strip'], 'coverflow');
+    const label = (c, it) => { if (!it.zh) return; const L = div('', c, `<div style="font:600 24px var(--zh)">${it.zh}</div><div style="font:700 13px var(--en);letter-spacing:4px;opacity:0.7;margin-top:2px">${(it.en || '').toUpperCase()}</div>`); Object.assign(L.style, { position: 'absolute', left: '22px', top: '18px', padding: '10px 18px', borderRadius: '12px', background: 'rgba(255,255,255,0.94)', color: '#1c2533' }); };
+    const n = Math.max(1, I.length), cols = n <= 2 ? n : n <= 4 ? 2 : 3, rows = Math.ceil(n / cols);
+    const cw = lay === 'grid' ? Math.min(760, 1640 / cols - 40) : lay === 'strip' ? 880 : 960, chh = cw * 0.625;
+    scene(start, end, (R, S) => { S.cards = I.map((it) => { const c = pic(R, it.media, cw, chh); label(c, it); return c; }); }, (S, lt, d) => {
+      const step = d / n, { dur, ease } = MO.focus;
       let c = 0; for (let i = 0; i < n; i++) { const l = lt - i * step; if (l >= 0) c = i - 1 + ease(prog(l, 0, Math.min(dur, 0.9))); }
-      S.cards.forEach((el, i) => { const dd = i - c; place(el, { x: dd * 820, y: 0, z: -Math.abs(dd) * 540, ry: clamp(-dd * 40 * Math.max(MO.tilt, 0.35), -60, 60), s: lerp(1, 0.84, clamp(Math.abs(dd))), o: clamp(1 - Math.abs(dd) * 0.55) * (dd > 1.6 ? 0 : 1) }); });
+      const cur = Math.round(clamp(c, 0, n - 1));
+      S.cards.forEach((el, i) => {
+        const dd = i - c;
+        if (lay === 'grid') {
+          const gx = (i % cols - (cols - 1) / 2) * (cw + 40), gy = (Math.floor(i / cols) - (rows - 1) / 2) * (chh + 40) + 30;
+          const on = i === cur ? 1 : 0, e = M.pop(lt, i * Math.min(step, 0.5) * 0.6, { x: gx, y: gy });
+          place(el, { ...e, z: on * 120, s: (e.s || 1) * (1 + on * 0.06), o: (e.o ?? 1) * (on ? 1 : 0.55) });
+        } else if (lay === 'strip') {
+          place(el, { x: dd * (cw + 60), y: 20, s: lerp(1.08, 0.78, clamp(Math.abs(dd))), o: clamp(1.25 - Math.abs(dd) * 0.45) * (Math.abs(dd) > 2.2 ? 0 : 1) });
+        } else {
+          place(el, { x: dd * 820, y: 0, z: -Math.abs(dd) * 540, ry: clamp(-dd * 40 * Math.max(MO.tilt, 0.35), -60, 60), s: lerp(1, 0.84, clamp(Math.abs(dd))), o: clamp(1 - Math.abs(dd) * 0.55) * (dd > 1.6 ? 0 : 1) });
+        }
+      });
     });
   }
 
   // clip { media: '*.webm', base?, title?: {zh, en}, offset?: 0, rate?: 1 } — screen recording in the style's frame.
   function clipScene(start, end, o) {
     scene(start, end, (R, S) => {
+      S.ownVideo = true;   // it seeks its own clip (offset, rate)
       S.W = win(R, { srcs: [{ video: o.media }], base: o.base, w: 1300 });
       if (o.title) S.t = tag(S.W, o.title.zh, o.title.en);
     }, (S, lt, d) => {
@@ -201,7 +240,8 @@ const LIB = (() => {
       // (sharpens, lifts) out of the hook's own screen. Then it holds alone (2–3 s, backdrop dimmed), then the name.
       const n = S.wins.length, per = kind === 'stack' ? Math.min(0.6, 1.6 / n) : 0, hold = Math.min(d * 0.55, 3.8);
       const settle = esoft(prog(lt, hold, hold + 1.1)), out = 1 - prog(lt, d - 0.7, d);
-      if (S.bd) { place(S.bd.root, { o: lerp(0.7, 0.35, esoft(prog(lt, 0.2, 1.2))) * out }); S.bd.root.style.filter = `blur(${lerp(2, 12, esoft(prog(lt, 0, 1.0))).toFixed(1)}px) saturate(0.8)`; }
+      if (S.bd) { place(S.bd.root, { o: lerp(0.7, 0.35, esoft(prog(lt, 0.2, 1.2))) * out }); const dim = ST.light ? 1 : lerp(1, 0.42, esoft(prog(lt, 0.2, 1.2)));   // a dark style: a light UI recedes into a dark texture, not a grey wash
+        S.bd.root.style.filter = `blur(${lerp(2, 12, esoft(prog(lt, 0, 1.0))).toFixed(1)}px) saturate(0.8) brightness(${dim.toFixed(3)})`; }
       S.wins.forEach((W, i) => {
         const a = esoft(prog(lt, i * per, i * per + 0.9));
         const off = kind === 'stack' ? (i - (n - 1) / 2) : 0;
@@ -262,8 +302,11 @@ const LIB = (() => {
       const col = ([en, zh, val, sub]) => `<div style="text-align:center;padding:0 46px"><div class="accent" style="font:600 14px var(--en);letter-spacing:5px">${en}</div><div class="muted" style="font:500 18px var(--zh);margin-top:6px">${zh}</div><div style="font:600 26px var(--zh);margin-top:8px">${val}</div><div class="muted" style="font:400 19px var(--en);margin-top:4px">${sub || ''}</div></div>`;
       S.info = textEl(R, `<div style="display:flex">${(b.contacts || []).map(col).join('<div style="width:1px;align-self:stretch;background:var(--faint)"></div>')}</div>`, { whiteSpace: 'nowrap' });
       S.chips = textEl(R, chipsHTML(b.chips, 17), { whiteSpace: 'nowrap' });
+      // the call to action (AIDA's A): one true next step from the docs — "申请内测 / Join the beta" — the last thing to arrive
+      if (b.cta && (b.cta.zh || b.cta.en)) S.cta = textEl(R, `<span style="display:inline-block;padding:14px 34px;border-radius:999px;background:var(--accent);color:var(--bg-edge);font:700 24px var(--zh);letter-spacing:3px">${b.cta.zh || ''}${b.cta.en ? `<span style="font:700 15px var(--en);letter-spacing:3px;margin-left:14px;opacity:0.85">${b.cta.en.toUpperCase()}</span>` : ''}</span>`, { whiteSpace: 'nowrap' });
     }, (S, lt) => {
       const a = (t0, t1) => prog(lt, t0, t1);
+      if (S.cta) { place(S.chips, { y: 418, o: a(3.6, 4.3) }); place(S.cta, M.pop(lt, 4.0, { y: 336 })); }
       place(S.icon, M.pop(lt, 0.1, { y: -372 }));
       M.text(S.name, lt, 0.4, { y: -238 });
       place(S.kick, { y: -170, o: a(0.8, 1.4) });
@@ -271,7 +314,7 @@ const LIB = (() => {
       M.text(S.motto, lt, 1.6, { y: -6 });
       place(S.rule2, { y: 138, s: eo(a(2.6, 3.4)), o: a(2.6, 3.0) });
       M.text(S.info, lt, 3.0, { y: 236 });
-      place(S.chips, { y: 354, o: a(3.6, 4.3) });
+      if (!S.cta) place(S.chips, { y: 354, o: a(3.6, 4.3) });
     });
   }
 
@@ -279,8 +322,10 @@ const LIB = (() => {
   const fill169 = (base) => { const [bw, bh] = base, w = Math.min(bw, bh * 16 / 9), h = w * 9 / 16; return [(bw - w) / 2, (bh - h) / 2, w, h]; };
   const zoomIn = (r, k, cx = 0.5, cy = 0.5) => { const w = r[2] / k, h = r[3] / k; return [r[0] + (r[2] - w) * cx, r[1] + (r[3] - h) * cy, w, h]; };
   const backdrop = (R, media, base) => { const W = win(R, { srcs: media, base, w: 1920, chrome: 'none', radius: 0 }); W.root.dataset.qa = 'backdrop'; W.root.style.boxShadow = 'none'; return W; };
-  const scrim = (R, side) => { const d = div('', R); Object.assign(d.style, { position: 'absolute', inset: 0, pointerEvents: 'none',
-    background: side === 'left' ? 'linear-gradient(90deg, rgba(0,0,0,0.62), rgba(0,0,0,0.25) 45%, rgba(0,0,0,0) 70%)' : 'linear-gradient(rgba(0,0,0,0) 45%, rgba(0,0,0,0.55))' }); return d; };
+  const SCRIM = { left: 'linear-gradient(90deg, rgba(0,0,0,0.62), rgba(0,0,0,0.25) 45%, rgba(0,0,0,0) 70%)', right: 'linear-gradient(270deg, rgba(0,0,0,0.62), rgba(0,0,0,0.25) 45%, rgba(0,0,0,0) 70%)',
+    bottom: 'linear-gradient(rgba(0,0,0,0) 45%, rgba(0,0,0,0.55))', center: 'radial-gradient(ellipse at 50% 62%, rgba(0,0,0,0.55), rgba(0,0,0,0.18) 55%, rgba(0,0,0,0) 80%)' };
+  const scrim = (R, side) => { const d = div('', R); Object.assign(d.style, { position: 'absolute', inset: 0, pointerEvents: 'none', background: SCRIM[side] || SCRIM.bottom }); return d; };
+  const layoutOf = (o, allowed, dflt) => (allowed.includes(o.layout) ? o.layout : allowed.includes(SHOT.layout) ? SHOT.layout : dflt);
   // a product cut-out (transparent PNG) standing on the stage: soft contact shadow + faint floor reflection
   function cutout(R, src, w, h) {
     const root = div('abs', R); Object.assign(root.style, { width: w + 'px', height: h + 'px' }); root.dataset.qa = 'media';
@@ -293,17 +338,36 @@ const LIB = (() => {
     return { root, im };
   }
 
-  // photo { media, base?, title?: {zh, en}, focus?: [x,y,w,h], side?: 'left'|'bottom' } — full-bleed photograph, slow push-in, text on a scrim.
+  // photo { media, base?, title?: {zh, en}, focus?: [x,y,w,h], side?|layout?: 'left'|'right'|'bottom'|'center'|'split' }
+  //   left/right/bottom/center: full-bleed photograph, slow push-in, text on a scrim on that side
+  //   split: the photograph as a tall card on the left 58 % (it drifts inside its frame), the line in clean space on the right
   function photo(start, end, o) {
     const base = o.base || [1920, 1080], from = fill169(base), to = o.focus || zoomIn(from, 1.12, 0.5, 0.45);
+    const lay = layoutOf({ layout: o.side || o.layout }, ['left', 'right', 'bottom', 'center', 'split'], 'left');
+    const titleHTML = (light) => `<div class="h-zh" style="${light ? 'color:#fff;text-shadow:0 4px 30px rgba(0,0,0,0.5);' : ''}font-size:52px;letter-spacing:8px">${o.title?.zh || ''}</div><div style="margin-top:14px;font:500 22px var(--en);letter-spacing:4px;${light ? 'color:rgba(255,255,255,0.86)' : ''}" class="${light ? '' : 'muted'}">${o.title?.en || ''}</div>`;
+    if (lay === 'split') {
+      const cw = 1040, ch = 860, aspect = cw / ch, k = Math.min(base[0], base[1] * aspect), cropW = k, cropH = k / aspect;
+      const c0 = [(base[0] - cropW) / 2, (base[1] - cropH) / 2, cropW, cropH], c1 = zoomIn(c0, 1.1, 0.5, 0.45);
+      scene(start, end, (R, S) => {
+        S.W = win(R, { srcs: o.media, base, crop: c0, w: cw, chrome: 'none', radius: 18 }); S.W.root.dataset.qa = 'media';
+        if (o.title) S.t = textEl(R, titleHTML(false), { width: '620px' });
+      }, (S, lt, d) => {
+        setCrop(S.W, c0.map((v, j) => lerp(v, c1[j], esoft(prog(lt, 0, d + ST.xf)))), cw);
+        place(S.W.root, M.win(lt, d, { x: -960 + 96 + cw / 2, y: 0 }));
+        if (S.t) M.text(S.t, lt, 0.6, { x: 960 - 96 - 310, y: 0 });
+      });
+      return;
+    }
     scene(start, end, (R, S) => {
       S.W = backdrop(R, o.media, base);
-      if (o.title) { S.scrim = scrim(R, o.side || 'left');
-        S.t = textEl(R, `<div class="h-zh" style="color:#fff;font-size:52px;letter-spacing:8px;text-shadow:0 4px 30px rgba(0,0,0,0.5)">${o.title.zh || ''}</div><div style="margin-top:14px;font:500 22px var(--en);letter-spacing:4px;color:rgba(255,255,255,0.86)">${o.title.en || ''}</div>`, { width: '760px' }); }
+      if (o.title) { S.scrim = scrim(R, lay); S.t = textEl(R, titleHTML(true), { width: '760px', textAlign: lay === 'center' ? 'center' : lay === 'right' ? 'right' : 'left' }); }
     }, (S, lt, d) => {
       const k = esoft(prog(lt, 0, d + ST.xf));
       setCrop(S.W, from.map((v, j) => lerp(v, to[j], k)), 1920); place(S.W.root, { o: 1 });
-      if (S.t) { M.text(S.t, lt, 0.6, { x: -960 + 120 + 380, y: o.side === 'bottom' ? 200 : 40 }); S.scrim.style.opacity = prog(lt, 0.2, 1.0); }   // 120 px margin
+      if (S.t) {   // 120 px margin
+        const pos = { left: { x: -960 + 120 + 380, y: 40 }, right: { x: 960 - 120 - 380, y: 40 }, bottom: { x: -960 + 120 + 380, y: 200 }, center: { x: 0, y: 220 } }[lay];
+        M.text(S.t, lt, 0.6, pos); S.scrim.style.opacity = prog(lt, 0.2, 1.0);
+      }
     });
   }
 
@@ -345,6 +409,7 @@ const LIB = (() => {
   function detail(start, end, o) {
     const base = o.base || [1920, 1080], f = fill169(base);
     const C = (o.crops && o.crops.length ? o.crops : [{ rect: zoomIn(f, 2.6, 0.5, 0.45) }, { rect: zoomIn(f, 2.2, 0.25, 0.5) }, { rect: zoomIn(f, 2.2, 0.75, 0.55) }]).slice(0, 4);
+    if (layoutOf(o, ['macro', 'split'], 'macro') === 'split') return detailSplit(start, end, o, base, C);
     scene(start, end, (R, S) => {
       S.layers = C.map(() => backdrop(R, o.media, base));
       S.labels = C.map((c) => (c.zh ? textEl(R, `<span class="chip">${c.zh}${c.en ? ` <span class="muted" style="font:500 15px var(--en)">${c.en}</span>` : ''}</span>`, { whiteSpace: 'nowrap' }) : null));
@@ -352,11 +417,32 @@ const LIB = (() => {
       const n = C.length, per = d / n;
       S.layers.forEach((W, i) => {
         const l = lt - i * per, inA = i === 0 ? 1 : prog(l, -0.25, 0.35), outA = i === n - 1 ? 1 : 1 - prog(l, per - 0.25, per + 0.35);
-        const r = C[i].rect, k = esoft(prog(l, -0.3, per + 0.4));
+        const r = padTo169(C[i].rect, base, 1.0, 0.36), k = esoft(prog(l, -0.3, per + 0.4));   // 16:9 and at most ~2.8× — a strip or a button is never blown up
         setCrop(W, zoomIn(r, lerp(1, 1.1, k)), 1920); place(W.root, { o: clamp(Math.min(inA, outA)) });
         W.root.style.display = l > -0.3 && l < per + 0.4 ? 'block' : 'none';
         if (S.labels[i]) M.text(S.labels[i], l, 0.35, { x: -560, y: 300, o: clamp(Math.min(prog(l, 0.3, 0.7), 1 - prog(l, per - 0.3, per))) });
       });
+    });
+  }
+
+  // detail layout 'split': the whole image small on the left with a box on the region, the region large on the right —
+  // "here, and up close". The box travels to each crop in turn; the magnified view follows it.
+  function detailSplit(start, end, o, base, C) {
+    const sw = 700, bw = 960, R16 = C.map((c) => padTo169(c.rect, base, 1.0, 0.3));
+    scene(start, end, (R, S) => {
+      S.small = win(R, { srcs: o.media, base, w: sw, chrome: 'none', radius: 14 });
+      S.box = div('', S.small.ov); Object.assign(S.box.style, { position: 'absolute', border: '3px solid var(--accent)', borderRadius: '8px', boxShadow: '0 0 0 9999px rgba(0,0,0,0.35)' });
+      S.big = win(R, { srcs: o.media, base, crop: R16[0], w: bw, chrome: 'none', radius: 18 });
+      S.labels = C.map((c) => (c.zh ? textEl(R, `<span class="chip">${c.zh}${c.en ? ` <span class="muted" style="font:500 15px var(--en)">${c.en}</span>` : ''}</span>`, { whiteSpace: 'nowrap' }) : null));
+    }, (S, lt, d) => {
+      const n = C.length, per = d / n, steps = R16.map((r, i) => [i * per + 0.6, r]);
+      const r = M.focus(lt, [[0, R16[0]], ...steps]);
+      setCrop(S.big, r, bw);
+      const [x, y, w, h] = r, k = S.small.s;
+      Object.assign(S.box.style, { left: `${(x - S.small.crop[0]) * k}px`, top: `${(y - S.small.crop[1]) * k}px`, width: `${w * k}px`, height: `${h * k}px`, opacity: prog(lt, 0.3, 0.8) });
+      place(S.small.root, M.win(lt, d, { x: -960 + 96 + sw / 2, y: -20 }));
+      place(S.big.root, M.win(lt - 0.25, d, { x: 960 - 96 - bw / 2, y: -20 }));
+      S.labels.forEach((el, i) => { if (el) M.text(el, lt, i * per + 0.5, { x: 960 - 96 - bw / 2, y: 340, o: Math.min(prog(lt, i * per + 0.5, i * per + 0.9), 1 - prog(lt, (i + 1) * per - 0.3, (i + 1) * per)) }); });
     });
   }
 
@@ -383,5 +469,118 @@ const LIB = (() => {
     }, (S, lt, d) => { place(S.mark, { x: -600, y: -300, o: prog(lt, 0.1, 0.8) * 0.35 }); M.text(S.q, lt, 0.3, { y: -40 }); M.text(S.who, lt, 1.4, { y: 230 }); });
   }
 
-  return { cover, pain, feature: featureScene, carousel, numbers, gallery, clip: clipScene, phone, compare, statement, finale, endcard, photo, hero, detail, lineup, quote };
+  // ---------- motion graphics: story built in code (no materials; never a fake product UI) ----------
+  const svgEl = (tag, attrs = {}, parent) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+  const stageSVG = (R) => { const sv = svgEl('svg', { width: 1920, height: 1080, viewBox: '0 0 1920 1080' }); Object.assign(sv.style, { position: 'absolute', left: 0, top: 0, pointerEvents: 'none' }); R.appendChild(sv); return sv; };
+  const emph = (s) => String(s || '').replace(/\*([^*]+)\*/g, '<span class="accent">$1</span>');
+
+  // flow { steps: [{zh, en?}] (2–5) | "chapters", title?: {zh, en} } — the journey as a line of nodes: the line draws
+  // itself, a light travels along it, each node lights up on its slice (say one step per line). "chapters" = the film's
+  // own chapter names, so the map and the chapters always agree.
+  function flow(start, end, o) {
+    const ST_ = (o.steps || []).slice(0, 5), n = Math.max(1, ST_.length), span = Math.min(1500, 340 * n), x0 = 960 - span / 2, gap = n > 1 ? span / (n - 1) : 0, Y = 560;
+    scene(start, end, (R, S) => {
+      S.svg = stageSVG(R);
+      S.track = svgEl('path', { d: `M${x0},${Y} L${x0 + span},${Y}`, fill: 'none', stroke: 'var(--faint)', 'stroke-width': 3 }, S.svg);
+      S.line = svgEl('path', { d: `M${x0},${Y} L${x0 + span},${Y}`, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 4, 'stroke-linecap': 'round' }, S.svg);
+      S.dot = svgEl('circle', { r: 9, fill: 'var(--accent)' }, S.svg); S.dot.style.filter = 'drop-shadow(0 0 12px var(--accent))';
+      S.nodes = ST_.map((st, i) => {
+        const g = div('abs', R); g.dataset.qa = 'text';
+        g.innerHTML = `<div style="width:84px;height:84px;border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center;font:700 30px var(--mono);border:3px solid var(--accent);background:var(--bg-edge)">${String(i + 1).padStart(2, '0')}</div>
+          <div style="margin-top:22px;text-align:center;font:600 32px var(--zh);white-space:nowrap">${st.zh || ''}</div><div class="muted" style="margin-top:6px;text-align:center;font:600 15px var(--en);letter-spacing:4px;white-space:nowrap">${(st.en || '').toUpperCase()}</div>`;
+        return g;
+      });
+      if (o.title) S.title = textEl(R, `<div class="h-zh" style="text-align:center;font-size:46px;letter-spacing:6px">${emph(o.title.zh)}</div><div class="kicker" style="text-align:center;margin-top:12px">${o.title.en || ''}</div>`, { whiteSpace: 'nowrap' });
+    }, (S, lt, d) => {
+      const t0 = 0.6, step = (d - t0 - 0.6) / n, T = ST_.map((_, i) => t0 + i * step), cur = T.reduce((c, ti, i) => (lt >= ti ? i : c), -1);
+      if (S.title) M.text(S.title, lt, 0.1, { y: -300 });
+      const reach = n > 1 ? clamp((lt - T[0]) / (T[n - 1] - T[0] + 1e-6)) : 1, len = span;
+      S.line.setAttribute('stroke-dasharray', len); S.line.setAttribute('stroke-dashoffset', len * (1 - eio(reach)));
+      S.dot.setAttribute('cx', x0 + span * eio(reach)); S.dot.setAttribute('cy', Y); S.dot.setAttribute('opacity', reach > 0 && reach < 1 ? 1 : 0);
+      S.nodes.forEach((g, i) => { const on = i === cur, past = i < cur; place(g, { ...M.pop(lt, T[i] - 0.15, { x: x0 + i * gap - 960, y: Y - 540 + 70 }), s: on ? 1.08 : 1, o: lt < T[i] - 0.15 ? 0 : on ? 1 : past ? 0.75 : 0.35 }); });
+    });
+  }
+
+  // hub { center?: {zh, en}, items: [{zh, en?}] (3–6), title? } — the scattered old way becomes one place: grey tools
+  // drift apart, lines reach out from the hub, the tools glide into a calm ring and light up. "One workbench, not five tools."
+  function hub(start, end, o) {
+    const I = (o.items || []).slice(0, 6), n = Math.max(1, I.length), R0 = 330;
+    const scatter = I.map((_, i) => { const a = (i / n) * Math.PI * 2 + 0.6; return [Math.cos(a) * 760 + Math.sin(i * 7.3) * 60, Math.sin(a) * 380 + Math.cos(i * 5.1) * 40, (i % 2 ? 1 : -1) * (6 + i * 2)]; });
+    const ring = I.map((_, i) => { const a = (i / n) * Math.PI * 2 - Math.PI / 2; return [Math.cos(a) * R0 * 1.35, Math.sin(a) * R0]; });
+    scene(start, end, (R, S) => {
+      S.svg = stageSVG(R);
+      S.lines = I.map(() => svgEl('line', { stroke: 'var(--accent)', 'stroke-width': 2, opacity: 0 }, S.svg));
+      S.core = div('abs', R); S.core.dataset.qa = 'text';
+      const c = o.center || { zh: CONFIG.BRAND?.name || '', en: '' };
+      S.core.innerHTML = `<div style="width:260px;height:260px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, var(--bg-edge)), var(--bg-edge));box-shadow:0 0 80px color-mix(in srgb, var(--accent) 35%, transparent);border:2px solid var(--accent)">
+        <div style="font:700 34px var(--zh);text-align:center;padding:0 20px">${c.zh || ''}</div><div class="muted" style="font:600 14px var(--en);letter-spacing:4px;margin-top:8px">${(c.en || '').toUpperCase()}</div></div>`;
+      S.items = I.map((it) => { const e = textEl(R, `<span class="chip" style="font-size:24px;padding:14px 26px">${it.zh}${it.en ? ` <span class="muted" style="font:600 14px var(--en)">${it.en}</span>` : ''}</span>`, { whiteSpace: 'nowrap' }); return e; });
+      if (o.title) S.title = textEl(R, `<div class="h-zh" style="text-align:center;font-size:44px;letter-spacing:6px">${emph(o.title.zh)}</div><div class="kicker" style="text-align:center;margin-top:12px">${o.title.en || ''}</div>`, { whiteSpace: 'nowrap' });
+    }, (S, lt, d) => {
+      const gather = esoft(prog(lt, d * 0.32, d * 0.62)), coreIn = prog(lt, d * 0.22, d * 0.4);
+      if (S.title) M.text(S.title, lt, d * 0.55, { y: -440 });
+      place(S.core, { ...M.pop(lt, d * 0.22, { y: 0 }), s: lerp(0.6, 1, eo(coreIn)) * (1 + 0.015 * Math.sin(lt * 2)) });
+      S.items.forEach((el, i) => {
+        const [sx, sy, sr] = scatter[i], [rx, ry] = ring[i], drift = (1 - gather) * Math.sin(lt * 0.9 + i) * 14;
+        const x = lerp(sx, rx, gather), y = lerp(sy, ry, gather) + drift;
+        place(el, { x, y, rz: lerp(sr, 0, gather), s: lerp(0.9, 1, gather), o: Math.min(prog(lt, i * 0.12, i * 0.12 + 0.5), 1) });
+        el.style.filter = `grayscale(${(1 - gather).toFixed(2)})`; el.style.opacity = (+el.style.opacity * lerp(0.55, 1, gather)).toFixed(3);
+        const ln = S.lines[i], a = prog(lt, d * 0.3 + i * 0.08, d * 0.6);
+        ln.setAttribute('x1', 960); ln.setAttribute('y1', 540); ln.setAttribute('x2', 960 + x * a); ln.setAttribute('y2', 540 + y * a); ln.setAttribute('opacity', (a * 0.55).toFixed(3));
+      });
+    });
+  }
+
+  // type { lines: [{zh, en?}] (1–4) } — kinetic typography: one big line at a time rises through a mask, *word* in the
+  // accent colour; earlier lines step back and dim. For a hook, a manifesto, a turn in the story.
+  function type(start, end, o) {
+    const Ls = (o.lines || []).slice(0, 4), n = Math.max(1, Ls.length);
+    scene(start, end, (R, S) => {
+      S.ls = Ls.map((l) => textEl(R, `<div class="h-zh" style="font-size:${n > 2 ? 64 : 76}px;letter-spacing:6px;text-align:center;white-space:nowrap">${emph(l.zh)}</div>${l.en ? `<div class="kicker" style="text-align:center;margin-top:16px">${emph(l.en)}</div>` : ''}`, { whiteSpace: 'nowrap' }));
+    }, (S, lt, d) => {
+      const step = (d - 0.4) / n, gapY = n > 2 ? 150 : 180, top = -((n - 1) * gapY) / 2;
+      S.ls.forEach((el, i) => {
+        const t0 = 0.3 + i * step, a = ex(prog(lt, t0, t0 + 0.6)), older = lt > t0 + step ? 1 : 0;
+        el.style.clipPath = `inset(${((1 - a) * 100).toFixed(1)}% -10% -30% -10%)`;
+        place(el, { y: top + i * gapY + (1 - a) * 50, s: older ? 0.94 : 1, o: lt < t0 ? 0 : older ? 0.42 : 1 });
+      });
+    });
+  }
+
+  // chart { kind?: 'bar'|'line', data: [{label, value}] (2–8), unit?, title?, source? } — real numbers from the user's
+  // docs drawn on the beat. Bars grow (or the line draws) without in-between digits: each value appears only when its
+  // bar has landed, so no frame shows a number the product never claimed.
+  function chart(start, end, o) {
+    const D = (o.data || []).slice(0, 8), n = Math.max(1, D.length), kind = o.kind === 'line' ? 'line' : 'bar';
+    const W = Math.min(1400, 200 * n + 200), H = 520, X0 = 960 - W / 2, Y0 = 760, max = Math.max(...D.map((x) => +x.value || 0), 1);
+    const px = (i) => X0 + (i + 0.5) * (W / n), py = (v) => Y0 - (v / max) * H;
+    scene(start, end, (R, S) => {
+      S.svg = stageSVG(R);
+      svgEl('line', { x1: X0, y1: Y0, x2: X0 + W, y2: Y0, stroke: 'var(--faint)', 'stroke-width': 2 }, S.svg);
+      if (kind === 'bar') S.bars = D.map((_, i) => svgEl('rect', { x: px(i) - Math.min(70, W / n * 0.32), width: Math.min(140, W / n * 0.64), rx: 8, fill: i === n - 1 ? 'var(--accent)' : 'color-mix(in srgb, var(--ink) 30%, transparent)' }, S.svg));
+      else { S.path = svgEl('path', { d: D.map((x, i) => `${i ? 'L' : 'M'}${px(i)},${py(+x.value)}`).join(' '), fill: 'none', stroke: 'var(--accent)', 'stroke-width': 5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, S.svg); S.dots = D.map(() => svgEl('circle', { r: 9, fill: 'var(--accent)' }, S.svg)); }
+      S.vals = D.map((x) => textEl(R, `<div style="font:700 34px var(--mono);text-align:center">${x.value}${o.unit || ''}</div>`, { whiteSpace: 'nowrap' }));
+      S.labs = D.map((x) => textEl(R, `<div class="muted" style="font:600 22px var(--zh);text-align:center">${x.label}</div>`, { whiteSpace: 'nowrap' }));
+      if (o.title) S.title = textEl(R, `<div class="h-zh" style="text-align:center;font-size:42px;letter-spacing:5px">${emph(o.title.zh)}</div><div class="kicker" style="text-align:center;margin-top:10px">${o.title.en || ''}</div>`, { whiteSpace: 'nowrap' });
+      if (o.source) S.src = textEl(R, `<div class="muted" style="font:500 15px var(--en);letter-spacing:1px">${o.source}</div>`, { whiteSpace: 'nowrap' });
+    }, (S, lt, d) => {
+      const t0 = 0.6, step = Math.min(0.5, (d - 1.6) / n);
+      if (S.title) M.text(S.title, lt, 0.1, { y: -430 });
+      if (S.src) M.text(S.src, lt, 0.8, { x: X0 + W - 960 - 200, y: Y0 - 540 + 80 });
+      D.forEach((x, i) => {
+        const a = eio(prog(lt, t0 + i * step, t0 + i * step + 0.7)), v = +x.value || 0;
+        if (S.bars) { const h = (v / max) * H * a; S.bars[i].setAttribute('y', Y0 - h); S.bars[i].setAttribute('height', Math.max(0, h)); }
+        else { S.dots[i].setAttribute('cx', px(i)); S.dots[i].setAttribute('cy', py(v)); S.dots[i].setAttribute('opacity', a >= 0.99 ? 1 : 0); }
+        M.text(S.labs[i], lt, t0 + i * step, { x: px(i) - 960, y: Y0 - 540 + 36 });
+        place(S.vals[i], { x: px(i) - 960, y: py(v) - 540 - 34, o: a >= 0.99 ? prog(lt, t0 + i * step + 0.7, t0 + i * step + 0.9) : 0 });
+      });
+      if (S.path) { const L = S.path.getTotalLength ? S.path.getTotalLength() : 2000, a = eio(prog(lt, t0, t0 + n * step + 0.4)); S.path.setAttribute('stroke-dasharray', L); S.path.setAttribute('stroke-dashoffset', L * (1 - a)); }
+    });
+  }
+
+  // footage { media: '*.webm', base?, offset?, rate?, title?, layout? } — real camera footage full-bleed (or framed:
+  // layout 'split'), with the photo's scrims and text sides. The clip plays from the director's chosen moment.
+  function footage(start, end, o) { photo(start, end, o); }
+
+  return { cover, pain, feature: featureScene, carousel, numbers, gallery, clip: clipScene, phone, compare, statement, finale, endcard, photo, hero, detail, lineup, quote, flow, hub, type, chart, footage };
 })();

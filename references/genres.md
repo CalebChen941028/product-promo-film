@@ -1,13 +1,13 @@
 # Product genres · 产品类型
 
-English first, 中文在后。`scripts/genres.py` scores each genre on keyword hits in the brief, docs and file names, plus what the materials folder contains. The top genre sets the defaults below. Override with `"genre"` in the brief or `film.json`, or with `autofilm.py --genre`. Edit or add genres in `templates/genres.json`.
+English first, 中文在后。`scripts/genres.py` scores each genre on keyword hits in the brief, docs and file names, plus what the materials folder contains. The top genre sets the defaults below for the story arc, music and voice. The **look** (style and motion) is not a default: the director chooses it from the materials (`scripts/look.py`, `references/director.md` §9), so the style column below is only the genre's usual character, one input among several. Override with `"genre"` in the brief or `film.json`, or with `autofilm.py --genre`. Edit or add genres in `templates/genres.json`.
 
 ## English
 | Genre | Product | Look | Motion | Composed music | Arc |
 | --- | --- | --- | --- | --- | --- |
 | `software-saas` | Software, SaaS, productivity · 软件 / SaaS / 效率工具 | `midnight-tech` (or `keynote-light`, `editorial-mono`) | `cinematic-3d` | `cinematic-pulse` 104 | `problem-solution` |
 | `developer-ai` | Developer tools, AI agents, infrastructure · 开发者工具 / AI 智能体 / 安全基础设施 | `neon-cyber` (or `midnight-tech`, `editorial-mono`) | `kinetic-launch` | `minimal-electronic` 120 | `hype` |
-| `science-data` | Science, research, data analysis · 科研 / 数据分析 / 统计 | `paper-academic` (or `midnight-tech`, `keynote-light`) | `precision-data` | `minimal-electronic` 104 | `problem-solution` |
+| `science-data` | Science, research, data analysis · 科研 / 数据分析 / 统计 | `midnight-tech` (or `paper-academic`, `keynote-light`) | `precision-data` | `minimal-electronic` 104 | `problem-solution` |
 | `finance-fintech` | Finance, fintech, payments · 金融 / 支付 / 理财 | `midnight-tech` (or `keynote-light`, `paper-academic`) | `precision-data` | `minimal-electronic` 108 | `problem-solution` |
 | `mobile-consumer-app` | Consumer app, social, creator tools · 消费级 App / 社交 / 创作 | `aurora-glass` (or `keynote-light`, `natural-fresh`) | `playful-pop` | `bright-pop` 118 | `hype` |
 | `consumer-electronics` | Consumer electronics, smart hardware · 消费电子 / 智能硬件 / 设备 | `keynote-light` (or `midnight-tech`, `luxe-noir`) | `cinematic-3d` | `cinematic-pulse` 100 | `reveal` |

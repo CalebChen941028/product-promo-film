@@ -1,0 +1,453 @@
+{
+ "_golden": "GOLDEN REFERENCE (chaptered tour: a software product with 10+ real screens, 2–4 min; autofilm plans it). The structure follows examples/medstat-pilot, the 3:26 production film. Study it, then write YOUR product's film from YOUR docs. Do not copy its lines, its numbers or its product. It is not buildable (no materials). Every _why says what a top crew did and why.",
+ "_facts": "The docs this film was written from (fictional product): Fieldbook — a desktop data workbench for field ecologists. Imports CSV, Excel and GPX tracks; species names are checked against GBIF while you import. Cleaning tools: merge sites, fix coordinates, rename taxa in bulk. 40 analyses: diversity indices, rarefaction, occupancy models, ordination (NMDS, PCA), GLMMs. Figures at 300 or 600 DPI. One-click Word report; every analysis also exports its R script. An optional AI explains results; it receives summary tables, never raw records, and works with a local model. macOS and Windows. Free for students.",
+ "_anchors": {
+  "proposition": "A field season should end in findings, not in a week of spreadsheet repair.",
+  "concept": "From the notebook to the paper, in one place",
+  "hook": "Three months in the field. Three weeks in spreadsheets.",
+  "hero": "Fieldbook. From the field, to the finding.",
+  "last": "Three months in the field. One afternoon to the finding.",
+  "_why": "Even a long tour has ONE idea. The hook names the pain in the audience's own units (months, weeks); every chapter removes part of it; the last line repeats the hook with the product's change in it."
+ },
+ "name": "fieldbook-film",
+ "genre": "science-data",
+ "style": "midnight-tech",
+ "motion": "precision-data",
+ "cinema": "auto",
+ "music": {
+  "generate": {
+   "mood": "auto"
+  }
+ },
+ "voice": {
+  "engine": "kokoro",
+  "voice": "am_michael",
+  "lang": "a"
+ },
+ "brand": {
+  "name": "Fieldbook",
+  "logo": "materials/logo.png",
+  "positioningZh": "野外生态数据工作台",
+  "positioningEn": "THE DATA WORKBENCH FOR FIELD ECOLOGY",
+  "taglineZh": "从野外，到发现",
+  "taglineEn": "From the field, to the finding.",
+  "motto": [
+   "野外三个月，",
+   "一个下午出结果。",
+   "Three months in the field. One afternoon to the finding."
+  ],
+  "contacts": [
+   [
+    "WEB",
+    "网站",
+    "fieldbook.example",
+    "Free for students"
+   ]
+  ],
+  "chips": [
+   "macOS",
+   "Windows",
+   "Beta"
+  ]
+ },
+ "scenes": [
+  {
+   "type": "cover",
+   "bars": 4,
+   "media": "materials/06-analysis-nmds-result.png",
+   "focus": [
+    960,
+    180,
+    864,
+    486
+   ],
+   "_why": "Hook first, over the best real output (not the home screen): a calm second of the whole result, a push into the ordination plot, and the line that names the pain. The name comes after (~5 s).",
+   "say": [
+    {
+     "en": "Three months in the field. Three weeks in spreadsheets.",
+     "zh": "野外三个月，表格里三个星期。",
+     "at": 0.6
+    }
+   ]
+  },
+  {
+   "type": "pain",
+   "bars": 3,
+   "_why": "Four chores the audience has done, in their words. No adjectives.",
+   "items": [
+    [
+     "合并样地",
+     "Merging sites"
+    ],
+    [
+     "核对物种名",
+     "Checking names"
+    ],
+    [
+     "换软件建模",
+     "Switching tools"
+    ],
+    [
+     "手抄表格",
+     "Retyping tables"
+    ]
+   ],
+   "say": [
+    {
+     "en": "Merge the sites, check the names, switch tools, retype the tables.",
+     "zh": "合并样地、核对物种名、换软件、手抄表格。"
+    }
+   ]
+  },
+  {
+   "type": "flow",
+   "bars": 3,
+   "steps": "chapters",
+   "title": {
+    "zh": "从*野外*，到发现",
+    "en": "From the field, to the finding"
+   },
+   "_why": "The map before the journey: the chapters to come, drawn in code from the film's own chapter names, so the map and the film always agree. One sentence says the whole path; the chapters then walk it.",
+   "say": [
+    {
+     "en": "From the field sheet to the finding, in one place.",
+     "zh": "从野外记录表到结论，一个地方完成。"
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 4,
+   "media": "materials/02-data-import-checked.png",
+   "chapter": [
+    "01",
+    "数据",
+    "DATA"
+   ],
+   "_why": "Chapter 1 opens on the moment the user's own data arrives. One line says the result (names already checked); the points name where to look.",
+   "title": {
+    "zh": "导入时，物种名已核对",
+    "en": "Names checked as you import"
+   },
+   "points": [
+    {
+     "zh": "GBIF 核对",
+     "en": "Checked against GBIF",
+     "rect": [
+      980,
+      210,
+      760,
+      420
+     ]
+    },
+    {
+     "zh": "坐标与缺失",
+     "en": "Coordinates and gaps",
+     "rect": [
+      160,
+      210,
+      760,
+      420
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Drop in your field sheets. Every species name is checked against GBIF as it comes in.",
+     "zh": "拖入野外记录表，物种名在导入时就与 GBIF 核对。"
+    }
+   ]
+  },
+  {
+   "type": "carousel",
+   "bars": 3,
+   "title": {
+    "zh": "整理工具",
+    "en": "Cleaning tools"
+   },
+   "_why": "Breadth without a list: the rest of the chapter's screens flip by, each named in two or three words. One sentence covers all of them.",
+   "panels": [
+    {
+     "zh": "合并样地",
+     "en": "Merge sites",
+     "media": "materials/03-data-merge.png"
+    },
+    {
+     "zh": "修正坐标",
+     "en": "Fix coordinates",
+     "media": "materials/04-data-coords.png"
+    },
+    {
+     "zh": "批量改名",
+     "en": "Rename taxa",
+     "media": "materials/05-data-rename.png"
+    }
+   ],
+   "say": [
+    {
+     "en": "Merge sites, fix coordinates, rename taxa in bulk.",
+     "zh": "合并样地、修正坐标、批量改名。"
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 4,
+   "media": "materials/07-analysis-assign.png",
+   "chapter": [
+    "02",
+    "分析",
+    "ANALYSIS"
+   ],
+   "_why": "Chapter 2: the core job in one gesture (pick, drag, run). The count of analyses comes from the docs, said once.",
+   "title": {
+    "zh": "选方法，拖变量，运行",
+    "en": "Pick, drag, run"
+   },
+   "points": [
+    {
+     "zh": "40 种分析",
+     "en": "40 analyses",
+     "rect": [
+      40,
+      120,
+      420,
+      860
+     ]
+    },
+    {
+     "zh": "拖入变量",
+     "en": "Drag in variables",
+     "rect": [
+      560,
+      220,
+      760,
+      520
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "Forty analyses, from diversity to occupancy. Pick one, drag in your variables, and run.",
+     "cap": "40 analyses, from diversity to occupancy. Pick one, drag in your variables, and run.",
+     "zh": "40 种分析，从多样性到占域模型：选一个，拖入变量，运行。"
+    }
+   ]
+  },
+  {
+   "type": "carousel",
+   "bars": 3,
+   "title": {
+    "zh": "常用模型",
+    "en": "Common models"
+   },
+   "_why": "The second carousel names methods the audience searches for. Specific nouns beat 'powerful models'.",
+   "panels": [
+    {
+     "zh": "稀疏曲线",
+     "en": "Rarefaction",
+     "media": "materials/08-analysis-rarefaction.png"
+    },
+    {
+     "zh": "占域模型",
+     "en": "Occupancy",
+     "media": "materials/09-analysis-occupancy.png"
+    },
+    {
+     "zh": "混合模型",
+     "en": "GLMM",
+     "media": "materials/10-analysis-glmm.png"
+    }
+   ],
+   "say": [
+    {
+     "en": "Rarefaction, occupancy models, mixed models.",
+     "zh": "稀疏曲线、占域模型、混合模型。"
+    }
+   ]
+  },
+  {
+   "type": "statement",
+   "bars": 2,
+   "_why": "The breath after two chapters: no picture, the feeling, no new fact.",
+   "zh": "数据还是你的，只是不用再修了。",
+   "en": "Your data. Without the repair work."
+  },
+  {
+   "type": "gallery",
+   "bars": 4,
+   "chapter": [
+    "03",
+    "产出",
+    "OUTPUTS"
+   ],
+   "_why": "Chapter 3 is outputs: real figures in a coverflow, the voice names one per item (at), nothing else.",
+   "items": [
+    {
+     "media": "materials/11-outputs-nmds.png",
+     "zh": "NMDS 排序",
+     "en": "NMDS"
+    },
+    {
+     "media": "materials/12-outputs-rarefaction.png",
+     "zh": "稀疏曲线",
+     "en": "Rarefaction"
+    },
+    {
+     "media": "materials/13-outputs-map.png",
+     "zh": "样地地图",
+     "en": "Site map"
+    }
+   ],
+   "say": [
+    {
+     "en": "Ordination.",
+     "zh": "排序图。",
+     "at": 0.2
+    },
+    {
+     "en": "Rarefaction.",
+     "zh": "稀疏曲线。",
+     "at": 1.5
+    },
+    {
+     "en": "Site maps, at six hundred DPI.",
+     "cap": "Site maps, at 600 DPI.",
+     "zh": "样地地图，600 DPI。",
+     "at": 2.8
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 4,
+   "media": "materials/14-outputs-report.docx.png",
+   "_why": "The take-away: the report and the script. Reproducibility is said as what it lets the user do.",
+   "title": {
+    "zh": "一键 Word 报告",
+    "en": "One-click Word report"
+   },
+   "points": [
+    {
+     "zh": "表与图已排版",
+     "en": "Tables and figures, laid out"
+    },
+    {
+     "zh": "附 R 脚本",
+     "en": "With its R script"
+    }
+   ],
+   "say": [
+    {
+     "en": "One click writes the report. Every analysis keeps its R script, so anyone can rerun it.",
+     "zh": "一键生成报告；每个分析都附 R 脚本，谁都能重跑。"
+    }
+   ]
+  },
+  {
+   "type": "feature",
+   "bars": 4,
+   "media": "materials/15-ai-answer.png",
+   "chapter": [
+    "04",
+    "AI",
+    "AI"
+   ],
+   "_why": "Chapter 4: AI as a colleague, with its limit in the same scene (summary tables only, a local model is possible). The film says the AI text was scripted (in the report and the README, not on screen).",
+   "title": {
+    "zh": "AI 解读结果",
+    "en": "AI reads the results"
+   },
+   "points": [
+    {
+     "zh": "只看汇总表",
+     "en": "Summary tables only",
+     "rect": [
+      1180,
+      160,
+      640,
+      760
+     ]
+    }
+   ],
+   "say": [
+    {
+     "en": "The assistant explains what the model found. It sees summary tables, never your records.",
+     "zh": "AI 解释模型发现了什么；它只看到汇总表，看不到原始记录。"
+    }
+   ]
+  },
+  {
+   "type": "compare",
+   "bars": 4,
+   "_why": "Why it is new, in rows the docs support. Old way left, new way right, short.",
+   "rows": [
+    [
+     "四个软件",
+     "Four tools",
+     "一个工作台",
+     "One workbench"
+    ],
+    [
+     "手动核对物种名",
+     "Names by hand",
+     "导入即核对",
+     "Checked on import"
+    ],
+    [
+     "手抄结果",
+     "Retyped results",
+     "报告直出",
+     "Report in one click"
+    ],
+    [
+     "难以复现",
+     "Hard to rerun",
+     "附 R 脚本",
+     "R script included"
+    ]
+   ],
+   "say": [
+    {
+     "en": "One workbench instead of four tools, and every result can be rerun.",
+     "zh": "一个工作台取代四个软件，每个结果都能重跑。"
+    }
+   ]
+  },
+  {
+   "type": "finale",
+   "bars": 4,
+   "hero": "rise",
+   "image": "materials/11-outputs-nmds.png",
+   "backdrop": "materials/06-analysis-nmds-result.png",
+   "media": [
+    "materials/11-outputs-nmds.png",
+    "materials/12-outputs-rarefaction.png",
+    "materials/13-outputs-map.png",
+    "materials/14-outputs-report.docx.png"
+   ],
+   "_why": "The hero pays off the hook: the cold-open screen returns blurred and the finished figure rises out of it on the downbeat, alone for ~3 s, then the name.",
+   "say": [
+    {
+     "id": "tagline",
+     "en": "Fieldbook. From the field, to the finding.",
+     "zh": "Fieldbook，从野外，到发现。",
+     "at": 1.2
+    }
+   ]
+  },
+  {
+   "type": "endcard",
+   "bars": "rest",
+   "_why": "Callback to the hook with the product's change in it. Platforms and price live in chips and contacts.",
+   "say": [
+    {
+     "id": "motto",
+     "en": "Three months in the field. One afternoon to the finding.",
+     "zh": "野外三个月，一个下午出结果。",
+     "at": 0.6
+    }
+   ]
+  }
+ ]
+}

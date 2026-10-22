@@ -10,7 +10,7 @@
 <a id="english"></a>
 ## English
 
-Point an AI coding agent at a folder: screenshots, product photos or cut-outs, clips, a logo and a README. Music is optional. It produces a 1080p film of 45 s to 4 min (the length follows the materials) with:
+Point an AI coding agent at a folder: screenshots, product photos or cut-outs, clips, a logo and a README. No screenshots? Point it at the installed app or a URL instead: `scripts/capture_app.mjs` drives the real app from a shot list and captures every screen at 3840×2160. Music is optional. It produces a 1080p film of 45 s to 4 min (the length follows the materials) with:
 - a cover poster;
 - real material animated with restraint, cut on the beat;
 - an original underscore when you have no track;
@@ -35,6 +35,9 @@ It works for software, apps, hardware, fashion, food, services, places and brand
 - **The film is data, not code.**
   - `film.json` picks from 17 scene types: cover · pain · feature · carousel · numbers · gallery · clip · phone · compare · statement · finale · endcard, plus photo · hero · detail · lineup · quote for physical products, places and people.
   - `make_film.py` runs check → build → voice → QA → render → finish, and every error prints a `FIX:` line.
+- **A look chosen from the materials, not by product type** (`scripts/look.py`): it scores all 8 styles on what the pictures actually are and writes its reasons into the treatment; the user's own words for the feel (`--mood`) count triple.
+- **A director that designs before it makes** (`scripts/director.py`): it reads every picture (screen or photo, dense or calm, the quiet side, where the subject sits) and gives each scene its own layout, camera move and cut, with the reason, in a storyboard you can read and overrule. 7 feature layouts, photo/gallery/carousel/detail variants, 15 camera moves (push, pan, crane, arc, dolly zoom, handheld…) and 12 cuts (rack focus, iris, doors, light leak, dip…), within the motion language's palette.
+- **Story drawn in code, any product:** journey maps, many-into-one hubs, kinetic type and real-number charts glue the materials together; real footage plays from its best moment and can open the film.
 - **A restrained director's cinema layer:** a colour script, a LUT grade, adaptive 180° motion blur, a subtle lens and light, and quiet synthesised sound design. Effects are felt, not seen.
 - **Automatic layout QA** measures overlaps, off-frame content and caption collisions, so mid-sized models ship clean frames.
 - **Highlight boxes without measuring:** `suggest_rects.py` finds the cards, panels, charts and tables in a screenshot; autofilm pre-fills feature points with them.
@@ -42,7 +45,7 @@ It works for software, apps, hardware, fashion, food, services, places and brand
 - **Measured on smaller models:** given one line, Claude Haiku's films matched the film Claude Opus made on the same materials (within critic noise) and beat it on others, in blind panels of three independent critics, with every honesty gate passing. `evals/` holds the test folders, the method and the full report ([evals/REPORT.md](evals/REPORT.md)).
 
 ### 8 visual styles × 6 motion languages
-The look and the movement are chosen separately. Both follow the product's genre and theme.
+The look and the movement are chosen separately, and neither is a default: the director reads the materials (`scripts/look.py`: screens or photos, light or dark UI, saturation, density, charts, warm or cool hues) and scores all eight styles with written reasons.
 
 | Style | Preview | Default motion | Suits |
 | --- | --- | --- | --- |
@@ -120,7 +123,7 @@ Examples:
 <a id="中文"></a>
 ## 中文
 
-把一个文件夹交给 AI 编程智能体：截图、产品照片或透明底产品图、录屏、Logo、README，音乐可有可无。它会做出一部 45 秒到 4 分钟的 1080p 宣传片（片长取决于素材多少）：
+把一个文件夹交给 AI 编程智能体：截图、产品照片或透明底产品图、录屏、Logo、README，音乐可有可无。没有截图时，也可以直接指向已安装的应用或网址：`scripts/capture_app.mjs` 按镜头清单操作真实应用，以 3840×2160 采集每一屏。它会做出一部 45 秒到 4 分钟的 1080p 宣传片（片长取决于素材多少）：
 - 封面海报；
 - 克制而有节奏的真实素材动效，切点卡在节拍上；
 - 没有音乐时自动原创配乐；
@@ -143,6 +146,9 @@ Examples:
 - **片子是数据而不是代码**：
   - `film.json` 从 17 种场景中选择；新增的 photo · hero · detail · lineup · quote 用于实物产品、空间与人物。
   - `make_film.py` 一条命令完成检查到交付，出错时给出 `FIX:`。
+- **视觉风格由素材决定，不按产品类型套用**（`scripts/look.py`）：按图片的真实情况给 8 种风格打分并把理由写进方案；用户描述风格的用词（`--mood`）权重三倍。
+- **先设计、后制作的导演**（`scripts/director.py`）：读懂每张画面（截图还是照片、密还是疏、哪一侧安静、主体在哪），为每个场景选好版式、运镜和转场并写明理由，生成可读、可改的分镜表。功能场景 7 种版式，照片、画廊、轮播、细节各有变体，15 种运镜（推拉、横移、升降、环绕、希区柯克变焦、手持……）、12 种转场（焦点转移、圆形展开、对开、漏光、黑场……），都在本片动效语言的调色板之内。
+- **用代码讲故事，适用于任何产品**：旅程图、多合一汇聚、动态文字、真实数字图表把素材串起来；实拍视频从最好的片段播放，也可以做开场。
 - **克制的导演电影层**：色彩脚本、LUT 调色、自适应 180° 运动模糊、含蓄的镜头与光效、轻声的合成声音设计；效果感受得到，看不出来。
 - **自动版式 QA**：用数值检测重叠、出画、字幕冲突，中等规模的模型也能交出干净的画面。
 - **高亮框不用手量**：`suggest_rects.py` 自动找出截图里的卡片、面板、图表和表格，autofilm 用它预填功能要点。
@@ -150,7 +156,7 @@ Examples:
 - **在较小模型上实测**：只给一句提示，Claude Haiku 做出的片子在三位独立评审的盲评中，同一素材上与 Claude Opus 制作的片子持平（在评审波动范围内），其他素材上超过它，且所有诚实性关卡都通过。`evals/` 里有测试素材、方法和完整报告（[evals/REPORT.md](evals/REPORT.md)）。
 
 ### 8 种视觉风格 × 6 种动效语言
-风格与动效分开选择，都依据产品类型与主题；对照表与预览见上方英文部分。新增 `luxe-noir`（安静的奢华感：时尚、美妆、珠宝、高端硬件）与 `natural-fresh`（日光与材质：食品、身心健康、旅行、家居、亲子）。
+风格与动效分开选择，都由导演读素材后决定（没有默认值，见 `scripts/look.py`）；对照表与预览见上方英文部分。新增 `luxe-noir`（安静的奢华感：时尚、美妆、珠宝、高端硬件）与 `natural-fresh`（日光与材质：食品、身心健康、旅行、家居、亲子）。
 
 ### 安装与快速开始
 命令见上方英文部分。对智能体说：“用 product-promo-film skill，根据 ~/materials 里的素材给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。示例：

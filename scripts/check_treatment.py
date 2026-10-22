@@ -88,6 +88,7 @@ def qkey(q):
 def omitted_qualifiers(spec, docs):
     """(scene index, claim, doc sentence, qualifier) for claims the docs qualify but the scene does not."""
     flat = re.sub(r'"\s*[,:]\s*"|"\s*[\]\[{}]|[\]\[{}]\s*"|\\n', '\n', docs)       # JSON lists/fields from brief.json → one item per line
+    flat = re.sub(r'[\w./-]+\.(?:png|jpe?g|webp|gif|webm|mp4|mov|docx?|pdf)\b', '', flat, flags=re.I)   # a file name ("02-data-preview.png") is not a qualifier
     sents = [x.strip(' -•*"') for x in re.split(r'(?<=[.!?。！？；;])\s+|\n+', flat) if QRE.search(x or '')]
     out, seen = [], set()
     for i, sc in enumerate(spec.get('scenes', [])):
@@ -202,6 +203,14 @@ elif sum(vals) / len(vals) < 4 or min(vals) < 3:
 if len(sys.argv) > 2:
     fpath = Path(sys.argv[2])
     spec = json.load(open(fpath))
+    try:   # "rect": "@panel name" → the exact box (scripts/director.py); unresolved names are make_film's errors to report
+        import director as _DIR
+        _DIR.resolve_rects(spec, fpath.resolve().parent)
+        for sc in spec.get('scenes', []):
+            for p_ in sc.get('points', []) or []:
+                if not isinstance(p_.get('rect'), (list, type(None))): p_.pop('rect', None)
+    except Exception:
+        pass
     todo = [p for p, v in lint_copy.walk(spec) if 'TODO' in v]
     if todo: err(f'film.json still has {len(todo)} TODO(s), e.g. {todo[0]}', 'write them from the treatment (copywriter)')
     b = spec.get('brand', {})
@@ -240,6 +249,7 @@ if len(sys.argv) > 2:
     tlow = truth.lower()
     copy_items = [(p_, v) for p_, v in lint_copy.walk(spec)] + [(f'brand.chips[{k}]', c) for k, c in enumerate(b.get('chips') or []) if isinstance(c, str)]
     copy_items += [(f'scenes[{i}].stats[{k}]', f"{st.get('value', '')}{st.get('suffix', '')} {st.get('en', '')} {st.get('zh', '')}") for i, sc in enumerate(spec.get('scenes', [])) for k, st in enumerate(sc.get('stats', []))]
+    copy_items += [(f'scenes[{i}].data[{k}]', f"{x.get('value', '')}{sc.get('unit', '')} {x.get('label', '')}") for i, sc in enumerate(spec.get('scenes', [])) if sc.get('type') == 'chart' for k, x in enumerate(sc.get('data', [])) if isinstance(x, dict)]
     name_nums = set(re.findall(r'\d+', f"{b.get('name', '')} {b.get('nameAccent', '')}"))
     unsourced = []
     sec8 = section(md, 8)
@@ -293,14 +303,28 @@ if len(sys.argv) > 2:
             err(f'{label} "{want[:50]}" is not what the {(sc or {}).get("type", idx)} scene says ("{got[:50]}")', 'the anchor lines are written first and used as written: put them in the cover / finale / endcard "say" (or change the treatment)')
 
     # specificity
+    # deliberate choices: a crew may break a taste default on purpose ("- Deliberate · 刻意: Rhythm — three close-ups in a
+    # row: the open is a macro sequence"). The named taste check then advises instead of blocking. Honesty never bends:
+    # numbers, specs, qualifiers, places, TODOs and the form stay hard.
+    TASTE = {'one idea': 'One idea', 'idea': 'One idea', 'hook': 'Hook', 'specific': 'Specific', 'copy': 'Specific', 'image': 'Image',
+             'restraint': 'Restraint', 'rhythm': 'Rhythm', 'hero': 'Hero', 'ending': 'ending', 'memorable ending': 'ending'}
+    deliberate = {}
+    for ln in re.findall(r'Deliberate[^:\n]*:\s*([^\n]+)', md):
+        for part in re.split(r'[;；]', ln):
+            m_ = re.match(r'\s*([A-Za-z ]+?)\s*[—–:-]\s*(.+)', part)
+            if not m_: continue
+            key = TASTE.get(m_.group(1).strip().lower())
+            reason = m_.group(2).strip()
+            if key and (len(reason.split()) >= 6 or len(re.findall(r'[\u4e00-\u9fff]', reason)) >= 10): deliberate[key] = reason
+    soft = lambda key: (lambda m, fix: warn(f'{m} — kept on purpose ({key}: "{deliberate[key][:60]}")', fix)) if key in deliberate else err
     if docs and body:
         vague_lines = [(t, s['en']) for _, t, s in body if not is_concrete(s['en'], vocab)]
         ratio = 1 - len(vague_lines) / len(body)
         proof = [(t, l) for t, l in vague_lines if t in ('feature', 'hero', 'numbers', 'compare', 'phone', 'clip', 'carousel')]
         for t, l in proof:
-            err(f'{t} line has no fact from the docs: "{l[:70]}"', 'a proof beat names something real — a number, a part, a material, a place, a feature by name (from the README/brief)')
+            soft('Specific')(f'{t} line has no fact from the docs: "{l[:70]}"', 'a proof beat names something real — a number, a part, a material, a place, a feature by name (from the README/brief)')
         if ratio < 2 / 3:
-            err(f'only {ratio:.0%} of the spoken lines carry a concrete fact (need ≥ 67%)', 'replace mood lines with what is true: e.g. "Each glaze finds its own way through the kiln", not "Discover a new way to enjoy your morning"')
+            soft('Specific')(f'only {ratio:.0%} of the spoken lines carry a concrete fact (need ≥ 67%)', 'replace mood lines with what is true: e.g. "Each glaze finds its own way through the kiln", not "Discover a new way to enjoy your morning"')
         caps['Specific'] = 5 if ratio >= 0.85 else (4 if ratio >= 0.75 else 3)
         if vague_lines and not proof: warn(f'{len(vague_lines)} line(s) without a fact, e.g. "{vague_lines[0][1][:60]}"', 'fine for one mood line; more reads as filler')
     elif not docs:
@@ -323,7 +347,7 @@ if len(sys.argv) > 2:
         cname = re.split(r'\s[—–:-]\s|:', concepts[ch.group(1)])[0]
         key = [stem(w) for w in words(cname) if w.lower() not in STOP and len(w) > 2]
         if key and not any(k in {stem(w) for w in words(copy_all)} for k in key):
-            err(f'the chosen concept "{cname.strip()}" never reaches the film', 'the idea must be on screen: put its key image or words in the hook, the hero line or the tagline — otherwise it is a feature list')
+            soft('One idea')(f'the chosen concept "{cname.strip()}" never reaches the film', 'the idea must be on screen: put its key image or words in the hook, the hero line or the tagline — otherwise it is a feature list')
             caps['One idea'] = 3
     prop = field(section(md, 2), 'Single-minded proposition')
     if prop and tag_en and overlap(prop, tag_en + ' ' + (b.get('motto') or [''])[-1]) == 0 and overlap(prop, ' '.join(s['en'] for _, _, s in spoken[-2:])) == 0:
@@ -396,6 +420,9 @@ if len(sys.argv) > 2:
     if holds:
         caps['Rhythm'] = min(caps.get('Rhythm', 5), 3)
         warn(f'a long hold on one image ({holds[0]})', 'silent or single-image beats over ~6 s read as empty: 2–3 bars, or give the beat a line')
+    if c0.get('type') == 'cover' and isinstance(c0.get('media'), str) and re.search(r'home|welcome|start[-_ ]?screen|splash|login|sign.?in|settings?|empty|blank|首页|欢迎|设置', Path(c0['media']).stem, re.I):
+        caps['Hook'] = min(caps.get('Hook', 5), 3)
+        warn('the cold open is a home / start screen', 'a home screen shows nothing happening: open on the best real output (a result, a plot, the answer), as autofilm chose, and let the hook line name the tension')
     if scenes and scenes[0]['type'] == 'cover' and isinstance(scenes[0].get('media'), str) and re.search(r'detail|texture|macro|grain|close', scenes[0]['media'], re.I):
         caps['Hook'] = min(caps.get('Hook', 5), 3)
         warn('the cold open is a texture', 'open on an image with a subject; textures belong in the detail beat')
@@ -416,7 +443,7 @@ if len(sys.argv) > 2:
         caps['Image'] = min(caps.get('Image', 5), 3)
         warn(f'scenes[{big[0]}]: a highlight box covers most of the screen', 'box only the region the point names (suggest_rects.py --preview); a box around everything highlights nothing')
     hero_hits = [sc for sc in scenes if sc.get('hit') == 'hero']
-    if len(hero_hits) > 1: caps['Restraint'] = 3; err(f'{len(hero_hits)} scenes marked "hit": "hero"', 'exactly one hero moment (references/director.md §5)')
+    if len(hero_hits) > 1: caps['Restraint'] = 3; soft('Restraint')(f'{len(hero_hits)} scenes marked "hit": "hero"', 'exactly one hero moment (references/director.md §5)')
     cover_line = next((s['en'] for sc in scenes[:1] for s in sc.get('say', [])), '')
     end_line = ' '.join(s['en'] for sc in scenes[-1:] for s in sc.get('say', [])) + ' ' + ' '.join((b.get('motto') or [])[-1:])
     if cover_line and end_line.strip() and overlap(cover_line, end_line, MINSTOP) == 0 and overlap(tag_en or '', end_line, MINSTOP) == 0:
@@ -427,7 +454,7 @@ if len(sys.argv) > 2:
         warn('the last line is logistics (dates, prices, booking)', 'logistics go in the contacts; the last line is the one the audience keeps')
     for k, cap in caps.items():
         if k in scores and scores[k] > cap:
-            err(f'taste score "{k}" = {scores[k]}, but the film shows at most {cap}', 'fix the film (copy, images, rhythm) until it earns the score — or lower the score and improve another part. Never inflate.')
+            soft(k)(f'taste score "{k}" = {scores[k]}, but the film shows at most {cap}', 'fix the film (copy, images, rhythm) until it earns the score — or lower the score and improve another part. Never inflate.')
 
 print('\n'.join(warns_))
 print('\n'.join(errs) if errs else 'treatment OK — the crew signed off; build the film')

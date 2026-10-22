@@ -11,9 +11,9 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `out` | string | no | working folder (default `film_out`) |
 | `materials` | path | no | the materials folder (autofilm writes it); `check_treatment.py` reads the docs there to check that proof lines carry facts |
 | `treatment` | path / `"skip"` | no | the crew's treatment (default `treatment.md`); the build refuses to start until it passes `check_treatment.py`. `"skip"` only for a throwaway test cut |
-| `genre` | string | no | product type from `templates/genres.json` (`python3 scripts/genres.py --list`); sets the defaults for style, motion and composed music |
-| `style` | string | yes | look: `midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`, or `auto` (from the genre) |
-| `motion` | string | no | motion language: `cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`; empty = the style's default |
+| `genre` | string | no | product type from `templates/genres.json` (`python3 scripts/genres.py --list`); sets the defaults for composed music and the story arc; the look is chosen separately, from the materials |
+| `style` | string | yes | look: `midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`, or `auto` (the director's `scripts/look.py` reads the materials; autofilm writes its choice here) |
+| `motion` | string | no | motion language: `cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`; empty = the one that goes with the look (a dense data UI gets `precision-data`) |
 | `music.file` | path | no | the user's track (mp3/wav/m4a…). Without it, an original underscore is composed bar-for-bar from the scenes |
 | `music.generate` | object | no | `{"mood": "auto"\|"cinematic-pulse"\|"minimal-electronic"\|"warm-piano"\|"bright-pop"\|"luxe-lounge"\|"ambient-air"\|"warm-acoustic", "bpm": 98, "seed": 3}`. The end card (`"rest"`) is then about 8 s (3–4 bars) plus a ring-out bar |
 | `music.extend` | object | no | `{"from_bar": A, "to_bar": B, "times": 1}` repeats bars A–B once (a chorus) to lengthen the film |
@@ -25,6 +25,11 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `tools.ffmpeg` / `tools.node_modules` / `tools.workers` | — | no | override tool discovery / render workers |
 | `cover_t` | number | no | second used for the cover poster (default: just before the cover ends, when the title has settled) |
 | `cinema` | `"auto"` / `"off"` / object | no | the director's cinema layer (default `"auto"` = on, all defaults from the style + motion). See below |
+| `scripts` | list of paths | no | the film's own JS: custom scenes (`CUSTOM.x`), camera moves (`CAMERA.x`), cuts (`CUT.x`); loaded after the library (`references/custom-scenes.md`) |
+| `css` | list of paths | no | the film's own stylesheet(s), loaded after the style: variables, fonts, any rule |
+| `motions` | object | no | the film's own motion languages: `{"id": {"like": "<built-in>", enter, text, hl, pop, camera, tilt, drift, focus, palette}}`; use the id as `motion` |
+| `palette` | object | no | `{"accent": "#…", "accent2": "#…", "why": "…"}`: the film's accent colours, chosen by the colour director (`scripts/palette.py`: the brand, colour psychology for the genre, harmony with the materials, ≥ 3:1 contrast). Background and ink stay the style's. Remove it to use the style's own accent |
+| `direction` | object | no | `{"variety": "calm" \| "balanced" \| "rich"}`: how far the shot plan strays from the motion language's signature layout, move and cut (default `balanced`; `references/director.md` §6) |
 
 ### cinema (director's layer, `references/director.md`)
 | Key | Default | Meaning |
@@ -39,7 +44,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `lens` | by motion (restrained) | override `{shake, hz, dof, pull, glint, flare, kick, leak, bokeh}`; 0 = off. `leak` and `bokeh` are 0 by default — add them only for soft or playful briefs |
 
 ### brand
-`name`, `nameAccent` (second word in the accent colour), `logo` (transparent PNG), `positioningZh`, `positioningEn`, `taglineZh`, `taglineEn`, `motto` = [zh line 1, zh line 2 (accent), English line], `contacts` = list of [LABEL_EN, 中文标签, value, sub-line] (≤ 3 reads best), `chips` = platforms/status (last chip highlighted if it says Beta/Preview/内测).
+`name`, `nameAccent` (second word in the accent colour), `logo` (transparent PNG), `positioningZh`, `positioningEn`, `taglineZh`, `taglineEn`, `motto` = [zh line 1, zh line 2 (accent), English line], `contacts` = list of [LABEL_EN, 中文标签, value, sub-line] (≤ 3 reads best), `chips` = platforms/status (last chip highlighted if it says Beta/Preview/内测), `cta` = {zh, en} the call to action, one true next step from the docs (zh ≤ 8 字, en ≤ 4 words), shown last on the end card as a button (optional).
 
 ### Every scene
 | Field | Meaning |
@@ -49,7 +54,10 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `chapter` | optional `["01", "数据", "DATA"]` → top-left chapter label while the scene plays |
 | `say` | optional narration lines `[{en, zh, cap?, at?, id?}]`. `en` is spoken, `zh` is the Chinese caption, `cap` replaces the English caption (digits: "300 DPI"), `at` = start in bars from the scene start (default spread evenly from 0.3), `id` = `tagline`/`motto` to hide the caption because the text is already on screen |
 | `mood` | optional colour-script mood: `cold` `neutral` `peak` `warm` `night` (default by type: pain cold, numbers/finale peak, endcard warm) |
-| `cut` | optional cut INTO this scene: `style` (the style's transition), `whip` (pan + motion blur), `push` (camera flies through). Default by motion language |
+| `cut` | optional cut INTO this scene: `style` (the style's transition), `whip`, `push`, `slide-up`, `wipe`, `iris`, `zoom`, `blur`, `rack`, `doors`, `light`, `dip` (`references/director.md` §6). Default: the director's shot plan |
+| `layout` | optional frame for this scene: feature `center` `split` `split-r` `full` `soft` `stickers` `editorial` · photo `left` `right` `bottom` `center` `split` · gallery `coverflow` `grid` `strip` · carousel `menu` `stack` · detail `macro` `split`. Default: the shot plan |
+| `camera` | optional camera move over the scene: `push` `pull` `pan-l` `pan-r` `crane` `tilt` `arc` `vertigo` `handheld` `reveal` `orbit` `punch` `dolly` `sway` `none`. Default: the shot plan |
+| `motion` | optional motion language for this scene only (the film keeps its own) |
 | `energy` | optional 0–3: the music section under this scene when the music is composed (default by type) |
 | `hit` | optional `true`/`false`/`"hero"`. A hit is a small camera kick plus a soft sound on the scene's first beat (default: the scene after `pain`, `numbers`). The one `"hero"` beat (default `finale`) also gets the flare, the impact and a riser |
 
@@ -73,6 +81,12 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `detail` | 2 | `media`, `base?`, `crops?[{rect,zh?,en?}]` ≤ 4 | macro close-ups (texture before the whole); default crops are chosen for you |
 | `lineup` | 2 | `items[{media,zh?,en?}]` ≤ 6, `title?`, `cutout?` | the range (colours, models, sizes) standing together |
 | `quote` | 2 | `zh`, `en?`, `who`, `role?` | a **real**, approved testimonial; large and quiet |
+| `custom` | 1 | `fn`, `assets?`, `size?`, any field | the director's cut: a scene your script registers as `CUSTOM.<fn>` (`references/custom-scenes.md`) |
+| `footage` | 2 | `media` (.webm from intake), `base?`, `offset?`, `rate?`, `poster?`, `title?`, `layout?` | real camera footage, full-bleed (text on the quiet side) or framed (`split`). `offset` = where it plays from (autofilm picks the best moment with `scripts/footage.py`). A `.webm` also works as the media of `cover`, `photo` and `hero` |
+| `flow` | 2 | `steps` = [{zh, en}] (2–5) or `"chapters"`, `title?` | code-drawn journey map: the line draws, a light travels, each step lights on its slice. `"chapters"` = the film's own chapter names |
+| `hub` | 3 | `items` [{zh, en}] (3–6), `center?` {zh, en}, `title?` | code-drawn many-into-one: scattered grey items gather into a ring around the product and light up |
+| `type` | 2 | `lines` [{zh, en?}] (1–4) | kinetic typography: big lines rise through a mask; `*word*` in the accent colour |
+| `chart` | 3 | `data` [{label, value}] (2–8), `kind?` `bar`/`line`, `unit?`, `title?`, `source?` | real numbers drawn on the beat; each value appears only when its bar lands. Every value needs a source in the user's docs (gated) |
 
 ### Coordinates
 `base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units. `scripts/suggest_rects.py <image> --preview .` suggests numbered rects (cards, panels, charts, tables) in base units for any image size; autofilm pre-fills feature points with them. Measure by hand with `scripts/grid_overlay.py` (grid labels are base units for 1920×1080 captures) or `scripts/modal_bbox.py` for dialogs.
@@ -100,6 +114,11 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `tools.*` | — | 否 | 手动指定 ffmpeg、node_modules、渲染进程数 |
 | `cover_t` | 数字 | 否 | 封面海报取第几秒（默认：封面结束前、标题落定时） |
 | `cinema` | `"auto"` / `"off"` / 对象 | 否 | 导演电影层（默认 `"auto"` 开启，参数取自风格与动效语言），见下 |
+| `scripts` | 路径列表 | 否 | 本片自己的 JS：自定义场景（`CUSTOM.x`）、运镜（`CAMERA.x`）、转场（`CUT.x`），在场景库之后加载（见 `references/custom-scenes.md`） |
+| `css` | 路径列表 | 否 | 本片自己的样式表，在风格之后加载：变量、字体、任意规则 |
+| `motions` | 对象 | 否 | 本片自己的动效语言：`{"id": {"like": "<内置语言>", enter, text, hl, pop, camera, tilt, drift, focus, palette}}`，把 id 写进 `motion` 使用 |
+| `palette` | 对象 | 否 | `{"accent": "#…", "accent2": "#…", "why": "…"}`：全片强调色，由色彩导演（`scripts/palette.py`）根据品牌色、本类产品的色彩心理、与素材的色彩和谐、≥ 3:1 对比度选出；背景与文字色仍用风格自带的。删除则使用风格默认强调色 |
+| `direction` | 对象 | 否 | `{"variety": "calm" \| "balanced" \| "rich"}`：镜头表偏离动效语言招牌版式、运镜、转场的程度（默认 `balanced`，见 `references/director.md` 第 6 节） |
 
 ### cinema（导演电影层，见 `references/director.md`）
 | 键 | 默认 | 含义 |
@@ -114,7 +133,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `lens` | 随动效语言（克制） | 覆盖 `{shake, hz, dof, pull, glint, flare, kick, leak, bokeh}`，0 为关闭；`leak`、`bokeh` 默认 0，只在柔和或活泼的项目中再打开 |
 
 ### brand（品牌）
-`name`、`nameAccent`（强调色显示的第二个词）、`logo`（透明 PNG）、`positioningZh` / `positioningEn`（定位）、`taglineZh` / `taglineEn`（口号）、`motto` = [中文第一行, 中文第二行（强调色）, 英文一句]、`contacts` = [英文标签, 中文标签, 值, 副行] 的列表（3 组最好看）、`chips` = 平台 / 版本状态（最后一个若是 Beta / 内测 会高亮）。
+`name`、`nameAccent`（强调色显示的第二个词）、`logo`（透明 PNG）、`positioningZh` / `positioningEn`（定位）、`taglineZh` / `taglineEn`（口号）、`motto` = [中文第一行, 中文第二行（强调色）, 英文一句]、`contacts` = [英文标签, 中文标签, 值, 副行] 的列表（3 组最好看）、`chips` = 平台 / 版本状态（最后一个若是 Beta / 内测 会高亮），`cta` = {zh, en} 行动号召：文档支持的一个真实下一步（中文 ≤ 8 字、英文 ≤ 4 词），在结尾页最后以按钮形式出现（可选）。
 
 ### 每个场景都有
 | 字段 | 含义 |
@@ -124,7 +143,10 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `chapter` | 可选，`["01", "数据", "DATA"]`，场景播放时左上角显示章节 |
 | `say` | 可选旁白 `[{en, zh, cap?, at?, id?}]`：`en` 是念出来的英文，`zh` 是中文字幕，`cap` 替换英文字幕（用于显示数字），`at` 为相对场景起点的小节数（默认从 0.3 起均匀分布），`id` 写 `tagline` / `motto` 时隐藏字幕（画面上已有同一句） |
 | `mood` | 可选，色彩脚本情绪：`cold` `neutral` `peak` `warm` `night`（默认：痛点 cold，数字和高潮 peak，结尾 warm） |
-| `cut` | 可选，进入本场景的转场：`style`（风格自带）、`whip`（甩镜 + 运动模糊）、`push`（镜头推进穿越）；默认随动效语言 |
+| `cut` | 可选，进入本场景的转场：`style`（风格自带）、`whip`、`push`、`slide-up`、`wipe`、`iris`、`zoom`、`blur`、`rack`、`doors`、`light`、`dip`（见 `references/director.md` 第 6 节）；默认由导演镜头表决定 |
+| `layout` | 可选，本场景版式：功能 `center` `split` `split-r` `full` `soft` `stickers` `editorial` · 照片 `left` `right` `bottom` `center` `split` · 画廊 `coverflow` `grid` `strip` · 轮播 `menu` `stack` · 细节 `macro` `split`；默认由镜头表决定 |
+| `camera` | 可选，本场景运镜：`push` `pull` `pan-l` `pan-r` `crane` `tilt` `arc` `vertigo` `handheld` `reveal` `orbit` `punch` `dolly` `sway` `none`；默认由镜头表决定 |
+| `motion` | 可选，仅本场景使用的动效语言（全片保持自己的） |
 | `energy` | 可选 0–3：原创配乐时本场景下的音乐强度（默认按类型） |
 | `hit` | 可选 `true`/`false`/`"hero"`：击点是场景第一拍的轻微镜头冲击加轻声音效（默认：痛点之后的场景、`numbers`）；唯一的 `"hero"` 高潮（默认 `finale`）另有镜头光晕、重击和上升音 |
 
@@ -148,6 +170,12 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `detail` | 2 | `media`、`base?`、`crops?[{rect,zh?,en?}]` ≤ 4 | 微距特写（先质感，后全貌），默认自动选取裁切 |
 | `lineup` | 2 | `items[{media,zh?,en?}]` ≤ 6、`title?`、`cutout?` | 产品系列（颜色、型号、尺寸）并排展示 |
 | `quote` | 2 | `zh`、`en?`、`who`、`role?` | **真实**且经授权的用户评价，大字、安静 |
+| `custom` | 1 | `fn`、`assets?`、`size?`、任意字段 | 导演剪辑版：由你的脚本注册为 `CUSTOM.<fn>` 的场景（见 `references/custom-scenes.md`） |
+| `footage` | 2 | `media`（intake 转出的 .webm）、`base?`、`offset?`、`rate?`、`poster?`、`title?`、`layout?` | 真实拍摄的视频，满幅（文字放在安静的一侧）或加框（`split`）。`offset` 为起播位置（autofilm 用 `scripts/footage.py` 选出最好的片段）。`.webm` 也可直接作为 `cover`、`photo`、`hero` 的素材 |
+| `flow` | 2 | `steps` = [{zh, en}]（2–5）或 `"chapters"`、`title?` | 代码绘制的流程图：线条逐段画出、光点前进、各步骤依次点亮；`"chapters"` 即用本片的章节名 |
+| `hub` | 3 | `items` [{zh, en}]（3–6）、`center?` {zh, en}、`title?` | 代码绘制的“多合一”：散落的灰色事项汇聚到产品周围并点亮 |
+| `type` | 2 | `lines` [{zh, en?}]（1–4） | 动态文字：大字逐行遮罩升起，`*某词*` 用强调色 |
+| `chart` | 3 | `data` [{label, value}]（2–8）、`kind?` `bar`/`line`、`unit?`、`title?`、`source?` | 按节拍绘出真实数字；每个数值只在柱子落定后出现。每个数值都必须能在用户文档中找到来源（门禁会检查） |
 
 ### 坐标
 `base` 是图片的坐标空间：1920×1080 窗口的 2 倍截图用 `[1920, 1080]`（默认）；`intake.py` 会为每张图给出建议的 `base`。`rect` / `crop` / `focus` 都是 base 单位下的 `[x, y, 宽, 高]`。`scripts/suggest_rects.py <图片> --preview .` 会自动给出编号的建议框（卡片、面板、图表、表格），适用于任意尺寸，单位为 base；autofilm 会用它预填功能要点。也可用 `scripts/grid_overlay.py` 手动量取（网格刻度即 1920×1080 截图的 base 单位），弹窗可用 `scripts/modal_bbox.py` 自动求框。

@@ -78,9 +78,10 @@ for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswi
         elif alpha and kind == 'cutout': role = 'cutout'            # product shot on a transparent background
         elif alpha and 0.8 < ar < 1.25 and w <= 1200: role = 'logo'
         elif kind == 'photo': role = 'photo'                         # photograph: lifestyle, product, people, place
-        elif ar < 0.75: role = 'phone'
-        elif ar > 1.45 and w >= 1200: role = 'desktop'
-        else: role = 'figure'
+        elif re.search(r'phone|mobile|ios|android|手机', hint): role = 'phone'
+        elif ar < 0.75 and not re.search(r'plot|chart|graph|curve|figure|table|report|roc|km|forest|docx|pdf|图|表|报告', hint): role = 'phone'
+        elif 1.45 < ar < 3 and w >= 1200: role = 'desktop'          # a very wide strip (a cropped table row) is a figure, not a screen
+        else: role = 'figure'                                         # charts, cropped dialogs, tables, report pages
         scale = 2 if w >= 2400 else 1
         if role == 'phone': scale = 3 if w >= 1000 else (2 if w >= 700 else 1)
         if role in ('photo', 'cutout'): scale = max(1, w / 1920)          # photos: base ≈ 1920 wide
@@ -95,10 +96,21 @@ for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswi
     elif ext in VID:
         info = probe(f)
         it = {'file': rel, 'kind': 'video', **info}
+        # screen recording or real footage? one frame from the middle, judged like a still (pixel-identical areas = a screen)
+        try:
+            mid = max(0.0, (info.get('duration') or 0) / 2)
+            fr = out / 'clips' / (f.stem + '.poster.png'); fr.parent.mkdir(parents=True, exist_ok=True)
+            subprocess.run([a.ffmpeg, '-y', '-loglevel', 'error', '-ss', f'{mid:.2f}', '-i', str(f), '-frames:v', '1', str(fr)], check=True)
+            it['role'] = 'screen' if look(Image.open(fr)) == 'ui' else 'footage'
+            it['poster'] = str(fr)
+        except Exception:
+            it['role'] = 'footage' if re.search(r'film|shot|footage|broll|b-roll|product|实拍|视频', f.stem, re.I) else 'screen'
+        if re.search(r'screen|record|录屏|界面|demo', f.stem, re.I): it['role'] = 'screen'
         if not a.no_transcode:
             dst = out / 'clips' / (f.stem + '.webm')
             vf = 'scale=min(1920\\,iw):-2,fps=30'
-            subprocess.run([a.ffmpeg, '-y', '-loglevel', 'error', '-i', str(f), '-an', '-vf', vf, '-c:v', 'libvpx-vp9', '-crf', '32', '-b:v', '0', '-row-mt', '1', '-pix_fmt', 'yuv420p', str(dst)], check=True)
+            # crf 20: text in a screen recording and texture in footage stay crisp (32 smeared both)
+            subprocess.run([a.ffmpeg, '-y', '-loglevel', 'error', '-i', str(f), '-an', '-vf', vf, '-c:v', 'libvpx-vp9', '-crf', '20', '-b:v', '0', '-row-mt', '1', '-pix_fmt', 'yuv420p', str(dst)], check=True)
             it['webm'] = str(dst)
         items.append(it)
     elif ext in AUD:

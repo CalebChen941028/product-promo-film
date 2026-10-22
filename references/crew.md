@@ -4,6 +4,9 @@ English first, 中文在后。A top film is made by a team, so play each role in
 
 ## English
 
+### Latitude
+Every rule below is the craft's default, written for the average film. A role may break one when the film is better for it: say what and why in the treatment (§9 `- Deliberate · 刻意: <check> — <why>`), and the matching check advises instead of blocking. The brand guardian's rules are the exception: truth, sources, qualifiers, rights and legibility never bend. Roles may also go beyond the library — their own scenes, motion, moves, cuts and look (`references/custom-scenes.md`).
+
 ### How to run the crew
 1. Read the facts (§0 of the treatment), the materials (look at the images if you can) and the brief. Then study the golden film for your arc (`templates/golden/<arc>.json`, named in §0) and `references/copy-bank.md`: they show what each role's output looks like at the top level.
 2. Play the roles **in order**, one at a time. Write only that role's section, and stay inside its job.
@@ -19,11 +22,15 @@ English first, 中文在后。A top film is made by a team, so play each role in
   - Music is the user's track or composed by `make_music.py`.
   - Quotes must be real and approved.
   - Missing material is solved by a different beat, not by faking it.
+- **Shot wishlist:** autofilm writes `shot_wishlist.md`: the shots that would lift this film most (size, content, light, camera specs) for the user or a real crew to shoot, and draft prompts for AI-generated mood shots. AI imagery is only ever atmosphere, labelled as such; it never stands in for the product, its screens or its results.
 
 ### 2. Strategist: what is true, and what matters?
 - **Job:** the audience truth, the insight (the tension), the *single-minded proposition* (one sentence), and the proof.
 - **Good:** "Researchers lose a week per paper to formatting tables." **Bad:** "Researchers want efficiency."
 - The proposition must be **specific, true, and about the audience's life**, not about the product's features.
+- **Audience:** who exactly (role, situation), what they use today instead (the real competitor is often a habit: a spreadsheet, five tools, doing nothing), and the one doubt that stops them. The film answers that doubt once, with proof.
+- **USP → proof beat:** at most three selling points; for each, what makes it different from the alternative, and the scene and image that prove it. A selling point no image can prove is cut, or said only in the voice with a source.
+- **AIDA, honestly:** Attention = the hook in 3 s; Interest = the problem or the reveal; Desire = the proof and the hero (the viewer sees themselves with it); Action = one true next step on the end card. Persuade with true social proof (real quotes, real numbers) and clarity, never with fake scarcity, fake urgency or invented testimonials.
 
 ### 3. Creative director: the idea people remember
 - **Job:** three *different* concepts (not three wordings of one). Choose the one that is the most surprising **and** the most true. Write the hook (0–3 s) and the hero moment. Then write the **three anchor lines** — hook line (cover), hero line (finale), last line (end card) — each saying the chosen concept in a different way, the last one a callback to the first. A concept that does not reach these three lines is not chosen; it is decoration.
@@ -52,9 +59,11 @@ English first, 中文在后。A top film is made by a team, so play each role in
   - Spoken English runs at about 2.5 words per second.
   - Chinese captions are natural Chinese, not a translation of the English.
 - **Banned:** see `scripts/lint_copy.py` (revolutionary, seamless, next-gen, 颠覆, 赋能, 极致, 一站式 …), exclamation marks and unprovable superlatives.
+- **Call to action:** one true next step the docs support (join the beta, download, book a table), zh ≤ 8 字 / en ≤ 4 words, in `brand.cta` — the end card shows it last, as a button. No CTA the product cannot honour; "none" is a fine answer. The last spoken line stays the callback, not the CTA.
 
-### 5. Art director: the high-taste designer
-- **Job:** confirm the look (style) and the one accent colour (from the logo), choose the best image for every beat, and keep the best one for the hero.
+### 5. Art director & colorist: the high-taste designer
+- **Job:** confirm the look (style) and the palette the colour director chose (`film.json` "palette", treatment §5; `references/director.md` §8), choose the best image for every beat, and keep the best one for the hero.
+- **As colorist:** the grade's temperature follows the palette (warm products warm, clinical and tech cool), at a strength that keeps real UI and product colours true; one look for the whole film; the colour script moves only slightly (cold before, honest product, a richer peak, a warm close).
 - **Taste rules:**
   - **One focal point per frame.** If two things compete, cut one.
   - **One accent colour.** Everything else is neutral. The brightest thing on screen is what the voice is talking about.
@@ -73,8 +82,11 @@ English first, 中文在后。A top film is made by a team, so play each role in
 - **The hero is a real output.** Screen-led films end on the work, done: one result screen (`"hero": "result"`), the one figure or report that matters rising out of the UI (`"rise"`), or a calm stack of outputs (`"stack"`). Photo-led films return to the cover photo (`"image"`). The tilted wall is a fallback, not a hero.
 - **A texture has a purpose:** a silent detail beat needs a line or labelled crops; otherwise cut it.
 
-### 6. Motion designer & editor: rhythm
-- **Job:** the motion language (by theme) and the rhythm map (one row per scene).
+### 6. Director & DP, motion designer & editor: frame, movement, rhythm
+- **Job:** read the storyboard the director designed (`treatment.md` §6: size, layout, camera, cut and the reason per scene) and keep or change it on purpose; the motion language (by theme); the rhythm.
+- **As director & DP (shot sizes, 景别):** the open moves close → wide (a detail, then the place) or wide → close on purpose; a chapter goes wide → medium → close (the whole tool, the panel, the number); never three shots of the same size in a row; the hero is the closest, cleanest frame of the film. Camera moves are motivated (a push toward what the voice names, a lateral drift with the slides), small, and never fight a zoom already inside the frame.
+- **Montage:** cut on the bar; a match cut when two scenes share a shape or an image (the hero returning to the hook's screen is the strongest one); a breath after two dense beats.
+- **As motion designer:** code-drawn glue (journey map, many-into-one, kinetic type, real-number charts; `references/director.md` §7) only where the story needs a picture the materials do not have.
 - Camera cuts only where the story turns. There is exactly one hero moment, around 60–70 % of the film.
 - **Breathing:** after two dense beats, one calm beat. The first 3 s and the last 5 s are the most watched; make them perfect.
 - **Vary the proof.** Two proof beats in a row never share a shape: follow a feature with a zoomed detail, one number, a clip, a before → after, or a breath. A phone or clip scene earns its place with a line that serves the idea, or it is cut.
@@ -108,6 +120,9 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
 
 ## 中文
 
+### 自由度
+下面每条规则都是行业默认做法，是为一般水平的片子写的。某个角色认为打破某条能让片子更好时，可以打破：在方案里写明打破了什么、为什么（第 9 节 `- Deliberate · 刻意: <检查项> — <理由>`），对应检查就从阻止改为提醒。品牌把关的规则例外：真实、出处、限定条件、版权和可读性永不变通。各角色也可以超出场景库：写自己的场景、动效、运镜、转场和视觉（`references/custom-scenes.md`）。
+
 ### 怎么运行团队
 1. 读事实（treatment 第 0 节）、素材（能看图就看）和 brief；再读本叙事结构的范例片（`templates/golden/<结构>.json`，第 0 节写明）和 `references/copy-bank.md`，看清每个角色在顶级水准下交出什么。
 2. **按顺序**逐个扮演角色，每次只写该角色的那一节，不越界。
@@ -123,11 +138,15 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
   - 音乐用用户的曲子或 `make_music.py` 原创。
   - 引言必须真实且经授权。
   - 缺素材就换一个拍点，不造假。
+- **补拍清单**：autofilm 会写出 `shot_wishlist.md`，列出最能提升这部片子的镜头（景别、内容、光线、拍摄参数），供用户或真人团队拍摄，并附上 AI 氛围镜头的提示词草稿。AI 画面只能作氛围用并明确标注，绝不能替代产品本身、产品界面或产品结果。
 
 ### 2. 策略：什么是真的、什么重要
 - **职责**：受众真相、洞察（其中的矛盾）、**唯一主张**（一句话）、证据。
 - **好的例子**：“研究者每写一篇论文要在排版表格上花掉一周。”**差的例子**：“研究者想要效率。”
 - 主张必须**具体、真实、关于受众的生活**，而不是罗列产品功能。
+- **目标受众**：具体是谁（角色、处境）、他们现在用什么替代（真正的竞争对手常常是习惯：一张表格、五个软件、什么都不做）、阻止他们的那个顾虑。片子用证据回答一次这个顾虑。
+- **卖点 → 证明画面**：最多三个卖点；每个写清与替代方案的不同，以及哪个场景、哪张画面证明它。没有画面能证明的卖点就删掉，或只在旁白里带着来源说出。
+- **诚实的 AIDA**：吸引 = 3 秒钩子；兴趣 = 问题或揭晓；欲望 = 证据与高潮（观众看到自己用上它）；行动 = 结尾页上一个真实的下一步。用真实的社会证明（真实引言、真实数字）和清晰来说服，绝不用虚假的稀缺、虚假的紧迫感或编造的评价。
 
 ### 3. 创意总监：让人记住的创意
 - **职责**：三个**真正不同**的创意（不是一个创意的三种说法），选出最出人意料**且**最真实的那个；写出开场钩子（0–3 秒）和高潮时刻；再写**三句锚点**——开场句（封面）、高潮句（finale）、收尾句（结尾页），各用不同方式说出选定的创意，收尾句呼应开场句。没有落到这三句里的创意，只是装饰。
@@ -156,9 +175,11 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
   - 英文语速约每秒 2.5 个词。
   - 中文字幕要写成自然的中文，而不是英文的翻译。
 - **禁用**：见 `scripts/lint_copy.py`（颠覆、赋能、极致、一站式、revolutionary、seamless 等）、感叹号、无法证明的最高级。
+- **行动号召**：文档支持的一个真实下一步（申请内测、下载、预订），中文 ≤ 8 字 / 英文 ≤ 4 词，写进 `brand.cta`，结尾页最后以按钮形式出现。产品做不到的不写；写“无”也完全可以。最后一句旁白仍是呼应开场的那句，不是行动号召。
 
-### 5. 美术指导：高品味设计师
-- **职责**：确认视觉风格和唯一的强调色（取自 Logo），为每个拍点挑最好的画面，把最好的一张留给高潮。
+### 5. 美术指导与调色：高品味设计师
+- **职责**：确认视觉风格和色彩导演选定的配色（`film.json` 的 "palette"，方案第 5 节；见 `references/director.md` 第 8 节），为每个拍点挑最好的画面，把最好的一张留给高潮。
+- **作为调色师**：调色的冷暖跟随配色（暖调产品偏暖，医疗与科技偏冷），强度以保持真实界面和产品颜色为准；全片一个影调；色彩脚本只轻微变化（之前偏冷、产品真实、高潮略浓、收尾偏暖）。
 - **品味规则**：
   - **每帧一个视觉焦点**，两个元素抢戏就删一个。
   - **一种强调色**，其余都是中性色；画面最亮的东西就是旁白正在讲的东西。
@@ -177,8 +198,11 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
 - **先出钩子，再出名字**：开头约 5 秒是产品的真相（画面与开场句），Logo 在之后出现，或只在高潮与结尾页出现（`"name": false`）。
 - **界面要看得清**：在成片尺寸下，界面文字至少 18 px；整屏密集截图停留不超过一秒，随即推近到旁白所说的区域（每个要点给 rect，轮播面板给 `crop`，界面封面给 `focus`）。文字过小时 `check` 会提示。
 
-### 6. 动效设计与剪辑：节奏
-- **职责**：动效语言（按主题选）和节奏表（每个场景一行）。
+### 6. 导演与摄影指导、动效设计与剪辑：画面、运动、节奏
+- **职责**：审阅导演设计的分镜表（`treatment.md` 第 6 节：每个场景的景别、版式、运镜、转场及理由），保留或有意识地修改；动效语言（按主题选）；节奏。
+- **作为导演与摄影指导（景别）**：开场刻意地由近到远（先细节、后环境）或由远到近；一章内由全景到中景到特写（整个工具、那块面板、那个数字）；不连续三个相同景别；高潮是全片最近、最干净的画面。运镜要有动机（推向旁白所说的东西、随轮播横移），幅度小，不与画面内已有的推近打架。
+- **蒙太奇**：切在小节线上；两个场景形状或画面相同时用匹配剪辑（高潮回到开场那张界面就是最强的一次）；两个密集拍点后喘一口气。
+- **作为动效设计师**：代码动画（旅程图、多合一、动态文字、真实数字图表，见 `references/director.md` 第 7 节）只用在故事需要、而素材里没有的画面上。
 - 只在故事转折处用镜头转场；全片只有一个高潮，位于 60–70% 处。
 - **呼吸感**：连续两个密集拍点之后给一个平静拍点。开头 3 秒和结尾 5 秒最常被看到，要做到完美。
 - **证据要换形状**：相邻两个证据拍点不用同一种形状：功能之后接放大的细节、一个数字、一段录屏、前后对比，或一口气。手机或录屏场景要有一句服务于核心概念的旁白，否则就删掉。

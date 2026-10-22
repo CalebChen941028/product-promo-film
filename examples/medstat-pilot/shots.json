@@ -1,0 +1,290 @@
+{
+ "_how": "Shot list for the installed MedStat Pilot app (scripts/capture_app.mjs), verified on 0.1.1-beta.3: 7 scenarios, 14 shots at 3840×2160, including the KM and ROC plots, the Word report and the AI assistant. Copy this folder's make_demo_data.py, replies.json and this file into your project, run python3 make_demo_data.py (writes demo_trial.csv), then: node <skill>/scripts/capture_app.mjs shoot shots.json. The AI replies are scripted from the real results of this demo data (mock_llm): say so in the report. The data is synthetic.",
+ "app": "/Applications/MedStat Pilot.app",
+ "out": "materials",
+ "storage": {
+  "medstat_ai_config": "{\"provider\":\"ollama\",\"model\":\"local-model\",\"base_url\":\"http://localhost:11434/v1\",\"api_key\":\"\"}"
+ },
+ "mock_llm": {
+  "port": 11434,
+  "replies": "replies.json"
+ },
+ "macros": {
+  "load": [
+   {
+    "upload": "demo_trial.csv"
+   },
+   {
+    "click": "开始解析"
+   },
+   {
+    "wait_for": "稍后保存",
+    "timeout": 150000
+   },
+   {
+    "click": "稍后保存",
+    "wait": 1500
+   }
+  ],
+  "analysis": [
+   {
+    "use": "load"
+   },
+   {
+    "click": "开始分析",
+    "exact": false,
+    "wait": 3000
+   }
+  ]
+ },
+ "scenarios": [
+  {
+   "name": "data",
+   "steps": [
+    {
+     "use": "load"
+    },
+    {
+     "shot": "01-data-variables"
+    },
+    {
+     "click": "查看数据",
+     "exact": false,
+     "wait": 2500
+    },
+    {
+     "shot": "02-data-preview"
+    }
+   ]
+  },
+  {
+   "name": "tools",
+   "steps": [
+    {
+     "use": "load"
+    },
+    {
+     "click": "数据转换",
+     "exact": false,
+     "wait": 1500
+    },
+    {
+     "shot": "03-tools-compute"
+    },
+    {
+     "click": "重编码",
+     "wait": 1200
+    },
+    {
+     "shot": "04-tools-recode"
+    },
+    {
+     "click": "AI 文本编码",
+     "wait": 1200
+    },
+    {
+     "shot": "05-tools-ai-coding"
+    }
+   ]
+  },
+  {
+   "name": "ttest",
+   "steps": [
+    {
+     "use": "analysis"
+    },
+    {
+     "shot": "06-analysis-workspace"
+    },
+    {
+     "click": "group"
+    },
+    {
+     "click": "分组变量"
+    },
+    {
+     "click": "sbp_12w"
+    },
+    {
+     "click": "检验变量"
+    },
+    {
+     "shot": "07-analysis-assign"
+    },
+    {
+     "click": "运行分析"
+    },
+    {
+     "wait_for": "APA",
+     "timeout": 180000,
+     "settle": 4000
+    },
+    {
+     "shot": "08-analysis-result"
+    },
+    {
+     "css": "button[title=\"放大预览\"]",
+     "wait": 2500
+    },
+    {
+     "shot": "09-analysis-boxplot"
+    }
+   ]
+  },
+  {
+   "name": "km",
+   "steps": [
+    {
+     "use": "analysis"
+    },
+    {
+     "click": "Kaplan-Meier 生存分析",
+     "wait": 1500
+    },
+    {
+     "click": "time_months"
+    },
+    {
+     "click": "时间变量"
+    },
+    {
+     "click": "event"
+    },
+    {
+     "click": "结局状态变量"
+    },
+    {
+     "click": "group"
+    },
+    {
+     "click": "分组变量"
+    },
+    {
+     "click": "运行分析"
+    },
+    {
+     "wait_for": "APA",
+     "timeout": 180000,
+     "settle": 6000
+    },
+    {
+     "css": "button[title=\"放大预览\"]",
+     "wait": 2500
+    },
+    {
+     "shot": "10-outputs-km-plot"
+    }
+   ]
+  },
+  {
+   "name": "roc",
+   "steps": [
+    {
+     "use": "analysis"
+    },
+    {
+     "click": "ROC 曲线分析",
+     "wait": 1500
+    },
+    {
+     "click": "biomarker"
+    },
+    {
+     "click": "检验变量"
+    },
+    {
+     "click": "event"
+    },
+    {
+     "click": "状态变量"
+    },
+    {
+     "click": "运行分析"
+    },
+    {
+     "wait_for": "APA",
+     "timeout": 180000,
+     "settle": 6000
+    },
+    {
+     "css": "button[title=\"放大预览\"]",
+     "wait": 2500
+    },
+    {
+     "shot": "11-outputs-roc-plot"
+    }
+   ]
+  },
+  {
+   "name": "exports",
+   "steps": [
+    {
+     "use": "analysis"
+    },
+    {
+     "click": "group"
+    },
+    {
+     "click": "分组变量"
+    },
+    {
+     "click": "sbp_12w"
+    },
+    {
+     "click": "检验变量"
+    },
+    {
+     "click": "运行分析"
+    },
+    {
+     "wait_for": "APA",
+     "timeout": 180000,
+     "settle": 4000
+    },
+    {
+     "download": "导出报告",
+     "file": "13-outputs-report.docx",
+     "exact": false
+    }
+   ]
+  },
+  {
+   "name": "ai",
+   "steps": [
+    {
+     "use": "analysis"
+    },
+    {
+     "click_xy": [
+      1855,
+      1017
+     ],
+     "wait": 2000
+    },
+    {
+     "css": "textarea",
+     "nth": 0
+    },
+    {
+     "type": "我想比较两组患者治疗 12 周后的收缩压，该用什么方法？"
+    },
+    {
+     "key": "Enter",
+     "wait": 1500
+    },
+    {
+     "shot": "14-ai-consent"
+    },
+    {
+     "click": "确认授权",
+     "exact": false,
+     "force": true,
+     "wait": 12000
+    },
+    {
+     "shot": "15-ai-answer"
+    }
+   ]
+  }
+ ]
+}
