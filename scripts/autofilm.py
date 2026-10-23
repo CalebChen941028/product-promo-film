@@ -104,6 +104,7 @@ close = (ranked[0]['score'] == 0 or (len(ranked) > 1 and ranked[0]['score'] - ra
 import look as LOOK  # noqa: E402
 LK = LOOK.choose(items, src, gid, text, a.mood + ' ' + str(brief.get('tone') or brief.get('mood') or ''))
 forced = a.style or (brief.get('style') if brief.get('style') not in (None, '', 'auto') else None)
+forced = {'keynote-light': 'clean-light'}.get(forced, forced)   # the style's earlier name
 style = forced or LK['style']
 motion = a.motion or (LK['motion'] if not forced or forced == LK['style'] else LOOK.STYLE_MOTION.get(style, LK['motion']))
 mo = brief.get('motto') or {}

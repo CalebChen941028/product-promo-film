@@ -13,7 +13,7 @@ This is the "any product" path end to end:
 3. The crew (`references/crew.md`) wrote `treatment.md`: three concepts, chose **"One of one"** (every glaze is unique), wrote the hook, the hero moment, the tagline (每一只，都只有一只 / One of one), the script and the taste review. `check_treatment.py` passes.
 4. The copy went into `film.json`; then `make_film.py film.json` ran (check → build → voice → QA 0 errors → render → finish).
 
-Try other looks on the same material: `"style": "luxe-noir"` (quiet luxury) or `"keynote-light"`.
+Try other looks on the same material: `"style": "luxe-noir"` (quiet luxury) or `"clean-light"`.
 
 ## 中文
 这是“任何产品”路线的完整示例：
@@ -22,4 +22,4 @@ Try other looks on the same material: `"style": "luxe-noir"` (quiet luxury) or `
 3. 团队（`references/crew.md`）填写了 `treatment.md`：三个概念中选定“每一只，都只有一只”（每一层釉都独一无二），写出开场、高潮、口号、旁白与品味评审，`check_treatment.py` 通过。
 4. 把文案写进 `film.json`，再运行 `make_film.py` 完成全部流程（QA 0 错误）。
 
-同一套素材可以换风格试试：`"style": "luxe-noir"`（安静的奢华感）或 `"keynote-light"`。
+同一套素材可以换风格试试：`"style": "luxe-noir"`（安静的奢华感）或 `"clean-light"`。

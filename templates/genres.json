@@ -33,7 +33,7 @@
    },
    "style": [
     "midnight-tech",
-    "keynote-light",
+    "clean-light",
     "editorial-mono"
    ],
    "motion": "cinematic-3d",
@@ -130,7 +130,7 @@
    "style": [
     "midnight-tech",
     "paper-academic",
-    "keynote-light"
+    "clean-light"
    ],
    "motion": "precision-data",
    "music": {
@@ -179,7 +179,7 @@
    },
    "style": [
     "midnight-tech",
-    "keynote-light",
+    "clean-light",
     "paper-academic"
    ],
    "motion": "precision-data",
@@ -221,7 +221,7 @@
    },
    "style": [
     "aurora-glass",
-    "keynote-light",
+    "clean-light",
     "natural-fresh"
    ],
    "motion": "playful-pop",
@@ -281,7 +281,7 @@
     "photo": 2
    },
    "style": [
-    "keynote-light",
+    "clean-light",
     "midnight-tech",
     "luxe-noir"
    ],
@@ -374,7 +374,7 @@
    "style": [
     "natural-fresh",
     "luxe-noir",
-    "keynote-light"
+    "clean-light"
    ],
    "motion": "gentle-story",
    "music": {
@@ -425,7 +425,7 @@
     "photo": 2
    },
    "style": [
-    "keynote-light",
+    "clean-light",
     "natural-fresh",
     "paper-academic"
    ],
@@ -474,7 +474,7 @@
     "photo": 1
    },
    "style": [
-    "keynote-light",
+    "clean-light",
     "paper-academic",
     "aurora-glass"
    ],
@@ -586,7 +586,7 @@
    "style": [
     "natural-fresh",
     "luxe-noir",
-    "keynote-light"
+    "clean-light"
    ],
    "motion": "gentle-story",
    "music": {
@@ -663,7 +663,7 @@
    "style": [
     "aurora-glass",
     "natural-fresh",
-    "keynote-light"
+    "clean-light"
    ],
    "motion": "playful-pop",
    "music": {
@@ -702,7 +702,7 @@
    },
    "style": [
     "editorial-mono",
-    "keynote-light",
+    "clean-light",
     "luxe-noir"
    ],
    "motion": "editorial-type",

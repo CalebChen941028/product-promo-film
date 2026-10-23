@@ -24,7 +24,7 @@ import palette as PAL        # noqa: E402
 
 # every option should look AND move differently: the motions a look can carry, best first
 LOOK_MOTIONS = {'midnight-tech': ['cinematic-3d', 'precision-data', 'kinetic-launch'], 'neon-cyber': ['kinetic-launch', 'cinematic-3d', 'playful-pop'],
-                'keynote-light': ['gentle-story', 'precision-data', 'cinematic-3d'], 'paper-academic': ['precision-data', 'editorial-type', 'gentle-story'],
+                'clean-light': ['gentle-story', 'precision-data', 'cinematic-3d'], 'paper-academic': ['precision-data', 'editorial-type', 'gentle-story'],
                 'editorial-mono': ['editorial-type', 'kinetic-launch', 'precision-data'], 'luxe-noir': ['gentle-story', 'editorial-type', 'cinematic-3d'],
                 'natural-fresh': ['gentle-story', 'playful-pop', 'editorial-type'], 'aurora-glass': ['playful-pop', 'kinetic-launch', 'gentle-story']}
 PACE = {'gentle-story': 'calm', 'precision-data': 'balanced', 'cinematic-3d': 'balanced', 'editorial-type': 'balanced',

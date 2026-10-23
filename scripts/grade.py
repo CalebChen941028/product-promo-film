@@ -10,7 +10,7 @@ Usage:
 
 Looks (default style in brackets):
   teal-night   [midnight-tech]  cool teal shadows, clean warm-neutral highlights, gentle S-curve
-  clean-bright [keynote-light]  neutral, slightly warm whites, soft contrast: keynote / product page
+  clean-bright [clean-light]  neutral, slightly warm whites, soft contrast: presentations / product pages
   bleach-print [editorial-mono] bleach-bypass: lower saturation, punchy contrast, print-like blacks
   pastel-glow  [aurora-glass]   lifted blacks, violet shadows, peach highlights, juicy mid saturation
   neon-night   [neon-cyber]     crushed blacks, magenta shadows, cyan highlights, strong contrast

@@ -58,7 +58,7 @@ The look and the movement are chosen separately, and neither is a default: the d
 | Style | Preview | Default motion | Suits |
 | --- | --- | --- | --- |
 | `midnight-tech` | ![](docs/gallery/midnight-tech.jpg) | `cinematic-3d` | platforms, B2B, serious tech |
-| `keynote-light` | ![](docs/gallery/keynote-light.jpg) | `gentle-story` | consumer & productivity, care, hardware |
+| `clean-light` | ![](docs/gallery/clean-light.jpg) | `gentle-story` | consumer & productivity, care, hardware |
 | `editorial-mono` | ![](docs/gallery/editorial-mono.jpg) | `editorial-type` | manifesto, brand, opinion |
 | `aurora-glass` | ![](docs/gallery/aurora-glass.jpg) | `playful-pop` | consumer, creators, kids |
 | `neon-cyber` | ![](docs/gallery/neon-cyber.jpg) | `kinetic-launch` | dev tools, AI agents, games, events |
@@ -128,10 +128,10 @@ Examples:
 
 ### Credits & licences
 - **Reelwright:** MIT. © 2026 Liangliang Chen (陈亮亮), [github.com/CalebChen941028](https://github.com/CalebChen941028), WeChat official account 科研牛马研习社. Built with Codex & Claude.
-- **Not bundled, installed by you:** Playwright (Apache-2.0), Kokoro-82M (Apache-2.0), ffmpeg (LGPL/GPL builds).
-- **Demo music** (`examples/demo/demo-music.m4a`): original, CC0. Music composed by `make_music.py` is yours to use.
-- **Placeholders:** the product-demo images are drawn placeholders for a fictional brand.
-- Use only material, music and voices you have the rights to.
+- **Not bundled, installed by you:** Playwright (Apache-2.0), Node.js (MIT), NumPy and Pillow (BSD / HPND), Kokoro-82M (Apache-2.0, with dependencies under their own licences), ffmpeg (LGPL/GPL builds). Full list, bundled-asset provenance, fonts and trademarks: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+- **Demo music** (`examples/demo/demo-music.m4a`): synthesised by the repo's own script, CC0. Music composed by `make_music.py` is original and royalty-free; no warranty.
+- **Placeholders:** the example images are drawn or rendered here for fictional brands. The MedStat Pilot example shows the maintainer's own product: its name and logo are not covered by the MIT licence.
+- **Responsible use:** use only material, music and voices you have the rights to; check every claim in a film before you publish it; the voice-over is synthetic, so disclose it where a platform or law asks. Provided "as is", without warranty. Security notes and how to report a problem: [SECURITY.md](SECURITY.md).
 
 <a id="中文"></a>
 ## 中文
@@ -184,7 +184,7 @@ Examples:
 
 ### 署名与许可
 - **Reelwright · 片匠**：MIT 许可。© 2026 陈亮亮，[github.com/CalebChen941028](https://github.com/CalebChen941028)，微信公众号：科研牛马研习社。由 Codex 与 Claude 协作开发。
-- **不随仓库分发、需自行安装**：Playwright、Kokoro-82M、ffmpeg。
-- **示例音乐**：原创，CC0；`make_music.py` 生成的配乐可自由使用。
-- **占位图**：产品示例中的图片是虚构品牌的绘制占位图。
-- 请只使用你有权使用的素材、音乐和声音。
+- **不随仓库分发、需自行安装**：Playwright（Apache-2.0）、Node.js（MIT）、NumPy 与 Pillow（BSD / HPND）、Kokoro-82M（Apache-2.0，其依赖另有许可）、ffmpeg（LGPL/GPL 构建）。完整清单、随仓库素材的来源、字体与商标说明见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+- **示例音乐**：由仓库自己的脚本合成，CC0；`make_music.py` 生成的配乐是原创、无版权费的，不附带担保。
+- **占位图**：示例中的图片是为虚构品牌在本仓库里绘制或渲染的。MedStat Pilot 示例展示的是维护者自己的产品：其名称和 Logo 不在 MIT 许可范围内。
+- **负责任地使用**：只使用你有权使用的素材、音乐和声音；发布前核对片子里的每一条说法；配音是合成声音，平台或法律要求时请披露。按"原样"提供，不附带担保。安全说明与如何报告问题见 [SECURITY.md](SECURITY.md)。

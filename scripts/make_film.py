@@ -26,7 +26,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SKILL = HERE.parent
 TPL = SKILL / 'templates'
-STYLES = ['midnight-tech', 'keynote-light', 'editorial-mono', 'aurora-glass', 'neon-cyber', 'paper-academic', 'luxe-noir', 'natural-fresh']
+STYLE_ALIASES = {'keynote-light': 'clean-light'}   # the style's earlier name: old film.json files keep working
+STYLES = ['midnight-tech', 'clean-light', 'editorial-mono', 'aurora-glass', 'neon-cyber', 'paper-academic', 'luxe-noir', 'natural-fresh']
 MOTIONS = ['cinematic-3d', 'precision-data', 'kinetic-launch', 'gentle-story', 'playful-pop', 'editorial-type']
 # minimum bars, required keys, list limits per scene type
 TYPES = {
@@ -1065,6 +1066,7 @@ if __name__ == '__main__':
     a = ap.parse_args()
     spec_path = Path(a.spec).resolve()
     spec = json.load(open(spec_path))
+    spec['style'] = STYLE_ALIASES.get(spec.get('style'), spec.get('style'))
     resolve_flow(spec)
     resolve_keyframes(spec)
     base = spec_path.parent

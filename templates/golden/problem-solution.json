@@ -9,7 +9,7 @@
   "last": "The translation takes a week. The invoice takes a minute.",
   "_why": "Hook, hero and last line are written FIRST and say the concept three times in three ways. The last line calls back to the hook word for word, with one change: that change is the product."
  },
- "name": "margin-film", "genre": "software-saas", "style": "keynote-light", "motion": "cinematic-3d", "cinema": "auto",
+ "name": "margin-film", "genre": "software-saas", "style": "clean-light", "motion": "cinematic-3d", "cinema": "auto",
  "music": {"generate": {"mood": "auto"}},
  "voice": {"engine": "kokoro", "voice": "am_michael", "lang": "a"},
  "brand": {

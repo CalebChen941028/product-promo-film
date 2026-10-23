@@ -9,7 +9,7 @@
   "last": "Come after five. We're here until nine.",
   "_why": "A human truth (the timing problem) is the tension; the service is the release. The real quote is the proof, used only because it is approved. The last line repeats the hook's hour and resolves it."
  },
- "name": "northside-film", "genre": "health-wellness", "style": "keynote-light", "motion": "gentle-story", "cinema": "auto",
+ "name": "northside-film", "genre": "health-wellness", "style": "clean-light", "motion": "gentle-story", "cinema": "auto",
  "music": {"generate": {"mood": "auto"}},
  "voice": {"engine": "kokoro", "voice": "am_michael", "lang": "a"},
  "brand": {

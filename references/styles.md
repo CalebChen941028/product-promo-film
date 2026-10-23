@@ -7,7 +7,7 @@ English first, 中文在后。A style = `styles/<id>.css` (colours, fonts, frame
 | id | Look | Transition · pulse | Default motion | Best for |
 | --- | --- | --- | --- | --- |
 | `midnight-tech` | deep navy stage, fine grid, accent glow, dark glass chrome | cross-fade · glow on every beat in choruses | cinematic-3d | dev tools, data/science software, B2B platforms (the MedStat Pilot film) |
-| `keynote-light` | bright off-white, soft colour haze, huge black type, long soft shadows | zoom-blur · soft glow | gentle-story | consumer & productivity apps, clinicians, investor demos |
+| `clean-light` | bright off-white, soft colour haze, huge black type, long soft shadows | zoom-blur · soft glow | gentle-story | consumer & productivity apps, clinicians, investor demos |
 | `editorial-mono` | near-black, off-white type, one hot accent, thin rules, giant chapter numerals, lower-third captions | hard wipe · accent edge bar | editorial-type | manifestos, opinionated research tools, launch teasers |
 | `aurora-glass` | moving colour mesh, frosted-glass cards, white type, caption pill | zoom · glow | playful-pop | consumer/creator/AI apps, social-first launches |
 | `neon-cyber` | black + neon grid floor, scanlines, magenta/cyan glow, monospace labels | glitch RGB-split + flash · flash | kinetic-launch | dev/security/infra, gaming-adjacent, EDM/trap music |
@@ -19,7 +19,7 @@ English first, 中文在后。A style = `styles/<id>.css` (colours, fonts, frame
 | id | Grade (LUT) | Bloom | Grain |
 | --- | --- | --- | --- |
 | `midnight-tech` | teal-night: teal shadows, clean neutral-warm highlights | 0.14 | 0.18 |
-| `keynote-light` | clean-bright: neutral, slightly warm whites | 0.05 | 0.08 |
+| `clean-light` | clean-bright: neutral, slightly warm whites | 0.05 | 0.08 |
 | `editorial-mono` | bleach-print: lower saturation, print contrast | 0.04 | 0.30 |
 | `aurora-glass` | pastel-glow: lifted blacks, violet shadows | 0.18 | 0.15 |
 | `neon-cyber` | neon-night: deep blacks, magenta/cyan split | 0.24 | 0.20 |
@@ -40,7 +40,7 @@ Copy the closest pair of files, rename the id in both, change `:root` tokens and
 | id | 视觉 | 转场 · 节拍脉冲 | 默认动效 | 适合 |
 | --- | --- | --- | --- | --- |
 | `midnight-tech` | 深海军蓝舞台、细网格、主色辉光、深色玻璃窗框 | 交叉淡化 · 副歌每拍辉光 | cinematic-3d | 开发工具、数据 / 科研软件、B2B 平台（MedStat Pilot 成片） |
-| `keynote-light` | 亮白舞台、柔和彩色光晕、超大黑字、长柔阴影 | 缩放虚化 · 柔光 | gentle-story | 消费级与效率应用、面向医生、融资演示 |
+| `clean-light` | 亮白舞台、柔和彩色光晕、超大黑字、长柔阴影 | 缩放虚化 · 柔光 | gentle-story | 消费级与效率应用、面向医生、融资演示 |
 | `editorial-mono` | 近黑底、米白字、单一热色、细分隔线、巨型章节数字、左下字幕 | 硬划像 · 主色边条 | editorial-type | 品牌宣言、有观点的科研工具、发布预告 |
 | `aurora-glass` | 流动彩色渐变、毛玻璃卡片、白字、胶囊字幕 | 缩放 · 辉光 | playful-pop | 消费 / 创作者 / AI 应用、社交平台首发 |
 | `neon-cyber` | 黑底霓虹网格地面、扫描线、品红青色辉光、等宽字体 | 故障 RGB 分离 + 闪白 · 闪光 | kinetic-launch | 开发 / 安全 / 基础设施、游戏相关、电子乐 |
@@ -52,7 +52,7 @@ Copy the closest pair of files, rename the id in both, change `:root` tokens and
 | id | 调色（LUT） | 辉光 | 颗粒 |
 | --- | --- | --- | --- |
 | `midnight-tech` | teal-night：青色暗部、干净偏暖的高光 | 0.14 | 0.18 |
-| `keynote-light` | clean-bright：中性、略暖的白 | 0.05 | 0.08 |
+| `clean-light` | clean-bright：中性、略暖的白 | 0.05 | 0.08 |
 | `editorial-mono` | bleach-print：低饱和、印刷感对比 | 0.04 | 0.30 |
 | `aurora-glass` | pastel-glow：抬升的黑、紫色暗部 | 0.18 | 0.15 |
 | `neon-cyber` | neon-night：深黑、品红 / 青色分离 | 0.24 | 0.20 |

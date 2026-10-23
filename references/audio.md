@@ -9,8 +9,8 @@ English first, 中文在后。
 - **Too short?** Repeat a chorus: in film.json `"music": {"file": …, "extend": {"from_bar": 56, "to_bar": 72}}`. Pick a span whose last bar flows into its first (both downbeats with a strong hit) — look for two identical phrases in `film_out/audio/grid.json` (same energy pattern 16/32 bars apart). Verify the printed seam jump ≤ the song's p99.9.
 - The film length = the (extended) music; the end card absorbs the remaining bars (`"bars": "rest"`).
 
-### Voice-over (Kokoro, Apache-2.0 — commercial use OK)
-Why not system voices: Apple/Windows voices are licensed for personal non-commercial use and sound robotic without premium packs.
+### Voice-over (Kokoro: Apache-2.0 model and package; its dependencies have their own licences, see THIRD_PARTY_NOTICES.md)
+Why not system voices: their licences often restrict commercial use (check yours), and they sound robotic without premium packs.
 
 **Kokoro setup** (ask the user first; downloads ≈ 650 MB: PyPI `kokoro` + PyTorch, Hugging Face `hexgrad/Kokoro-82M`, spaCy `en_core_web_sm` from GitHub):
 ```bash
@@ -70,8 +70,8 @@ Listen to a mood on its own: `python3 scripts/make_music.py --mood warm-piano --
 - **太短**：重复一段副歌，在 film.json 写 `"music": {"file": …, "extend": {"from_bar": 56, "to_bar": 72}}`。选择“段尾能自然接回段首”的片段（两端都是带重音的强拍），可在 `film_out/audio/grid.json` 中找能量模式相同、相隔 16 / 32 小节的两段。确认打印的拼接跳变不超过全曲 p99.9。
 - 片长等于（延长后的）音乐长度，剩余小节由结尾页（`"bars": "rest"`）吸收。
 
-### 配音（Kokoro，Apache-2.0，可商用）
-为什么不用系统语音：Apple / Windows 语音仅限个人非商业用途，且不装高级语音包时很机械。
+### 配音（Kokoro：模型与软件包为 Apache-2.0；其依赖另有许可，见 THIRD_PARTY_NOTICES.md）
+为什么不用系统语音：它们的授权通常限制商用（请核对你自己的），且不装高级语音包时很机械。
 
 **Kokoro 安装**（先征得用户同意；下载约 650 MB：PyPI 的 `kokoro` + PyTorch、Hugging Face 的 `hexgrad/Kokoro-82M`、GitHub 的 spaCy `en_core_web_sm`）：命令见上方英文代码块。之后在 film.json 写 `"voice": {"engine": "kokoro", "python": "~/.venvs/kokoro/bin/python", "voice": "am_michael"}`。首次运行会下载模型；Hugging Face 传输失败时设置 `HF_HUB_DISABLE_XET=1`。
 配音阶段离线运行：模型（约 330 MB）或音色（每个约 0.5 MB）尚未下载时会停下，并列出已下载的音色；用户同意后，加 `"allow_download": true` 运行一次。autofilm 与 doctor 会自动找到 `~/.venvs/kokoro`，并优先选用已下载的音色。

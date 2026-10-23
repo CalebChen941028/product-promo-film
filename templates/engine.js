@@ -310,7 +310,7 @@ const BG = {
     const [a, b, g] = [host.querySelector('.glow.a'), host.querySelector('.glow.b'), host.querySelector('.bg-grid')];
     return (t) => { place(a, { x: Math.sin(t * 0.11) * 400 - 200, y: Math.cos(t * 0.07) * 200 - 100 }); place(b, { x: Math.cos(t * 0.09) * 500 + 300, y: Math.sin(t * 0.06) * 260 + 120 }); g.style.transform = `translate(${-(t * 8) % 40}px, ${-(t * 4) % 40}px)`; };
   },
-  keynote(host) {
+  haze(host) {
     host.innerHTML = '<div class="bg-base"></div><div class="glow a"></div><div class="glow b"></div>';
     const [a, b] = [host.querySelector('.glow.a'), host.querySelector('.glow.b')];
     return (t) => { place(a, { x: Math.sin(t * 0.05) * 300 - 250, y: -200 + Math.cos(t * 0.04) * 80 }); place(b, { x: 380 + Math.cos(t * 0.06) * 220, y: 260 + Math.sin(t * 0.05) * 90 }); };

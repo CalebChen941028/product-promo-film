@@ -8,7 +8,7 @@ English first, 中文在后。The motion language decides HOW things move — en
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `cinematic-3d` | a product trailer | fly from depth, 34° tilt | rise | glowing grow | 1.3 s smooth push | slow orbit | 3D window + tags | platforms, B2B, serious tech |
 | `precision-data` | a measured lab demo | flat snap | mask wipe | traced outline | 0.45 s snap on the beat | none | spec sheet: numbered list, number badges on the highlights, a spotlight on the current point | science, data, research, finance, medicine |
-| `kinetic-launch` | a launch keynote drop | punch-in from 1.22× | fast slide | flash | 0.25 s whip | punch on every bar | full-bleed zoom bursts + slammed headline | dev tools, security, AI agents, gaming, fast music |
+| `kinetic-launch` | a launch-event drop | punch-in from 1.22× | fast slide | flash | 0.25 s whip | punch on every bar | full-bleed zoom bursts + slammed headline | dev tools, security, AI agents, gaming, fast music |
 | `gentle-story` | a documentary | soft rise 1.6 s | blur-in | soft fade | 2 s slow Ken Burns | slow dolly | soft window + one line at a time | care, health, education, mission |
 | `playful-pop` | a social-app ad | elastic bloom | bounce | bouncy | overshoot | gentle sway | tilted window + sticker bubbles | consumer, creators, kids, lifestyle |
 | `editorial-type` | a magazine spread | hard slide from the edge | mask-up | traced bar | 0.4 s snap | none | split screen: giant index + list, window right | manifesto, brand, opinionated research |
@@ -17,7 +17,7 @@ English first, 中文在后。The motion language decides HOW things move — en
 - One motion language per film. Mixing languages reads as indecision.
 - Fast music (≥ 128 BPM) → kinetic-launch or playful-pop; slow (≤ 95 BPM) → gentle-story or precision-data.
 - A scientific product with an emotional mission (e.g. patient care) → gentle-story for the story beats is wrong; keep precision-data and put the emotion in the narration and music.
-- The pairs in `references/styles.md` (default motion) are safe; cross pairs (e.g. keynote-light + precision-data) are fine when the theme asks for it.
+- The pairs in `references/styles.md` (default motion) are safe; cross pairs (e.g. clean-light + precision-data) are fine when the theme asks for it.
 
 ### Lens, cuts and sound
 Each motion language also sets a restrained lens (handheld drift, depth of field, focus pull, glints), where camera cuts happen, and the sound palette. See `references/director.md` §3.
@@ -40,7 +40,7 @@ Each motion language also sets a restrained lens (handheld drift, depth of field
 - 一部片子只用一种动效语言，混用会显得犹豫。
 - 快歌（≥ 128 BPM）选 kinetic-launch 或 playful-pop；慢歌（≤ 95 BPM）选 gentle-story 或 precision-data。
 - 有情感使命的科学产品（如患者关怀），仍用 precision-data，把情感放在旁白和音乐里。
-- `references/styles.md` 中的默认搭配最稳；主题需要时也可以交叉搭配（如 keynote-light + precision-data）。
+- `references/styles.md` 中的默认搭配最稳；主题需要时也可以交叉搭配（如 clean-light + precision-data）。
 
 ### 镜头、转场与声音
 每种动效语言还决定一套克制的镜头特性（手持漂移、景深、对焦、高光）、镜头转场的位置和音效音色，见 `references/director.md` 第 3 节。

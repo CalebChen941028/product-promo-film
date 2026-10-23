@@ -12,7 +12,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `materials` | path | no | the materials folder (autofilm writes it); `check_treatment.py` reads the docs there to check that proof lines carry facts |
 | `treatment` | path / `"skip"` | no | the crew's treatment (default `treatment.md`); the build refuses to start until it passes `check_treatment.py`. `"skip"` only for a throwaway test cut |
 | `genre` | string | no | product type from `templates/genres.json` (`python3 scripts/genres.py --list`); sets the defaults for composed music and the story arc; the look is chosen separately, from the materials |
-| `style` | string | yes | look: `midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`, or `auto` (the director's `scripts/look.py` reads the materials; autofilm writes its choice here) |
+| `style` | string | yes | look: `midnight-tech` `clean-light` (earlier name `keynote-light`, still accepted) `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`, or `auto` (the director's `scripts/look.py` reads the materials; autofilm writes its choice here) |
 | `motion` | string | no | motion language: `cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`; empty = the one that goes with the look (a dense data UI gets `precision-data`) |
 | `music.file` | path | no | the user's track (mp3/wav/m4a…). Without it, an original underscore is composed bar-for-bar from the scenes |
 | `music.generate` | object | no | `{"mood": "auto"\|"cinematic-pulse"\|"minimal-electronic"\|"warm-piano"\|"bright-pop"\|"luxe-lounge"\|"ambient-air"\|"warm-acoustic", "bpm": 98, "seed": 3}`. The end card (`"rest"`) is then about 8 s (3–4 bars) plus a ring-out bar |
@@ -105,7 +105,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `materials` | 路径 | 否 | 素材文件夹（autofilm 自动写入）；`check_treatment.py` 读取其中文档，核对证据句是否带有事实 |
 | `treatment` | 路径 / `"skip"` | 否 | 团队创意方案（默认 `treatment.md`）；未通过 `check_treatment.py` 时拒绝构建。`"skip"` 仅用于一次性测试片 |
 | `genre` | 字符串 | 否 | 产品类型（`templates/genres.json`，`python3 scripts/genres.py --list`），决定风格、动效、原创配乐的默认值 |
-| `style` | 字符串 | 是 | 视觉风格：`midnight-tech` `keynote-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`，或 `auto`（按类型） |
+| `style` | 字符串 | 是 | 视觉风格：`midnight-tech` `clean-light` `editorial-mono` `aurora-glass` `neon-cyber` `paper-academic` `luxe-noir` `natural-fresh`，或 `auto`（按类型） |
 | `motion` | 字符串 | 否 | 动效语言：`cinematic-3d` `precision-data` `kinetic-launch` `gentle-story` `playful-pop` `editorial-type`；留空则用风格默认值 |
 | `music.file` | 路径 | 否 | 用户提供的音乐；不提供时按场景逐小节原创一段配乐 |
 | `music.generate` | 对象 | 否 | `{"mood": "auto" 或 情绪名, "bpm": 98, "seed": 3}`；此时结尾页（`"rest"`）约 8 秒（3–4 小节），另加一小节余音 |

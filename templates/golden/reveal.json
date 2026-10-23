@@ -9,7 +9,7 @@
   "last": "Four o'clock. Every day.",
   "_why": "The concept is one ordinary, true moment (an hour of the day) instead of a list of specs. The hook names the moment, the hero line names the product's part in it, the last line returns to the moment."
  },
- "name": "halden-film", "genre": "consumer-electronics", "style": "keynote-light", "motion": "cinematic-3d", "cinema": "auto",
+ "name": "halden-film", "genre": "consumer-electronics", "style": "clean-light", "motion": "cinematic-3d", "cinema": "auto",
  "music": {"generate": {"mood": "auto"}},
  "voice": {"engine": "kokoro", "voice": "am_michael", "lang": "a"},
  "brand": {

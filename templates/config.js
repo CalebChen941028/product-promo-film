@@ -1,7 +1,7 @@
 // Film configuration — the only file most films need to change besides scenes.js.
 // Times are on the music's bar grid: G and BAR come from scripts/beat_grid.py; DUR = final music length.
 const CONFIG = {
-  STYLE: 'midnight-tech',   // look:   midnight-tech | keynote-light | editorial-mono | aurora-glass | neon-cyber | paper-academic
+  STYLE: 'midnight-tech',   // look:   midnight-tech | clean-light | editorial-mono | aurora-glass | neon-cyber | paper-academic
   MOTION: '',               // motion: cinematic-3d | precision-data | kinetic-launch | gentle-story | playful-pop | editorial-type
                             //         '' = the style's default; scripts/look.py picks one from the materials
   G: 0.4876,                // first beat offset (s)
