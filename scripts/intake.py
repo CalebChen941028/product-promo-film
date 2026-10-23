@@ -144,7 +144,7 @@ if packs: missing.append(f'packshot on white ({", ".join(packs)}): used framed a
 if not count('image', 'logo'): missing.append('logo (transparent PNG) — ask the user, or use the app icon from the repo (e.g. build/icon.png)')
 if not count('audio', 'music'): missing.append('music — none supplied: make_film.py will compose an original underscore (make_music.py) unless the user provides a licensed track; never pick one from the web')
 visual = sum(count('image', r) for r in ('desktop', 'phone', 'photo', 'cutout', 'figure')) + count('video')
-if visual < 4: missing.append(f'visual material — only {visual} images/clips: ask for more real product shots or screens (software: capture_kit.mjs; physical products: photos, ideally cut-outs on transparency)')
+if visual < 4: missing.append(f'visual material — only {visual} images/clips: ask for more real product shots or screens (software: capture_app.mjs; physical products: photos, ideally cut-outs on transparency)')
 if not count('text', 'brief'): missing.append('brief — fill templates/brief.example.json with the user (name, one-liner, features, differentiators, contacts, style)')
 print('missing:' if missing else 'nothing obviously missing')
 for m in missing: print('  -', m)

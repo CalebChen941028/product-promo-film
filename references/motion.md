@@ -1,6 +1,6 @@
 # Motion languages · 动效语言
 
-English first, 中文在后。The motion language decides HOW things move — entrances, text reveals, highlights, focus moves inside a screenshot, camera on the beat, and the layout of `feature` scenes. Choose it from the THEME the materials convey (`scripts/recommend_style.py`), then pick a style that fits. Set `"motion"` in film.json (empty = the style's default).
+English first, 中文在后。The motion language decides HOW things move — entrances, text reveals, highlights, focus moves inside a screenshot, camera on the beat, and the layout of `feature` scenes. The director picks it with the look from the materials (`scripts/look.py`) and the user confirms it among the proposals (`scripts/proposals.py`); set `"motion"` in film.json to change it, or define your own (`references/custom-scenes.md`). Empty = the one that goes with the style.
 
 ## English
 

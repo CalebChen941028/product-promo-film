@@ -18,7 +18,7 @@ English first, 中文在后。
 | `scenes need N bars but the music has M` | film longer than the music | shorten scenes or `music.extend` |
 | Speech hard to hear | peak normalisation | keep mix_audio.py defaults (RMS −17 dBFS, duck 0.72) |
 | Caption says "three hundred DPI" | spoken text used as caption | add `"cap": "300 DPI"` to that `say` line |
-| Highlight box misses the target | rect measured in the wrong space | rects are in `base` units; start from `suggest_rects.py` (autofilm pre-fills them), check on `grid_overlay.py` output |
+| Highlight box misses the target | rect in the wrong space, or on the wrong element | rects are in `base` units and snap to the element under them at build; name it instead (`"rect": "@its words"`) and look at `film_out/check/boxes-*.jpg` (red = not on an element) |
 | Dialog won't close during capture | app ignores Escape | new browser context per scenario, or click its close button |
 | Capture hangs on "starting service" / a backend never comes up | another copy of the app (often the user's own, still open) holds its port | ask the user to quit the app; never `pkill`/`killall` it |
 | `capture_app.mjs`: "not an Electron app" | a native app cannot be driven | ask the user for screenshots, or film the web build with `--url` |
@@ -49,7 +49,7 @@ English first, 中文在后。
 | 报“场景需要 N 小节，音乐只有 M 小节” | 片子比音乐长 | 缩短场景，或用 `music.extend` |
 | 人声听不清 | 按峰值归一化 | 保持 mix_audio.py 默认值（RMS −17 dBFS，闪避 0.72） |
 | 字幕出现 "three hundred DPI" | 字幕直接用了念出来的文字 | 给该句加 `"cap": "300 DPI"` |
-| 高亮框没对准 | 坐标量错了空间 | rect 用 `base` 单位；先用 `suggest_rects.py`（autofilm 已预填），再在 `grid_overlay.py` 的网格图上核对 |
+| 高亮框没对准 | 坐标空间不对，或框在了别的元素上 | rect 用 `base` 单位，构建时会吸附到下面的元素；改用文字指认（`"rect": "@元素文字"`），并查看 `film_out/check/boxes-*.jpg`（红色 = 未落在元素上） |
 | 采集时弹窗关不掉 | 应用不响应 Escape | 每个场景开新的浏览器上下文，或点关闭按钮 |
 | 采集卡在“启动服务中”，后台服务起不来 | 另一个应用实例（通常是用户自己开着的）占用了端口 | 请用户退出应用；不要 `pkill`/`killall` |
 | `capture_app.mjs` 提示 “not an Electron app” | 原生应用无法自动操作 | 请用户提供截图，或用 `--url` 拍网页版 |

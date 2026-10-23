@@ -93,7 +93,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `chart` | 3 | `data` [{label, value}] (2–8), `kind?` `bar`/`line`, `unit?`, `title?`, `source?` | real numbers drawn on the beat; each value appears only when its bar lands. Every value needs a source in the user's docs (gated) |
 
 ### Coordinates
-`base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units, or `"@the element's words"`. At build, every `rect` and `crop` snaps onto the real element under it (`scripts/snap.py`: the shot's element boxes, else blocks in the pixels); `"exact": true` on a point or crop keeps it as written; `film_out/check/boxes-*.jpg` shows the result. `scripts/suggest_rects.py <image> --preview .` suggests numbered rects (cards, panels, charts, tables) in base units for any image size; autofilm pre-fills feature points with them. Measure by hand with `scripts/grid_overlay.py` (grid labels are base units for 1920×1080 captures) or `scripts/modal_bbox.py` for dialogs.
+`base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units, or `"@the element's words"`. At build, every `rect` and `crop` snaps onto the real element under it (`scripts/snap.py`: the shot's element boxes, else blocks in the pixels); `"exact": true` on a point or crop keeps it as written; `film_out/check/boxes-*.jpg` shows the result. `scripts/suggest_rects.py <image> --preview .` suggests numbered rects (cards, panels, charts, tables) in base units for any image size; autofilm pre-fills feature points with them.
 
 ## 中文
 
@@ -186,4 +186,4 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `chart` | 3 | `data` [{label, value}]（2–8）、`kind?` `bar`/`line`、`unit?`、`title?`、`source?` | 按节拍绘出真实数字；每个数值只在柱子落定后出现。每个数值都必须能在用户文档中找到来源（门禁会检查） |
 
 ### 坐标
-`base` 是图片的坐标空间：1920×1080 窗口的 2 倍截图用 `[1920, 1080]`（默认）；`intake.py` 会为每张图给出建议的 `base`。`rect` / `crop` / `focus` 都是 base 单位下的 `[x, y, 宽, 高]`。`scripts/suggest_rects.py <图片> --preview .` 会自动给出编号的建议框（卡片、面板、图表、表格），适用于任意尺寸，单位为 base；autofilm 会用它预填功能要点。也可用 `scripts/grid_overlay.py` 手动量取（网格刻度即 1920×1080 截图的 base 单位），弹窗可用 `scripts/modal_bbox.py` 自动求框。
+`base` 是图片的坐标空间：1920×1080 窗口的 2 倍截图用 `[1920, 1080]`（默认）；`intake.py` 会为每张图给出建议的 `base`。`rect` / `crop` / `focus` 都是 base 单位下的 `[x, y, 宽, 高]`。`scripts/suggest_rects.py <图片> --preview .` 会自动给出编号的建议框（卡片、面板、图表、表格），适用于任意尺寸，单位为 base；autofilm 会用它预填功能要点。也可写 `"@元素上的文字"`。构建时每个 `rect` 和 `crop` 都会吸附到它下面的真实元素（`scripts/snap.py`）；`"exact": true` 保留原框；`film_out/check/boxes-*.jpg` 显示结果。

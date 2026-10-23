@@ -2,7 +2,7 @@
 
 English first, 中文在后。Dates: 2026-10-20 to 2026-10-21. Model under test: **Claude Haiku** (as a sub-agent), given one line and nothing else:
 `Make a promo film for the product in <folder> using the skill at ~/Desktop/product-promo-film (read SKILL.md and follow it). Output to <dir>.`
-Evidence: [`report/`](report): each run's `treatment.md` and `film.json`, contact sheets for the placeholder folders, and every critic's table and blind mapping. How to rerun: [README.md](README.md).
+Evidence: [`report/`](report): every critic's table and blind mapping, and the last rounds' runs (`round9`, `round10`, `reference`); rounds 1–8 are in the git history. How to rerun: [README.md](README.md).
 
 ## English
 

@@ -3,7 +3,7 @@
 const CONFIG = {
   STYLE: 'midnight-tech',   // look:   midnight-tech | keynote-light | editorial-mono | aurora-glass | neon-cyber | paper-academic
   MOTION: '',               // motion: cinematic-3d | precision-data | kinetic-launch | gentle-story | playful-pop | editorial-type
-                            //         '' = the style's default; pick by theme with scripts/recommend_style.py
+                            //         '' = the style's default; scripts/look.py picks one from the materials
   G: 0.4876,                // first beat offset (s)
   BAR: 2.0,                 // seconds per bar (4 beats); 120 BPM → 2.0
   DUR: 56,                  // film length (s) — the example storyboard below is 28 bars

@@ -56,9 +56,6 @@ def resolve_flow(spec):
             sc['steps'] = chs[:5]
             sc['_from_chapters'] = True
 GENRES = json.load(open(Path(__file__).resolve().parent.parent / 'templates' / 'genres.json'))['genres']
-REST_BARS = 5   # legacy constant; use rest_bars(bpm)
-
-
 def rest_bars(bpm):
     """End-card length when the music is composed: about 8 s (3–4 bars), plus one ring-out bar. Longer is dead air."""
     return max(3, round(8 / (240 / float(bpm or 100))))
@@ -449,7 +446,7 @@ def check(spec, base_dir):
             'then proposals.py film.json --apply <A|B|C> (--by assumed only when the user cannot be asked)')
     resolve_look(spec, base_dir)
     if spec.get('style') not in STYLES:
-        err(f"style '{spec.get('style')}' unknown", f'use one of {STYLES} (scripts/recommend_style.py suggests one)')
+        err(f"style '{spec.get('style')}' unknown", f'use one of {STYLES} (scripts/look.py picks one from the materials)')
     pal = spec.get('palette')
     if pal:
         import palette as PAL
@@ -636,7 +633,7 @@ def check(spec, base_dir):
                 if sc.get('frame') != 'photo' and not chart_media(base_dir, sc):
                     warn(f'{where}.points[{j}]: no rect → no highlight box', f'python3 {HERE / "suggest_rects.py"} {sc.get("media")} --preview . → copy the numbered rect this point talks about; real photos ("frame": "photo") need none')
             elif len(r) != 4:
-                err(f'{where}.points[{j}]: rect must be [x,y,w,h]', 'measure it with grid_overlay.py on the screenshot (base coordinates)')
+                err(f'{where}.points[{j}]: rect must be [x,y,w,h]', 'write it as "@the element\'s words", or [x, y, w, h] in base units from suggest_rects.py --preview (base coordinates)')
             elif r[0] < 0 or r[1] < 0 or r[0] + r[2] > basewh[0] + 1 or r[1] + r[3] > basewh[1] + 1:
                 err(f'{where}.points[{j}]: rect {r} outside base {basewh}', 'rects are in base units (CSS px of the capture); check base and rect')
             elif r[2] * r[3] > 0.3 * basewh[0] * basewh[1]:

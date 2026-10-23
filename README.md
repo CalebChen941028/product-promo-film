@@ -33,7 +33,7 @@ It works for software, apps, hardware, fashion, food, services, places and brand
   - **Golden films** (`templates/golden/`, one per story arc, every scene with a `_why`) and a **copy bank** (`references/copy-bank.md`) give mid-sized models something top-level to imitate.
 - **No music? It composes one.** `make_music.py` writes an original, royalty-free underscore bar for bar from the scene plan. Sections change on the cuts, half a beat of silence falls before the hero, and the end rings out. There are 7 moods, from cinematic pulse to warm acoustic and luxe lounge.
 - **The film is data, not code.**
-  - `film.json` picks from 17 scene types: cover · pain · feature · carousel · numbers · gallery · clip · phone · compare · statement · finale · endcard, plus photo · hero · detail · lineup · quote for physical products, places and people.
+  - `film.json` picks from 24 scene types: cover · pain · feature · carousel · numbers · gallery · clip · phone · compare · statement · finale · endcard; photo · hero · detail · lineup · quote · footage for physical products, places and people; flow · hub · type · chart · mg drawn in code; and `custom` for scenes you write yourself.
   - `make_film.py` runs check → build → voice → QA → render → finish, and every error prints a `FIX:` line.
 - **Products with source code, in motion:** with the user's yes, `record_ui.mjs` runs the product's own frontend in a sandbox (its own port, an empty profile, localhost only, demo responses for the backend) and records scripted interactions at 30 fps with a gliding cursor; flows that cannot run there can be redrawn in code from the source, always labelled 界面示意 · Illustrative UI on screen.
 - **Effects and transitions designed for the product:** keyframe cuts and moves anchored on an element (`"at"`): a zoom-through into the button or detail the story continues from, the product's own gesture as the effect (`references/director.md` §10).
@@ -45,7 +45,7 @@ It works for software, apps, hardware, fashion, food, services, places and brand
 - **Story drawn in code, any product:** journey maps, many-into-one hubs, kinetic type and real-number charts glue the materials together; real footage plays from its best moment and can open the film.
 - **A restrained director's cinema layer:** a colour script, a LUT grade, adaptive 180° motion blur, a subtle lens and light, and quiet synthesised sound design. Effects are felt, not seen.
 - **Automatic layout QA** measures overlaps, off-frame content and caption collisions, so mid-sized models ship clean frames.
-- **Highlight boxes without measuring:** `suggest_rects.py` finds the cards, panels, charts and tables in a screenshot; autofilm pre-fills feature points with them.
+- **Highlight boxes that land on the element, for any product** (`scripts/snap.py`): every box snaps onto the real element under it (the page's own element boxes, else blocks found in the pixels), and the point's words move a box written on the wrong element (page texts, or the system's text recognition on any screenshot). Measured on random interfaces from no particular product (`evals/rects/`): a box written by eye frames its element 11 % of the time, after snapping 87–95 %.
 - **Enforced gates:** no build before the treatment passes, no render before QA passes, no hand edits in `film_out/`, no downloads without the user's OK.
 - **Measured on smaller models:** given one line, Claude Haiku's films matched the film Claude Opus made on the same materials (within critic noise) and beat it on others, in blind panels of three independent critics, with every honesty gate passing. `evals/` holds the test folders, the method and the full report ([evals/REPORT.md](evals/REPORT.md)).
 
@@ -91,7 +91,9 @@ Where each agent looks for skills: [references/agents.md](references/agents.md).
 ### Quick start
 Ask your agent: *"Make a promo film for my product from ~/materials with the product-promo-film skill."* It follows [SKILL.md](SKILL.md):
 ```bash
-python3 scripts/autofilm.py ~/materials --out ~/my-film      # draft: genre, look, arc, music, film.json, treatment.md
+python3 scripts/briefing.py --project ~/my-film --materials ~/materials   # show the briefing, wait, then --ack "<the user's reply>"
+python3 scripts/autofilm.py ~/materials --out ~/my-film --mood "<the user's words>"   # draft: genre, look, arc, music, film.json, treatment.md
+python3 scripts/proposals.py ~/my-film/film.json              # 2–3 directions with previews; wait, then --apply <A|B|C>
 # the crew fills treatment.md and every TODO (references/crew.md), then:
 python3 scripts/check_treatment.py ~/my-film/treatment.md ~/my-film/film.json
 python3 scripts/make_film.py ~/my-film/film.json              # check → build → voice → QA → render → finish
@@ -99,7 +101,7 @@ python3 scripts/make_film.py ~/my-film/film.json              # check → build 
 Examples:
 - [examples/product-demo](examples/product-demo): a physical product, no music supplied, with the full crew treatment.
 - [examples/demo](examples/demo): software, the user's track.
-- [examples/medstat-pilot](examples/medstat-pilot): a 3:26 production film.
+- [examples/medstat-pilot](examples/medstat-pilot): a verified shot list for an installed desktop app, with its demo data and scripted AI replies.
 
 ### Requirements
 - Python 3.9+ with numpy and Pillow.
@@ -111,12 +113,14 @@ Examples:
 - [SKILL.md](SKILL.md): the procedure.
 - [crew](references/crew.md): the roles and the taste rubric.
 - [copy bank](references/copy-bank.md) and [golden films](templates/golden): what top-level copy and structure look like, per arc and genre.
-- [genres](references/genres.md): product type → look, motion, music, arc.
+- [genres](references/genres.md): product type → story arc, music, voice (the look is chosen from the materials).
 - [director](references/director.md): colour, camera, light, sound, restraint.
 - [film-spec](references/film-spec.md): every `film.json` field.
 - [materials](references/materials.md): what to put in the folder.
 - [styles](references/styles.md), [motion](references/motion.md), [audio](references/audio.md).
-- [storyboard](references/storyboard.md), [capture](references/capture.md), [qa](references/qa.md), [troubleshooting](references/troubleshooting.md), [agents](references/agents.md).
+- [custom scenes](references/custom-scenes.md): your own scenes, motion graphics, keyframe moves and cuts, redrawn UI.
+- [storyboard](references/storyboard.md), [capture](references/capture.md) (incl. `record_ui.mjs`), [qa](references/qa.md), [troubleshooting](references/troubleshooting.md), [agents](references/agents.md).
+- [evals](evals/README.md): blind tests on smaller models and the product-agnostic box benchmarks.
 
 ### Credits & licences
 - **This skill:** MIT. © 2026 Liangliang Chen (陈亮亮), [github.com/CalebChen941028](https://github.com/CalebChen941028), WeChat official account 科研牛马研习社. Built with Codex & Claude.
@@ -149,7 +153,7 @@ Examples:
   - **范例片**（`templates/golden/`，每种叙事结构一部，每个场景都有 `_why`）与**文案范例库**（`references/copy-bank.md`），让中等规模的模型有顶级水准可以模仿。
 - **没有音乐就作曲**：`make_music.py` 按场景逐小节原创无版权配乐，段落在切点变化，高潮前留半拍静默，结尾自然收束；有七种情绪可选。
 - **片子是数据而不是代码**：
-  - `film.json` 从 17 种场景中选择；新增的 photo · hero · detail · lineup · quote 用于实物产品、空间与人物。
+  - `film.json` 从 24 种场景中选择：基础场景；photo · hero · detail · lineup · quote · footage 用于实物产品、空间与人物；flow · hub · type · chart · mg 用代码绘制；`custom` 用于自己编写的场景。
   - `make_film.py` 一条命令完成检查到交付，出错时给出 `FIX:`。
 - **有源码的产品也能流畅演示**：用户同意后，`record_ui.mjs` 在沙盒里运行产品自己的前端（独立端口、空白配置、只访问本机、后端用演示数据），按脚本操作并以 30 帧录制，带平滑光标；沙盒里跑不起来的流程可按源码用代码重绘，画面上始终标注“界面示意 · Illustrative UI”。
 - **按产品设计特效与转场**：关键帧转场和运镜可锚定在画面元素上（`"at"`）：穿越推进到故事接下来的按钮或细节，用产品本身的动作做特效（`references/director.md` 第 10 节）。
@@ -161,7 +165,7 @@ Examples:
 - **用代码讲故事，适用于任何产品**：旅程图、多合一汇聚、动态文字、真实数字图表把素材串起来；实拍视频从最好的片段播放，也可以做开场。
 - **克制的导演电影层**：色彩脚本、LUT 调色、自适应 180° 运动模糊、含蓄的镜头与光效、轻声的合成声音设计；效果感受得到，看不出来。
 - **自动版式 QA**：用数值检测重叠、出画、字幕冲突，中等规模的模型也能交出干净的画面。
-- **高亮框不用手量**：`suggest_rects.py` 自动找出截图里的卡片、面板、图表和表格，autofilm 用它预填功能要点。
+- **高亮框落在元素上，适用于任何产品**（`scripts/snap.py`）：每个框吸附到它下面的真实元素（页面自己的元素位置，否则用像素识别的块），要点的文字会把写在错误元素上的框移到正确的卡片（页面文字，或在任何截图上用系统文字识别）。在与具体产品无关的随机界面上实测（`evals/rects/`）：目测写的框准确率 11%，吸附后 87–95%。
 - **强制关卡**：方案未通过不构建，QA 未通过不渲染，不许手改 `film_out/`，未经用户同意不下载。
 - **在较小模型上实测**：只给一句提示，Claude Haiku 做出的片子在三位独立评审的盲评中，同一素材上与 Claude Opus 制作的片子持平（在评审波动范围内），其他素材上超过它，且所有诚实性关卡都通过。`evals/` 里有测试素材、方法和完整报告（[evals/REPORT.md](evals/REPORT.md)）。
 
@@ -169,10 +173,10 @@ Examples:
 风格与动效分开选择，都由导演读素材后决定（没有默认值，见 `scripts/look.py`）；对照表与预览见上方英文部分。新增 `luxe-noir`（安静的奢华感：时尚、美妆、珠宝、高端硬件）与 `natural-fresh`（日光与材质：食品、身心健康、旅行、家居、亲子）。
 
 ### 安装与快速开始
-命令见上方英文部分。对智能体说：“用 product-promo-film skill，根据 ~/materials 里的素材给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。示例：
+命令见上方英文部分（开工说明 → 起草 → 方案选择 → 团队创作 → 构建）。对智能体说：“用 product-promo-film skill，根据 ~/materials 里的素材给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。示例：
 - [examples/product-demo](examples/product-demo)：实物产品，无音乐，含完整团队方案。
 - [examples/demo](examples/demo)：软件，使用用户音乐。
-- [examples/medstat-pilot](examples/medstat-pilot)：3:26 正式成片。
+- [examples/medstat-pilot](examples/medstat-pilot)：已安装桌面应用的已验证镜头清单，含演示数据与脚本化 AI 回复。
 
 ### 署名与许可
 - **本 skill**：MIT 许可。© 2026 陈亮亮，[github.com/CalebChen941028](https://github.com/CalebChen941028)，微信公众号：科研牛马研习社。由 Codex 与 Claude 协作开发。

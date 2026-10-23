@@ -56,9 +56,6 @@ Crops: write `"clip": "@the words on the card or panel"` rather than pixel numbe
 - Write the replies **from the real results** of the same demo data, and tell the user that the AI text was scripted.
 - Never type the user's API key into the app, even when they paste it in chat; they set it up themselves.
 
-### Older route
-`scripts/capture_kit.mjs` is the same idea as a Playwright script you edit by hand (web apps only). `examples/medstat-pilot/shoot.mjs` is the full capture behind the 3:26 reference film.
-
 ## 中文
 
 ### 选哪条路
@@ -112,6 +109,3 @@ Crops: write `"clip": "@the words on the card or panel"` rather than pixel numbe
 - 用户没配置模型（AI 面板报错或要求选择服务）时，不要删掉 AI 章节：加上 `"mock_llm": {"port": 11434, "replies": "replies.json"}`，并用 `storage` 把应用指向这个本地模型（Ollama 地址 `http://localhost:11434/v1`）。`explore` 会打印应用的 localStorage 键名和 AI 设置的结构（密钥已遮盖），照这个结构填入本地地址、密钥留空即可；回复格式见 `examples/medstat-pilot/replies.json`。也可以请用户自己配置。
 - 回复内容必须依据同一份演示数据的**真实结果**撰写，并告诉用户 AI 文本是预先写好的。
 - 即使用户在对话里贴出 API Key，也不要替他填进应用，由用户自己配置。
-
-### 旧方法
-`scripts/capture_kit.mjs` 思路相同，但需要手改 Playwright 脚本，只适用于网页应用。`examples/medstat-pilot/shoot.mjs` 是 3:26 参考片背后的完整采集脚本。

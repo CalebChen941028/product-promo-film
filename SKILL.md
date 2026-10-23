@@ -21,7 +21,7 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
 | `film.json` | the editable source of the whole film |
 
 ### Hard rules
-1. **Real material only.** Use real screenshots, captures (`scripts/capture_kit.mjs`) and real product photos. Never draw a fake UI or a fake product to pass as real. Placeholders are allowed only in demos, and must be labelled. Two ways to show a product with source code in motion, each only with the user's yes for that product: **recording its real UI** run from the source in a sandbox (`scripts/record_ui.mjs`: real material), and **a UI redrawn in code from the source** to show its logic, which must carry `"illustrative": true` (the film labels it 界面示意 · Illustrative UI on screen) and be named in treatment §8.
+1. **Real material only.** Use real screenshots, captures (`scripts/capture_app.mjs`, `scripts/record_ui.mjs`) and real product photos. Never draw a fake UI or a fake product to pass as real. Placeholders are allowed only in demos, and must be labelled. Two ways to show a product with source code in motion, each only with the user's yes for that product: **recording its real UI** run from the source in a sandbox (`scripts/record_ui.mjs`: real material), and **a UI redrawn in code from the source** to show its logic, which must carry `"illustrative": true` (the film labels it 界面示意 · Illustrative UI on screen) and be named in treatment §8.
 2. **Be honest.** Every claim (numbers, specs, health, finance, privacy) must be checkable in the user's docs. Quotes are real and approved. Demo or mock content is labelled.
 3. **Licences:**
    - Music: the user's track, or the original underscore composed by `make_music.py`. Never take a track from the web.
@@ -92,7 +92,7 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
 - Sharp material: capture screens at 2× (3840 wide); `--stage check` warns when a picture is enlarged over 1.5× (soft) or a dense screen is shown too small to read. Fix the material or the frame, never ignore it.
 
 ### Going further (optional)
-- Manual route (no autofilm): `templates/film.example.json` + `scripts/recommend_style.py` + `scripts/plan_storyboard.py`.
+- Manual route (no autofilm): start from `templates/film.example.json` and `references/film-spec.md`; `scripts/look.py` reads your materials for a look, `scripts/beat_grid.py` gives the music's bars.
 - Composed music on its own: `python3 scripts/make_music.py --list`.
 - Tune the cinema layer: `"cinema": {...}` (`references/film-spec.md`).
 - The director's cut — your own scenes, motion languages, camera moves, cuts and look: `references/custom-scenes.md` (example: `templates/custom.example.js`).
@@ -100,7 +100,7 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
 - Worked examples:
   - `examples/demo/`: software, the user's track;
   - `examples/product-demo/`: a physical product, composed music, full crew treatment;
-  - `examples/medstat-pilot/`: a 3:26 production film.
+  - `examples/medstat-pilot/`: a verified shot list for an installed desktop app (with demo data and scripted AI replies).
 - Install for other agents: `references/agents.md`.
 
 ## 中文
@@ -115,7 +115,7 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
 | `film.json` | 整部片子的可编辑源文件 |
 
 ### 硬性规则
-1. **只用真实素材**：真实截图、录屏（`scripts/capture_kit.mjs`）、真实产品照片；不得画假界面或假产品冒充真实。只有演示才可用占位图，且必须标注。有源码的产品可以用两种方式做出流畅的动态演示，每个产品都需用户同意：**在沙盒里运行源码录制真实界面**（`scripts/record_ui.mjs`，属于真实素材）；**按源码用代码重绘界面**来展示逻辑，此类场景必须写 `"illustrative": true`（片中会显示“界面示意 · Illustrative UI”标签），并在方案第 8 节写明。
+1. **只用真实素材**：真实截图、采集与录屏（`scripts/capture_app.mjs`、`scripts/record_ui.mjs`）、真实产品照片；不得画假界面或假产品冒充真实。只有演示才可用占位图，且必须标注。有源码的产品可以用两种方式做出流畅的动态演示，每个产品都需用户同意：**在沙盒里运行源码录制真实界面**（`scripts/record_ui.mjs`，属于真实素材）；**按源码用代码重绘界面**来展示逻辑，此类场景必须写 `"illustrative": true`（片中会显示“界面示意 · Illustrative UI”标签），并在方案第 8 节写明。
 2. **诚实**：数字、规格、健康、金融、隐私等说法都要能在用户资料里核实；引言必须真实且经授权；演示 / mock 内容要标注。
 3. **授权**：
    - 音乐只用用户提供的，或 `make_music.py` 原创的配乐，不从网上找。
@@ -186,7 +186,7 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
 - 素材要清晰：界面按 2 倍（3840 宽）采集；`--stage check` 会在画面被放大超过 1.5 倍（发虚）或密集界面显示过小（看不清）时警告。修素材或换画面，不要忽略。
 
 ### 进阶（可选）
-- 手动路线（不用 autofilm）：`templates/film.example.json` + `scripts/recommend_style.py` + `scripts/plan_storyboard.py`。
+- 手动路线（不用 autofilm）：从 `templates/film.example.json` 和 `references/film-spec.md` 开始；`scripts/look.py` 根据素材给出视觉风格，`scripts/beat_grid.py` 给出音乐的小节。
 - 单独生成原创配乐：`python3 scripts/make_music.py --list`。
 - 调整电影层：`"cinema": {...}`（见 `references/film-spec.md`）。
 - 导演剪辑版——自定义场景、动效语言、运镜、转场与视觉：`references/custom-scenes.md`（示例：`templates/custom.example.js`）。
@@ -194,5 +194,5 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
 - 实战案例：
   - `examples/demo/`：软件，使用用户音乐；
   - `examples/product-demo/`：实物产品，原创配乐，含完整团队方案；
-  - `examples/medstat-pilot/`：3:26 正式成片。
+  - `examples/medstat-pilot/`：已安装桌面应用的已验证镜头清单（含演示数据与脚本化 AI 回复）。
 - 安装到其他智能体：`references/agents.md`。
