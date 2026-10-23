@@ -1,9 +1,9 @@
 ---
-name: product-promo-film
-description: Make a commercial-grade promo film (45 s – 4 min as the materials allow, 1080p, landscape) for ANY product — software, apps, hardware, fashion, food, services, brands — from the user's materials folder (screenshots, photos, product cut-outs, clips, logo, docs), with or without the user's music. Classifies the product into 15 genres to pick the look (8 styles), motion (6 theme-driven languages), story arc and an original composed underscore when no track is given. A built-in crew (strategist, creative director, copywriter, art director, editor, composer, brand guardian, design critic) writes a checked treatment. A restrained director's cinema layer adds colour script, LUT grade, motion blur and subtle sound design. Kokoro voice-over, bilingual captions, poster and SRT. One command from folder to draft (autofilm.py), one command to film (make_film.py), automatic QA. Use for promo / launch / ad / brand / explainer videos, 宣传片, 产品视频, 广告片.
+name: reelwright
+description: Reelwright (片匠). Make a commercial-grade promo film (45 s – 4 min as the materials allow, 1080p, landscape) for ANY product — software, apps, hardware, fashion, food, services, brands — from the user's materials folder (screenshots, photos, product cut-outs, clips, logo, docs), with or without the user's music. Classifies the product into 15 genres to pick the look (8 styles), motion (6 theme-driven languages), story arc and an original composed underscore when no track is given. A built-in crew (strategist, creative director, copywriter, art director, editor, composer, brand guardian, design critic) writes a checked treatment. A restrained director's cinema layer adds colour script, LUT grade, motion blur and subtle sound design. Kokoro voice-over, bilingual captions, poster and SRT. One command from folder to draft (autofilm.py), one command to film (make_film.py), automatic QA. Use for promo / launch / ad / brand / explainer videos, 宣传片, 产品视频, 广告片.
 ---
 
-# Product Promo Film · 产品宣传片
+# Reelwright · 片匠
 
 > **English first, 中文在后。** The hard rules below never bend. Everything else is a default: the steps are the safe path that makes a good film with any model, and every choice in them (story, scenes, layout, motion, camera, cuts, look, colour, music) can be replaced with your own when the film needs it — see "Two routes". Scripts print `FIX:` lines when something is wrong: do what they say, then rerun. Edit `film.json`, never the generated `film_out/`.
 >

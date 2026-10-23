@@ -10,4 +10,4 @@ Desktop statistics for clinical researchers. Load a spreadsheet, pick an analysi
 - Runs on your own Mac or Windows PC; your data never leaves the computer
 - A phone companion lists your saved analyses
 
-(Placeholder product for the product-promo-film evaluation. The screens are wireframe placeholders, not real captures.)
+(Placeholder product for the Reelwright evaluation. The screens are wireframe placeholders, not real captures.)

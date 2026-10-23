@@ -10,4 +10,4 @@ Three small cabins on a lake, for people who want a few days without a screen.
 - Open 15 May to 30 September; stays of three nights or more
 - Book at larchwood.example
 
-(Placeholder brand for the product-promo-film evaluation. The images are drawn placeholders, not photographs.)
+(Placeholder brand for the Reelwright evaluation. The images are drawn placeholders, not photographs.)

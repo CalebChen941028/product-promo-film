@@ -149,7 +149,7 @@ def ocr_regions(path, base):
         h = hashlib.sha1(path.read_bytes()).hexdigest()[:16]
     except Exception:
         return []
-    cache = Path(os.path.expanduser('~/.cache/product-promo-film')); (cache / 'ocr').mkdir(parents=True, exist_ok=True)
+    cache = Path(os.path.expanduser('~/.cache/reelwright')); (cache / 'ocr').mkdir(parents=True, exist_ok=True)
     hit = cache / 'ocr' / f'{h}.json'
     items = None
     if hit.exists():

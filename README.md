@@ -1,7 +1,10 @@
-# product-promo-film
+# Reelwright · 片匠
 
 **Commercial-grade promo films for any product, from a folder of materials: an agent skill.**
 **任何产品，一个素材文件夹，做出商业级宣传片：给 AI 智能体用的 skill。**
+
+> *Reelwright*: a *reel* (film) and a *wright* (a maker, as in shipwright). The craftsperson who builds your film from your real material.
+> *片匠*：以匠人之心，用你的真实素材一帧一帧打造片子。(Formerly `product-promo-film`.)
 
 [English](#english) · [中文](#中文)
 
@@ -10,7 +13,7 @@
 <a id="english"></a>
 ## English
 
-Point an AI coding agent at a folder: screenshots, product photos or cut-outs, clips, a logo and a README. No screenshots? Point it at the installed app or a URL instead: `scripts/capture_app.mjs` drives the real app from a shot list and captures every screen at 3840×2160. Music is optional. It produces a 1080p film of 45 s to 4 min (the length follows the materials) with:
+**Reelwright** is an agent skill that turns a folder into a promo film. Point an AI coding agent at a folder: screenshots, product photos or cut-outs, clips, a logo and a README. No screenshots? Point it at the installed app or a URL instead: `scripts/capture_app.mjs` drives the real app from a shot list and captures every screen at 3840×2160. Music is optional. It produces a 1080p film of 45 s to 4 min (the length follows the materials) with:
 - a cover poster;
 - real material animated with restraint, cut on the beat;
 - an original underscore when you have no track;
@@ -79,8 +82,8 @@ How a top commercial director works is turned into automatic defaults. The guide
 
 ### Install
 ```bash
-git clone https://github.com/CalebChen941028/product-promo-film.git
-cd product-promo-film
+git clone https://github.com/CalebChen941028/reelwright.git
+cd reelwright
 ./install.sh                 # ~/.agents/skills + Claude Code + Codex   (Windows: .\install.ps1)
 ./install.sh all             # + OpenCode, Antigravity, DeepSeek Harness, Kimi Code, Cursor, Copilot, Gemini CLI, Qwen Code, Trae
 npm i playwright && npx playwright install chromium
@@ -89,7 +92,7 @@ python3 scripts/doctor.py
 Where each agent looks for skills: [references/agents.md](references/agents.md). Agents without skill support: point them at [AGENTS.md](AGENTS.md).
 
 ### Quick start
-Ask your agent: *"Make a promo film for my product from ~/materials with the product-promo-film skill."* It follows [SKILL.md](SKILL.md):
+Ask your agent: *"Make a promo film for my product from ~/materials with the Reelwright skill."* It follows [SKILL.md](SKILL.md):
 ```bash
 python3 scripts/briefing.py --project ~/my-film --materials ~/materials   # show the briefing, wait, then --ack "<the user's reply>"
 python3 scripts/autofilm.py ~/materials --out ~/my-film --mood "<the user's words>"   # draft: genre, look, arc, music, film.json, treatment.md
@@ -123,7 +126,7 @@ Examples:
 - [evals](evals/README.md): blind tests on smaller models and the product-agnostic box benchmarks.
 
 ### Credits & licences
-- **This skill:** MIT. © 2026 Liangliang Chen (陈亮亮), [github.com/CalebChen941028](https://github.com/CalebChen941028), WeChat official account 科研牛马研习社. Built with Codex & Claude.
+- **Reelwright:** MIT. © 2026 Liangliang Chen (陈亮亮), [github.com/CalebChen941028](https://github.com/CalebChen941028), WeChat official account 科研牛马研习社. Built with Codex & Claude.
 - **Not bundled, installed by you:** Playwright (Apache-2.0), Kokoro-82M (Apache-2.0), ffmpeg (LGPL/GPL builds).
 - **Demo music** (`examples/demo/demo-music.m4a`): original, CC0. Music composed by `make_music.py` is yours to use.
 - **Placeholders:** the product-demo images are drawn placeholders for a fictional brand.
@@ -132,7 +135,7 @@ Examples:
 <a id="中文"></a>
 ## 中文
 
-把一个文件夹交给 AI 编程智能体：截图、产品照片或透明底产品图、录屏、Logo、README，音乐可有可无。没有截图时，也可以直接指向已安装的应用或网址：`scripts/capture_app.mjs` 按镜头清单操作真实应用，以 3840×2160 采集每一屏。它会做出一部 45 秒到 4 分钟的 1080p 宣传片（片长取决于素材多少）：
+**Reelwright · 片匠**：把一个文件夹交给 AI 编程智能体：截图、产品照片或透明底产品图、录屏、Logo、README，音乐可有可无。没有截图时，也可以直接指向已安装的应用或网址：`scripts/capture_app.mjs` 按镜头清单操作真实应用，以 3840×2160 采集每一屏。它会做出一部 45 秒到 4 分钟的 1080p 宣传片（片长取决于素材多少）：
 - 封面海报；
 - 克制而有节奏的真实素材动效，切点卡在节拍上；
 - 没有音乐时自动原创配乐；
@@ -173,13 +176,13 @@ Examples:
 风格与动效分开选择，都由导演读素材后决定（没有默认值，见 `scripts/look.py`）；对照表与预览见上方英文部分。新增 `luxe-noir`（安静的奢华感：时尚、美妆、珠宝、高端硬件）与 `natural-fresh`（日光与材质：食品、身心健康、旅行、家居、亲子）。
 
 ### 安装与快速开始
-命令见上方英文部分（开工说明 → 起草 → 方案选择 → 团队创作 → 构建）。对智能体说：“用 product-promo-film skill，根据 ~/materials 里的素材给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。示例：
+命令见上方英文部分（开工说明 → 起草 → 方案选择 → 团队创作 → 构建）。对智能体说：“用 Reelwright（片匠）skill，根据 ~/materials 里的素材给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。示例：
 - [examples/product-demo](examples/product-demo)：实物产品，无音乐，含完整团队方案。
 - [examples/demo](examples/demo)：软件，使用用户音乐。
 - [examples/medstat-pilot](examples/medstat-pilot)：已安装桌面应用的已验证镜头清单，含演示数据与脚本化 AI 回复。
 
 ### 署名与许可
-- **本 skill**：MIT 许可。© 2026 陈亮亮，[github.com/CalebChen941028](https://github.com/CalebChen941028)，微信公众号：科研牛马研习社。由 Codex 与 Claude 协作开发。
+- **Reelwright · 片匠**：MIT 许可。© 2026 陈亮亮，[github.com/CalebChen941028](https://github.com/CalebChen941028)，微信公众号：科研牛马研习社。由 Codex 与 Claude 协作开发。
 - **不随仓库分发、需自行安装**：Playwright、Kokoro-82M、ffmpeg。
 - **示例音乐**：原创，CC0；`make_music.py` 生成的配乐可自由使用。
 - **占位图**：产品示例中的图片是虚构品牌的绘制占位图。

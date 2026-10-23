@@ -1,4 +1,4 @@
-# AGENTS.md — product-promo-film
+# AGENTS.md — Reelwright · 片匠
 
 **For any AI coding agent**: Codex, Claude Code, OpenCode, Antigravity, DeepSeek Harness, Kimi Code, ZCode, Cursor, Copilot, Gemini CLI, Qwen Code, Trae and others.
 面向任何 AI 编程智能体。

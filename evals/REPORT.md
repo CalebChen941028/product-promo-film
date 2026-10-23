@@ -1,7 +1,7 @@
 # Blind test report: a smaller model with this skill · 小模型盲测报告
 
 English first, 中文在后。Dates: 2026-10-20 to 2026-10-21. Model under test: **Claude Haiku** (as a sub-agent), given one line and nothing else:
-`Make a promo film for the product in <folder> using the skill at ~/Desktop/product-promo-film (read SKILL.md and follow it). Output to <dir>.`
+`Make a promo film for the product in <folder> using the skill at ~/Desktop/reelwright (read SKILL.md and follow it). Output to <dir>.`
 Evidence: [`report/`](report): every critic's table and blind mapping, and the last rounds' runs (`round9`, `round10`, `reference`); rounds 1–8 are in the git history. How to rerun: [README.md](README.md).
 
 ## English

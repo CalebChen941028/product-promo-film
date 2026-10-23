@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Install this skill for one or more AI coding agents (macOS / Linux; works with macOS's bash 3.2).
+# Install Reelwright (片匠) for one or more AI coding agents (macOS / Linux; works with macOS's bash 3.2).
 #   ./install.sh                 # universal ~/.agents/skills + Claude Code + Codex
 #   ./install.sh all             # every known agent folder
 #   ./install.sh claude codex opencode antigravity deepseek kimi gemini cursor copilot qwen trae
 # Each target gets a COPY (some agents resolve or reject symlinks). Re-run after updating the skill.
 set -eu
-NAME=product-promo-film
+NAME=reelwright
 SRC="$(cd "$(dirname "$0")" && pwd)"
 ALL="agents claude codex opencode antigravity deepseek kimi gemini cursor copilot qwen trae"
 dest() {

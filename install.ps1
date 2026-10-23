@@ -1,9 +1,9 @@
-# Install this skill for AI coding agents on Windows (PowerShell).
+# Install Reelwright (片匠) for AI coding agents on Windows (PowerShell).
 #   .\install.ps1                      # %USERPROFILE%\.agents\skills + Claude Code + Codex
 #   .\install.ps1 all                  # every known agent folder
 #   .\install.ps1 claude codex antigravity
 param([string[]]$Targets = @('agents', 'claude', 'codex'))
-$Name = 'product-promo-film'
+$Name = 'reelwright'
 $Src = Split-Path -Parent $MyInvocation.MyCommand.Path
 $H = $env:USERPROFILE
 $Dest = @{
