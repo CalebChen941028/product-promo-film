@@ -35,6 +35,8 @@ for t in $targets; do
   else
     mkdir -p "$d/$NAME"; (cd "$SRC" && tar --exclude node_modules --exclude film_out --exclude .git -cf - .) | (cd "$d/$NAME" && tar -xf -)
   fi
+  # the capture and render tools need Playwright: share this folder's node_modules (local, nothing downloaded)
+  if [ -d "$SRC/node_modules/playwright" ]; then ln -s "$SRC/node_modules" "$d/$NAME/node_modules"; fi
   echo "installed → $d/$NAME"
 done
 echo "Next: cd \"$SRC\" && npm i playwright && npx playwright install chromium && python3 scripts/doctor.py"

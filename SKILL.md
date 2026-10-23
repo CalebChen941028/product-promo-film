@@ -21,7 +21,7 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
 | `film.json` | the editable source of the whole film |
 
 ### Hard rules
-1. **Real material only.** Use real screenshots, captures (`scripts/capture_kit.mjs`) and real product photos. Never draw a fake UI or a fake product to pass as real. Placeholders are allowed only in demos, and must be labelled.
+1. **Real material only.** Use real screenshots, captures (`scripts/capture_kit.mjs`) and real product photos. Never draw a fake UI or a fake product to pass as real. Placeholders are allowed only in demos, and must be labelled. Two ways to show a product with source code in motion, each only with the user's yes for that product: **recording its real UI** run from the source in a sandbox (`scripts/record_ui.mjs`: real material), and **a UI redrawn in code from the source** to show its logic, which must carry `"illustrative": true` (the film labels it 界面示意 · Illustrative UI on screen) and be named in treatment §8.
 2. **Be honest.** Every claim (numbers, specs, health, finance, privacy) must be checkable in the user's docs. Quotes are real and approved. Demo or mock content is labelled.
 3. **Licences:**
    - Music: the user's track, or the original underscore composed by `make_music.py`. Never take a track from the web.
@@ -32,14 +32,16 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
 6. **Restraint.** Calm, professional, premium: effects are felt, not seen, and the film has one hero moment (`references/director.md`).
 
 ### Two routes (and you are free to design)
-The motion, the camera, the cuts and the motion graphics are yours to design. The director's shot plan, the 6 motion languages, the 12 cuts and the built-in camera moves are a proposal and a vocabulary, not a cage: change any scene's `layout` / `camera` / `cut` / `motion`, write your own moves and cuts as keyframes in film.json, design MG scenes (`"type": "mg"`), or write code. No permission and no `Deliberate` note is needed for a creative choice; say your intent in treatment §6. Only the hard rules and the QA bind.
+The motion, the camera, the cuts and the motion graphics are yours to design. The director's shot plan, the 6 motion languages, the 12 cuts and the built-in camera moves are a proposal and a vocabulary, not a cage: change any scene's `layout` / `camera` / `cut` / `motion`, write your own moves and cuts as keyframes in film.json, design MG scenes (`"type": "mg"`), or write code. Design the effects and transitions for THIS product and each pair of scenes (a zoom-through into the element the story continues from, the product's own gesture as the effect, one or two signature cuts as a motif: `references/director.md` §10). No permission and no `Deliberate` note is needed for a creative choice; say your intent in treatment §6. Only the hard rules and the QA bind.
 - **Autopilot (any model):** follow the steps. autofilm drafts the film, the director proposes every shot, the colour director the palette, the crew writes the words, the checks keep it clean. This is the floor, and it is a good film.
 - **Director's cut (when you can see further):** keep the hard rules and the tools, and replace any default with something better — your own motion language, camera moves and cuts as keyframes in film.json (`"cameras"`, `"cuts"`), motion graphics as `mg` scenes (layers of text, shapes, lines, numbers and real images on beat keyframes), or your own scenes, moves and look in code (`references/custom-scenes.md`); any scene order, any length. When a taste check stands in the way of a better film, break it on purpose and say why in the treatment (`- Deliberate · 刻意: Rhythm — …`): the check then advises instead of blocking. The QA, the captions, the grade, the sound and the honesty gates still run on everything you write.
 
 ### Steps (do them in order)
+0. **Briefing first — before anything else, even before capturing.** Run `python3 scripts/briefing.py --project <project dir> [--materials <folder>] [--source <repo>] [--lang zh|en|both]` (the user's language) and show the briefing to the user as it is: what the skill will do, what it will not do (its limits), what the user is responsible for, how long it takes, and the questions whose answers shape the film. **Stop and wait.** Record their reply with `--ack "<their words>"` and use the answers (the feel → `--mood`, the length → `--seconds`, music, voice, contacts, permissions). The film must reach the length the user asked for with real story, never by holding the end card. Once per project; brief again only if the request changes. autofilm refuses a project without a confirmed briefing. Cannot ask (a batch run)? `--ack "…" --assumed`, and say in the report that the briefing was not confirmed.
 1. **Environment.** Run `python3 scripts/doctor.py` and fix every `MISS`. First time only: in this folder run `npm i playwright && npx playwright install chromium`.
 2. **Materials → draft.** The user gives a folder or uploads files: screenshots, photos, product cut-outs (transparent PNG), clips, logo, music (optional), README or brief (optional).
-   - **No folder, only the product** (an installed app, a URL), or under ~10 screens of software? Capture the real UI first with `scripts/capture_app.mjs` (explore → shot list → shoot; `references/capture.md`). If `examples/` has a shot list for this product (`examples/medstat-pilot/shots.json` for MedStat Pilot), start from it. Shoot 12–25 screens: autofilm refuses fewer than 8 from an app. Its output folder is the materials folder. Never `pkill`/`killall` anything and never run the product's source code: the user's own copy of the app may be open.
+   - **No folder, only the product** (an installed app, a URL), or under ~10 screens of software? Capture the real UI first with `scripts/capture_app.mjs` (explore → shot list → shoot; `references/capture.md`). If `examples/` has a shot list for this product (`examples/medstat-pilot/shots.json` for MedStat Pilot), start from it. Shoot 12–25 screens: autofilm refuses fewer than 8 from an app. Its output folder is the materials folder. Never `pkill`/`killall` anything and never run the product's source code unasked: the user's own copy of the app may be open.
+   - **The product's source code is available** (the user points at the repo)? Stills are the floor; motion is better. Ask the user once: may I run its frontend in a sandbox, with demo data, to record it? On yes, write a recipe and run `node scripts/record_ui.mjs recipe.json --approved-by-user` (`references/capture.md`): its own port and an empty browser profile, the network limited to localhost, a backend replaced by demo responses (`"mock"`), a gliding cursor with click ripples, 30 fps (`"scale": 2` for 4K). The takes (`.webm`) go in the materials folder next to the stills and play as real screen clips. Where a flow cannot run in a sandbox (a native engine, licensed data), and the user agreed, redraw it in code from the source (`templates/ui-sim.example.js`, `"illustrative": true`): read the flow from the handlers, the labels from the components, the colours from the theme, invent nothing.
    - Then run `python3 scripts/autofilm.py <folder> --out <project> --mood "<the user's own words for the feel>"` (e.g. `"大气 商业 科技感"`, `"warm, human, quiet"`; leave it out only if the user said nothing about the feel). It:
      - classifies every file;
      - reads the docs and picks the **genre** (`scripts/genres.py --list`: 15 types, from SaaS to fashion, food and hardware);
@@ -51,14 +53,14 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
      - adds code-drawn story glue where the arc needs it (a journey map, many-into-one, kinetic type; `references/director.md` §7);
      - with 8 or more software screens (home screens and prompts do not count), plans a **chaptered tour** (2–4 min, like `examples/medstat-pilot`): one chapter per stage of the job, from the shot names `NN-chapter-what`;
      - writes `film.json` (with `TODO` copy), `treatment.md`, and `shot_wishlist.md` (the shots that would lift the film, with specs, for the user or a real crew; AI prompts only for atmosphere, never the product).
-3. **Confirm with the user.** Ask only what matters:
+3. **Proposals: the user chooses before anything is made.** Run `python3 scripts/proposals.py <project>/film.json`. The director reads the materials and lays out 2–3 directions that look AND move differently (look, motion, pace, palette, grade, its reasons), each with a 3-frame preview rendered from the real materials (`proposals/A.jpg`…). Write each option's concept, hook and hero in `proposals.md`, then show the user the options and previews in one message, together with the questions below, and **stop and wait**. When they answer, apply their choice and any change they asked for: `python3 scripts/proposals.py film.json --apply B [--style … --motion … --variety calm|balanced|rich --mood "…"] --note "<their words>"` (it redrafts the film in that direction and records the decision). `make_film.py` refuses to build an autofilm draft that has no approved direction. In the same message, ask only what matters:
    - the feel in their own words (big and cinematic? warm and human? clean and calm? rigorous and academic?): it steers the look;
    - the genre and look, if autofilm printed **CLOSE CALL**;
    - their own music, or the composed underscore;
    - voice-over language and voice (autofilm picks a voice that is already downloaded; any other voice is a download: ask first);
    - contacts for the end card.
 
-   **Cannot ask** (a batch run, a sub-agent, the user is away)? Do not stop and do not download. Keep autofilm's genre, look, composed music and voice, take contacts from the docs (or leave them empty), and list every assumption in the report.
+   **Cannot ask** (a batch run, a sub-agent, the user is away)? Do not stop and do not download. Apply the recommended option with `--apply A --by assumed`, keep autofilm's genre, composed music and voice, take contacts from the docs (or leave them empty), and list every assumption in the report.
 4. **Crew.** First study the golden film autofilm prints (`templates/golden/<arc>.json`, or `tour.json` for a chaptered tour; every scene has a `_why`) and `references/copy-bank.md`. Learn the moves; never copy their lines. Then read `references/crew.md` and play each role in order, filling `treatment.md`: producer → strategist (audience, USP → proof, AIDA) → creative director (3 concepts, choose 1, then the **three anchor lines**: hook, hero, last) → copywriter (a full script, one bullet per scene, a true call to action) → art director & colorist (palette, grade) → director & DP, motion designer & editor (the storyboard: shot sizes, moves, cuts) → composer → brand guardian → design critic. Then run `python3 scripts/check_treatment.py treatment.md` until it passes. A low taste score means redo the weakest part you can change, not re-score; never stop at the gate. What the materials cannot give (placeholders, few photos) goes in the report, not in a score.
 5. **Write the film.**
    - Copy the treatment's words into `film.json` and replace every `TODO`.
@@ -112,7 +114,7 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
 | `film.json` | 整部片子的可编辑源文件 |
 
 ### 硬性规则
-1. **只用真实素材**：真实截图、录屏（`scripts/capture_kit.mjs`）、真实产品照片；不得画假界面或假产品冒充真实。只有演示才可用占位图，且必须标注。
+1. **只用真实素材**：真实截图、录屏（`scripts/capture_kit.mjs`）、真实产品照片；不得画假界面或假产品冒充真实。只有演示才可用占位图，且必须标注。有源码的产品可以用两种方式做出流畅的动态演示，每个产品都需用户同意：**在沙盒里运行源码录制真实界面**（`scripts/record_ui.mjs`，属于真实素材）；**按源码用代码重绘界面**来展示逻辑，此类场景必须写 `"illustrative": true`（片中会显示“界面示意 · Illustrative UI”标签），并在方案第 8 节写明。
 2. **诚实**：数字、规格、健康、金融、隐私等说法都要能在用户资料里核实；引言必须真实且经授权；演示 / mock 内容要标注。
 3. **授权**：
    - 音乐只用用户提供的，或 `make_music.py` 原创的配乐，不从网上找。
@@ -123,14 +125,16 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
 6. **克制**：平静、专业、高级；效果“感受得到，看不出来”，全片只有一个高潮（`references/director.md`）。
 
 ### 两条路线（动效可以自由设计）
-动效、运镜、转场和 MG 动画由你来设计。导演的镜头表、6 种动效语言、12 种转场和内置运镜都是建议和词汇表，不是限制：任何场景的 `layout` / `camera` / `cut` / `motion` 都可以改；可以在 film.json 里用关键帧写你自己的运镜和转场，设计 MG 场景（`"type": "mg"`），或者写代码。创意选择不需要许可，也不需要写 `Deliberate`；在方案第 6 节写明意图即可。只有硬性规则和 QA 是约束。
+动效、运镜、转场和 MG 动画由你来设计。导演的镜头表、6 种动效语言、12 种转场和内置运镜都是建议和词汇表，不是限制：任何场景的 `layout` / `camera` / `cut` / `motion` 都可以改；可以在 film.json 里用关键帧写你自己的运镜和转场，设计 MG 场景（`"type": "mg"`），或者写代码。按这款产品和每两个相邻场景的关系设计特效与转场（穿越推进到故事接下来的那个元素、用产品本身的动作做特效、选一两个标志性转场作为母题，见 `references/director.md` 第 10 节）。创意选择不需要许可，也不需要写 `Deliberate`；在方案第 6 节写明意图即可。只有硬性规则和 QA 是约束。
 - **自动驾驶（任何模型）**：按步骤走。autofilm 起草，导演为每个镜头给出建议，色彩导演定配色，团队写文案，检查保证干净。这是底线，也是一部好片子。
 - **导演剪辑版（当你看得更远时）**：守住硬性规则、用好工具，把任何默认值换成更好的：在 film.json 里用关键帧写你自己的动效语言、运镜和转场（`"cameras"`、`"cuts"`），用 `mg` 场景做 MG 动画（文字、形状、线条、数字和真实图片按节拍关键帧运动），或用代码写你自己的场景、运镜和视觉（`references/custom-scenes.md`）；任意场景顺序、任意长度。某条审美检查挡住了更好的片子时，有意打破它，并在方案里写明理由（`- Deliberate · 刻意: Rhythm — …`），该检查就从阻止改为提醒。QA、字幕、调色、声音和诚实关卡对你写的一切照常生效。
 
 ### 步骤（按顺序）
+0. **先做开工说明——在任何操作之前，包括采集素材之前。** 运行 `python3 scripts/briefing.py --project <项目目录> [--materials <文件夹>] [--source <仓库>] [--lang zh|en|both]`（用用户的语言），把说明原样展示给用户：skill 会做什么、不会做什么（限制）、用户需要负责什么、大概多久，以及决定成片效果的几个问题。**停下来等待回复。** 用 `--ack "<用户原话>"` 记录确认，并使用其中的回答（感觉 → `--mood`、时长 → `--seconds`、音乐、配音、联系方式、权限）。成片要用真实的内容达到用户要求的时长，绝不靠拉长结尾页凑时间。每个项目只需一次；需求变化时再重新说明。没有确认记录时 autofilm 拒绝开工。无法询问（批处理）时用 `--ack "…" --assumed`，并在汇报中说明未经用户确认。
 1. **环境**：运行 `python3 scripts/doctor.py`，修好所有 `MISS`。首次需在本目录运行 `npm i playwright && npx playwright install chromium`。
 2. **素材 → 草稿**：用户给一个文件夹或上传文件（截图、照片、透明底产品图、录屏、Logo、音乐可选、README 或 brief 可选）。
-   - **没有素材文件夹、只有产品本身**（已安装的应用、网址），或软件截图少于约 10 张：先用 `scripts/capture_app.mjs` 采集真实界面（探索 → 镜头清单 → 拍摄，见 `references/capture.md`）。若 `examples/` 里已有这个产品的镜头清单（MedStat Pilot 用 `examples/medstat-pilot/shots.json`），就从它开始。拍 12–25 屏：从应用采集少于 8 屏时 autofilm 会拒绝。它的输出文件夹就是素材文件夹。不要 `pkill`/`killall` 任何进程，也不要运行产品源码：用户自己可能正开着这个应用。
+   - **没有素材文件夹、只有产品本身**（已安装的应用、网址），或软件截图少于约 10 张：先用 `scripts/capture_app.mjs` 采集真实界面（探索 → 镜头清单 → 拍摄，见 `references/capture.md`）。若 `examples/` 里已有这个产品的镜头清单（MedStat Pilot 用 `examples/medstat-pilot/shots.json`），就从它开始。拍 12–25 屏：从应用采集少于 8 屏时 autofilm 会拒绝。它的输出文件夹就是素材文件夹。不要 `pkill`/`killall` 任何进程，未经同意也不要运行产品源码：用户自己可能正开着这个应用。
+   - **有产品源码**（用户给了仓库）时：截图是底线，动态更好。先问用户一次：能否在沙盒里用演示数据运行它的前端来录制？同意后写好录制脚本，运行 `node scripts/record_ui.mjs recipe.json --approved-by-user`（见 `references/capture.md`）：独立端口、空白浏览器配置、只允许访问本机、后端用演示数据替代（`"mock"`）、平滑光标与点击涟漪、30 帧（`"scale": 2` 为 4K）。录好的 `.webm` 放进素材文件夹，与截图一起作为真实录屏使用。沙盒里跑不起来的流程（原生引擎、授权数据），在用户同意后可按源码用代码重绘（`templates/ui-sim.example.js`，`"illustrative": true`）：流程取自事件处理代码，文字取自组件，颜色取自主题，不编造任何东西。
    - 然后运行 `python3 scripts/autofilm.py <文件夹> --out <项目目录> --mood "<用户自己描述的风格感觉>"`（如 `"大气 商业 科技感"`、`"温暖 人文 安静"`；用户没说才省略），它会：
      - 给每个文件分类；
      - 读文档判断**产品类型**（`scripts/genres.py --list`：15 类，从 SaaS 到时尚、食品、硬件）；
@@ -142,14 +146,14 @@ The motion, the camera, the cuts and the motion graphics are yours to design. Th
      - 在叙事需要处加入代码动画（旅程图、多合一、动态文字，见 `references/director.md` 第 7 节）；
      - 软件截图有 8 张或更多（首页和提示框不算）时，排成**分章节的产品巡礼**（2–4 分钟，类似 `examples/medstat-pilot`）：按镜头名 `NN-章节-内容` 每个工作阶段一章；
      - 写出 `film.json`（文案为 `TODO`）、`treatment.md`，以及 `shot_wishlist.md`（最能提升片子的补拍镜头及拍摄参数，供用户或真人团队拍摄；AI 提示词只用于氛围镜头，绝不生成产品本身）。
-3. **与用户确认**（只问关键的）：
+3. **方案：用户先选，再动工。** 运行 `python3 scripts/proposals.py <项目目录>/film.json`。导演读完素材，给出 2–3 套在视觉和动效上都不同的方向（风格、动效、节奏、配色、调色及理由），每套都附一张用真实素材渲染的三帧预览（`proposals/A.jpg`…）。在 `proposals.md` 里为每套写好创意概念、开场和高潮，然后在一条消息里把方案、预览和下面的问题一起给用户，**停下来等待**。用户回复后，按其选择和修改意见执行：`python3 scripts/proposals.py film.json --apply B [--style … --motion … --variety calm|balanced|rich --mood "…"] --note "<用户原话>"`（按该方向重新起草并记录决定）。autofilm 的草稿没有确认方向时，`make_film.py` 拒绝构建。同一条消息里只问关键的：
    - 他们想要的气质（大气商业？温暖人文？简洁克制？严谨学术？），用他们自己的话：它决定视觉风格；
    - 输出 **CLOSE CALL** 时确认类型与风格；
    - 用他们自己的音乐还是原创配乐；
    - 旁白语言与音色（autofilm 会选已下载的音色；换其他音色需要下载，先征得同意）；
    - 结尾页联系方式。
 
-   **无法询问**（批处理、子智能体、用户不在）时：不要停下，也不要下载。沿用 autofilm 选定的类型、风格、原创配乐和音色，联系方式取自文档（没有就留空），并在汇报里列出每一个假设。
+   **无法询问**（批处理、子智能体、用户不在）时：不要停下，也不要下载。用 `--apply A --by assumed` 采用推荐方案，沿用 autofilm 选定的类型、原创配乐和音色，联系方式取自文档（没有就留空），并在汇报里列出每一个假设。
 4. **团队创作**：先读 autofilm 打印的范例片（`templates/golden/<结构>.json`，分章节巡礼用 `tour.json`；每个场景都有 `_why`）和 `references/copy-bank.md`，学手法，不抄句子。再读 `references/crew.md`，按顺序扮演各角色填写 `treatment.md`：制片 → 策略（目标受众、卖点 → 证明画面、AIDA）→ 创意总监（三个概念、选一个，再写**三句锚点**：开场句、高潮句、收尾句）→ 文案（完整脚本，每个场景一条；一个真实的行动号召）→ 美术指导与调色（配色、调色）→ 导演与摄影指导、动效与剪辑（分镜表：景别、运镜、转场）→ 作曲 → 品牌把关 → 设计评审。然后运行 `python3 scripts/check_treatment.py treatment.md` 直到通过。品味分低就重做你能改变的最弱环节，不要改分数，也不要停在关卡前；素材本身给不了的（占位图、照片太少）写进汇报，不计入分数。
 5. **写入影片**：
    - 把方案中的文字写进 `film.json`，替换所有 `TODO`。

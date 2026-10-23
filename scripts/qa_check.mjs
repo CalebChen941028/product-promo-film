@@ -19,8 +19,15 @@ const [html, out] = process.argv.slice(2);
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ args: ['--allow-file-access-from-files'] });
 const page = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
+const pageErrors = [];
+page.on('pageerror', (e) => pageErrors.push(String(e.message || e).split('\n')[0]));
 await page.goto(pathToFileURL(path.resolve(html)).href);
-const missing = await page.evaluate(() => window.ready);
+if (await page.evaluate(() => typeof window.renderFrame !== 'function')) {   // the page did not start: nothing below can be measured
+  console.error(`ERROR the film page did not start: ${pageErrors[0] || 'renderFrame is missing'}`);
+  writeFileSync(path.join(out, 'qa_report.json'), JSON.stringify({ errors: [`page-error: ${pageErrors[0] || 'renderFrame missing'}`], warnings: [] }, null, 2));
+  await browser.close(); process.exit(1);
+}
+const missing = (await page.evaluate(() => window.ready)) || [];
 const errors = [], warnings = [];
 if (missing.length) errors.push(`missing-media: ${missing.join(', ')}`);
 const scenes = await page.evaluate(() => SCENES.map((s, i) => ({ i, s: s.s, e: s.e })));
@@ -82,6 +89,7 @@ for (let k = 0; k < shots.length; k += 9) {
   await sheet.close();
 }
 const uniq = (a) => [...new Set(a)];
+for (const e of pageErrors) errors.push(`page-error: ${e} (a script error while rendering: some frames may be wrong)`);
 writeFileSync(path.join(out, 'qa_report.json'), JSON.stringify({ errors: uniq(errors), warnings: uniq(warnings), frames: shots.map((f) => path.basename(f)) }, null, 1));
 console.log(`qa: ${uniq(errors).length} errors, ${uniq(warnings).length} warnings, ${shots.length} frames`);
 await browser.close();

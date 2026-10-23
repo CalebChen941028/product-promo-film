@@ -90,15 +90,19 @@ for (const [id, m] of Object.entries(CONFIG.MOTIONS_EXTRA || {})) {
 //   CUT.<name> = ({p, inc}) => ({transform?, opacity?, filter?, clipPath?})  (optional CUT.<name>.len = × crossfade)
 const CAMERA = {}, CUT = {};
 // the film's own camera moves and cuts written as keyframes in film.json — no code (references/custom-scenes.md):
-//   "cameras": {"name": {"from": {x, y, z, s, rx, ry, rz}, "to": {…}, "ease": "esoft", "pulse": 0.01}}
+//   "cameras": {"name": {"from": {x, y, z, s, rx, ry, rz}, "to": {…}, "ease": "esoft", "pulse": 0.01, "at": [x, y]}}
+//     at = the stage point (px, 1920 × 1080) the move scales and turns around: push into a button, a product, a chart peak
 //     x/y/z px, s scale, rx/ry/rz degrees; the scene moves from "from" to "to" over its length; pulse = a scale kick on every beat
 //   "cuts": {"name": {"from": {x, y, s, rz, o, blur, bright}, "to": {…}, "reveal": "left|right|up|down|circle|center", "ease": "eio", "len": 1.2}}
 //     the incoming scene arrives from "from" (and reveals in that shape); the outgoing one leaves towards "to" (default: it stays)
+//     at = [x, y] stage px: both scale around it and a circle reveal opens from it — a zoom-through: the outgoing scene dives
+//     into the element the story continues from ("to": {"s": 3, "o": 0}) and the next scene grows out of the same point
 const KF_KEYS = { x: 0, y: 0, z: 0, s: 1, rx: 0, ry: 0, rz: 0, o: 1, blur: 0, bright: 1 };
 const kfMix = (a, b, e) => { const v = {}; for (const [k, d] of Object.entries(KF_KEYS)) v[k] = lerp(a[k] ?? d, b[k] ?? d, e); return v; };
-const kfTf = (v) => `translate3d(${v.x.toFixed(2)}px,${v.y.toFixed(2)}px,${v.z.toFixed(1)}px) rotateX(${v.rx.toFixed(3)}deg) rotateY(${v.ry.toFixed(3)}deg) rotateZ(${v.rz.toFixed(3)}deg) scale(${v.s.toFixed(4)})`;
-const kfReveal = (r, e) => {
+const kfTf = (v, at) => (at ? `translate(${at[0] - 960}px,${at[1] - 540}px) ` : '') + `translate3d(${v.x.toFixed(2)}px,${v.y.toFixed(2)}px,${v.z.toFixed(1)}px) rotateX(${v.rx.toFixed(3)}deg) rotateY(${v.ry.toFixed(3)}deg) rotateZ(${v.rz.toFixed(3)}deg) scale(${v.s.toFixed(4)})` + (at ? ` translate(${960 - at[0]}px,${540 - at[1]}px)` : '');   // at = [x, y] stage px: scale and turn around that point
+const kfReveal = (r, e, at) => {
   const q = ((1 - e) * 100).toFixed(2);
+  if (r === 'circle' && at) return `circle(${(e * 2300).toFixed(1)}px at ${at[0]}px ${at[1]}px)`;   // opens from the anchor (a button, a product)
   return r === 'left' ? `inset(0 ${q}% 0 0)` : r === 'right' ? `inset(0 0 0 ${q}%)` : r === 'up' ? `inset(${q}% 0 0 0)` : r === 'down' ? `inset(0 0 ${q}% 0)`
     : r === 'circle' ? `circle(${(e * 115).toFixed(2)}% at 50% 50%)` : r === 'center' ? `inset(0 ${(q / 2).toFixed(2)}% 0 ${(q / 2).toFixed(2)}%)` : '';
 };
@@ -107,15 +111,15 @@ for (const [id, c] of Object.entries(CONFIG.CAMERAS_EXTRA || {})) {
   CAMERA[id] = ({ lt, dur, beat }) => {
     const v = kfMix(c.from || {}, c.to || {}, ease(clamp(lt / Math.max(0.01, dur))));
     if (c.pulse) v.s *= 1 + c.pulse * Math.exp(-beat * 6);
-    return kfTf(v);
+    return kfTf(v, c.at);
   };
 }
 for (const [id, c] of Object.entries(CONFIG.CUTS_EXTRA || {})) {
   const ease = EASES[c.ease] || EASES.eio;
   CUT[id] = ({ p, inc }) => {
     const e = ease(clamp(p)), v = inc ? kfMix(c.from || { o: 0 }, {}, e) : kfMix({}, c.to || {}, e);
-    return { transform: kfTf(v), opacity: clamp(v.o), filter: `blur(${Math.max(0, v.blur).toFixed(1)}px) brightness(${v.bright.toFixed(3)})`,
-             clipPath: inc && c.reveal ? kfReveal(c.reveal, e) : '' };
+    return { transform: kfTf(v, c.at), opacity: clamp(v.o), filter: `blur(${Math.max(0, v.blur).toFixed(1)}px) brightness(${v.bright.toFixed(3)})`,
+             clipPath: inc && c.reveal ? kfReveal(c.reveal, e, c.at) : '' };
   };
   CUT[id].len = Math.min(2, Math.max(0.4, c.len || 1.2));
 }
@@ -433,6 +437,8 @@ const FILM = {
     for (const sc of SCENES) { sc.root = div('scene', host); sc.S = {}; useShot(sc.shot); const v0 = VIDS.length; sc.init(sc.root, sc.S); sc.vids = VIDS.slice(v0); }
     useShot(null);
     FX.init.forEach((f) => f());
+    const illus = (CONFIG.ILLUSTRATIVE || []).map(([a, b]) => [bar(a), bar(b)]), illusEl = $('illus');   // a UI redrawn in code is always labelled
+    if (illusEl) illusEl.textContent = CONFIG.ILLUS_LABEL || '界面示意 · Illustrative UI';
     const chapter = $('chapter'), capzh = $('capzh'), capen = $('capen'), capband = $('capband'), flash = $('flash'), pulse = $('pulse');
     const cuts = SCENES.map((s) => s.s).filter((s) => s > 0);
     window.renderFrame = (t) => {
@@ -463,6 +469,7 @@ const FILM = {
         chapter.querySelector('b').textContent = ch[2]; chapter.querySelector('.z').textContent = ch[3]; chapter.querySelector('.e').textContent = ch[4];
         chapter.style.opacity = Math.min(prog(t, ch[0] + 0.2, ch[0] + 0.7), 1 - prog(t, ch[1] - 0.35, ch[1]));
       } else chapter.style.opacity = 0;
+      if (illusEl) { const r = illus.find(([a, b]) => t >= a - 0.3 && t < b + 0.3); illusEl.style.opacity = r ? Math.min(prog(t, r[0] - 0.3, r[0]), 1 - prog(t, r[1], r[1] + 0.3)) : 0; }
       const c = (window.VO || []).find((v) => !onscreen.has(v.id) && t >= v.s - 0.1 && t < v.e + 0.45);
       if (c) {
         const a = Math.min(prog(t, c.s - 0.1, c.s + 0.2), 1 - prog(t, c.e + 0.15, c.e + 0.45));

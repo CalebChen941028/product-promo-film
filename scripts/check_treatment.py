@@ -254,6 +254,13 @@ if len(sys.argv) > 2:
     name_nums = set(re.findall(r'\d+', f"{b.get('name', '')} {b.get('nameAccent', '')}"))
     unsourced = []
     sec8 = section(md, 8)
+    # a UI redrawn in code (from the product's source) is not a capture: it is labelled on screen, and the brand guardian says so
+    ill = [i for i, sc in enumerate(spec.get('scenes', [])) if sc.get('illustrative')]
+    if ill and not re.search(r'illustrative|界面示意|redrawn|重绘', sec8, re.I):
+        err(f'scenes {ill} redraw the UI in code, but §8 does not say so',
+            'brand guardian: in §8 Qualifiers name the illustrative scenes ("界面示意 · Illustrative UI", redrawn from the source, what it simplifies), and confirm the user agreed')
+    if ill and str(spec.get('illustrative_label', 'x')).strip() == '':
+        err('"illustrative_label" is empty', 'a redrawn UI must carry its label; remove the field to use 界面示意 · Illustrative UI')
     mat_stems = [tp.stem for tp in (base / mats).iterdir()] if mats and (base / mats).is_dir() else []
     def screen_sourced(n):   # §8 names the material file the figure is read from ("95% CI → km.png")
         return any(n in ln and any(st and st in ln for st in mat_stems) for ln in sec8.splitlines())

@@ -147,7 +147,7 @@ def plan_shots(spec, base_dir, roles=None):
                 why_l = ('a photograph' if is_photo else 'a chart' if chart else 'no boxed region') + ': the whole frame carries it'
             else:
                 cx = sum(r[0] + r[2] / 2 for r in boxed) / len(boxed) / bw
-                side = 'split' if cx >= 0.5 else 'split-r'   # the list sits on the side of the boxes: short leader lines
+                side = 'split' if cx >= 0.5 else 'split-r'   # the list sits on the side of the boxes: the eye travels a short way from number to badge
                 dense = bool(a and a['density'] > 0.12)
                 if len(boxed) >= 3 or dense:
                     want = nearest(side, feats)

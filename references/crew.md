@@ -33,6 +33,7 @@ Every rule below is the craft's default, written for the average film. A role ma
 - **AIDA, honestly:** Attention = the hook in 3 s; Interest = the problem or the reveal; Desire = the proof and the hero (the viewer sees themselves with it); Action = one true next step on the end card. Persuade with true social proof (real quotes, real numbers) and clarity, never with fake scarcity, fake urgency or invented testimonials.
 
 ### 3. Creative director: the idea people remember
+- **The user's choice comes first:** the concepts, hook and hero start from the direction the user approved in `proposals.md` (and any change they asked for). Concept A in the treatment is that direction; B and C are the alternatives you weighed.
 - **Job:** three *different* concepts (not three wordings of one). Choose the one that is the most surprising **and** the most true. Write the hook (0–3 s) and the hero moment. Then write the **three anchor lines** — hook line (cover), hero line (finale), last line (end card) — each saying the chosen concept in a different way, the last one a callback to the first. A concept that does not reach these three lines is not chosen; it is decoration.
 - **Hook patterns that work:**
   - **macro detail:** texture before the whole;
@@ -149,6 +150,7 @@ Score each criterion 1–5. `check_treatment.py` cross-checks the scores against
 - **诚实的 AIDA**：吸引 = 3 秒钩子；兴趣 = 问题或揭晓；欲望 = 证据与高潮（观众看到自己用上它）；行动 = 结尾页上一个真实的下一步。用真实的社会证明（真实引言、真实数字）和清晰来说服，绝不用虚假的稀缺、虚假的紧迫感或编造的评价。
 
 ### 3. 创意总监：让人记住的创意
+- **用户的选择优先**：创意、开场与高潮都从用户在 `proposals.md` 里确认的方向（及其修改意见）出发。方案中的概念 A 就是这个方向，B、C 是你权衡过的备选。
 - **职责**：三个**真正不同**的创意（不是一个创意的三种说法），选出最出人意料**且**最真实的那个；写出开场钩子（0–3 秒）和高潮时刻；再写**三句锚点**——开场句（封面）、高潮句（finale）、收尾句（结尾页），各用不同方式说出选定的创意，收尾句呼应开场句。没有落到这三句里的创意，只是装饰。
 - **有效的开场方式**：
   - **微距细节**：先质感，后全貌；

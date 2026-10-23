@@ -64,7 +64,7 @@ Short-film and title-design craft, built in (each implemented from scratch in `t
 
 | Device | What it does on screen | Where the director uses it |
 | --- | --- | --- |
-| **Layouts** (`layout`) | feature: `center` (3D window), `split` / `split-r` (window + numbered list, leader lines), `full` (full-bleed + headline cards), `soft` (one line at a time), `stickers`, `editorial` (giant index) · photo: `left` `right` `bottom` `center` (full-bleed + scrim) or `split` (framed photo + clean text side) · gallery: `coverflow` `grid` `strip` · carousel: `menu` `stack` (a deck) · detail: `macro` or `split` (the whole image with a box + the region magnified) | a dense screen with 3+ points → a list layout; a chart or a photo → a full frame; never the same layout twice in a row |
+| **Layouts** (`layout`) | feature: `center` (3D window), `split` / `split-r` (window + numbered list; each highlight wears its number and a spotlight dims the rest), `full` (full-bleed + headline cards), `soft` (one line at a time), `stickers`, `editorial` (giant index) · photo: `left` `right` `bottom` `center` (full-bleed + scrim) or `split` (framed photo + clean text side) · gallery: `coverflow` `grid` `strip` · carousel: `menu` `stack` (a deck) · detail: `macro` or `split` (the whole image with a box + the region magnified) | a dense screen with 3+ points → a list layout; a chart or a photo → a full frame; never the same layout twice in a row |
 | **Camera moves** (`camera`) | `push` / `pull` (5 % in or out), `pan-l` / `pan-r` (lateral 70 px), `crane` (rise), `tilt`, `arc` (a slow orbit step), `vertigo` (dolly zoom: the frame pushes while depth flattens), `handheld` (a slow breathing float), `reveal` (starts close and high, settles onto the whole), plus the languages' `orbit` `punch` `dolly` `sway` | lateral moves alternate direction; photos breathe handheld in the softer languages; statements push in |
 | **Cuts** (`cut`) | `whip` (pan + motion blur), `push` (through the frame), `slide-up`, `wipe` (a hard edge), `iris` (a circle opens), `zoom` (settles from 125 %), `blur` (defocus dissolve), `rack` (focus pulls from one scene to the next), `doors` (split open from the centre), `light` (a light leak carries the change), `dip` (a breath through the background) | chapter openings take a designed cut; the way out of the pain takes a push; a breath (statement) takes a dip, blur or light; the hero takes the language's signature cut; inside a chapter the style's calm transition |
 | **Motion language per scene** (`motion`) | one scene borrows another language's entrances, text reveals and focus speed | rarely, on purpose: a `gentle-story` breath inside a `precision-data` film |
@@ -97,6 +97,19 @@ The style sets the ground (background, ink, type); the colour director sets the 
 
 ### 9. The look: chosen from the materials, never a default (`scripts/look.py`)
 Nothing picks a style by product type alone. `look.py` reads every picture (screen or photo, light or dark UI, saturation, information density, charts, the warmth of the dominant hue), weighs it with the product's character and the docs' tone words, and scores all 8 styles, writing the reasons into `treatment.md` §5. The user's own words for the feel (`autofilm.py --mood "大气 商业 科技感"`) count triple. A tie is settled by evidence (a dense white UI pops on a dark ground, a sparse one blends with a bright ground). The motion follows the look; a dense data UI gets `precision-data` instead of 3D drift. The crew confirms or changes `"style"` / `"motion"` in film.json and says why, so two films of one category look alike only when their materials and mood do. The thresholds are judgement calls: when a pick feels wrong for a product, change the film and say so in §5.
+
+### 10. Effects and transitions designed for the product and the scene
+A cut is motivated when it comes from something on screen or in the story. Design them for THIS product, in film.json keyframes (`"cuts"`, `"cameras"`, `at` = the stage point they move around; `references/custom-scenes.md`), and write the motive of each in treatment §6. Patterns to start from:
+| The two scenes | A motivated cut |
+| --- | --- |
+| the next scene is inside the last one (a panel, a button, a detail of the product) | **zoom-through**: the outgoing scene dives into that element (`"at": [x, y]`, `"to": {"s": 3, "o": 0}`) and the next one opens from it (`"reveal": "circle"`) |
+| the same product or screen, another side of it | **match**: keep the frame, change what is in it (a plain crossfade or `rack`), or turn around it (`"to": {"ry": 25}`) |
+| a step forward in a process (import → clean → analyse; brew → pour) | **directional push**: both move the way the process reads (`"from": {"x": 400}`, `"to": {"x": -400}`) |
+| before → after, old way → new way | **wipe** along the line that divides them (`"reveal": "left"`) |
+| time passes, a chapter ends | **dip** or a slow `light` |
+| a result appears (a chart, a finished dish, a printed page) | **reveal** from the result's own shape (`"reveal": "up"` for a bar rising, `"circle"` for a cup or a dial) |
+| an energetic montage on the beat | whips, `pulse` on the camera, short `len` |
+By product, the gesture the product itself makes is the best effect: data tools draw, sort and filter (a mask that sweeps like a sort, numbers that land); hardware turns, opens and lights up (a rotation around the product, a light leak on power-on); food and drink steam, pour and melt (a soft blur-and-bright dissolve, a slow push into the texture); fashion and beauty shimmer and drape (a slow rack, a sheen sweep); apps tap, swipe and slide (the next screen slides in the direction the user swipes). Keep one or two signature cuts and repeat them as a motif, rather than a new trick at every cut; inside a chapter, the plain cut is still the strongest.
 
 ## 中文
 
@@ -153,7 +166,7 @@ Nothing picks a style by product type alone. `look.py` reads every picture (scre
 
 | 手法 | 画面效果 | 导演怎么用 |
 | --- | --- | --- |
-| **版式**（`layout`） | 功能：`center`（3D 窗口居中）、`split` / `split-r`（窗口 + 编号列表 + 引线，左右镜像）、`full`（满幅 + 标题卡）、`soft`（一次一句）、`stickers`（贴纸气泡）、`editorial`（巨型编号）· 照片：`left` `right` `bottom` `center`（满幅 + 渐变遮罩）或 `split`（照片卡片 + 留白文字）· 画廊：`coverflow` `grid` `strip` · 轮播：`menu` `stack`（叠卡）· 细节：`macro` 或 `split`（左边全图带框、右边局部放大） | 要点多、截图密 → 列表版式；图表、照片 → 满幅；同一版式不连续出现 |
+| **版式**（`layout`） | 功能：`center`（3D 窗口居中）、`split` / `split-r`（窗口 + 编号列表，高亮框带编号角标，聚光压暗其余区域，左右镜像）、`full`（满幅 + 标题卡）、`soft`（一次一句）、`stickers`（贴纸气泡）、`editorial`（巨型编号）· 照片：`left` `right` `bottom` `center`（满幅 + 渐变遮罩）或 `split`（照片卡片 + 留白文字）· 画廊：`coverflow` `grid` `strip` · 轮播：`menu` `stack`（叠卡）· 细节：`macro` 或 `split`（左边全图带框、右边局部放大） | 要点多、截图密 → 列表版式；图表、照片 → 满幅；同一版式不连续出现 |
 | **运镜**（`camera`） | `push` / `pull`（推近 / 拉远 5%）、`pan-l` / `pan-r`（横移 70 px）、`crane`（升）、`tilt`（俯仰）、`arc`（缓慢环绕一步）、`vertigo`（希区柯克变焦：推近同时纵深变平）、`handheld`（缓慢的手持呼吸感）、`reveal`（从近处高处落到全景），以及各动效语言自带的 `orbit` `punch` `dolly` `sway` | 横移左右交替；柔和的语言里照片带手持呼吸；宣言句缓推 |
 | **转场**（`cut`） | `whip`（甩镜 + 运动模糊）、`push`（穿过画面）、`slide-up`（上滑）、`wipe`（硬边擦除）、`iris`（圆形展开）、`zoom`（从 125% 落定）、`blur`（虚焦叠化）、`rack`（焦点从上一场转到下一场）、`doors`（从中缝向两侧打开）、`light`（漏光带过）、`dip`（经背景过渡，一口气） | 章节开头用设计过的转场；走出痛点用 push；宣言句用 dip / blur / light；高潮用该语言的招牌转场；章节内用风格自带的平静转场 |
 | **场景级动效语言**（`motion`） | 单个场景借用另一种语言的入场、文字和推近节奏 | 少用、刻意用：比如在 precision-data 片子里插一拍 gentle-story 的“喘口气” |
@@ -186,3 +199,16 @@ Nothing picks a style by product type alone. `look.py` reads every picture (scre
 
 ### 9. 视觉风格：由素材决定，没有默认值（`scripts/look.py`）
 没有任何环节只凭产品类型就选风格。`look.py` 读懂每张图（截图还是照片、浅色还是深色界面、饱和度、信息密度、是否图表、主色冷暖），结合产品特点与文档语气，给 8 种风格逐一打分，并把理由写进 `treatment.md` 第 5 节。用户自己描述风格的用词（`autofilm.py --mood "大气 商业 科技感"`）权重三倍。平局由证据决定（文字密的白色界面在深色底上最醒目，界面稀疏则与明亮底融合）。动效跟着风格走；信息密集的数据界面用 `precision-data`，不用 3D 漂移。团队在 film.json 的 `"style"` / `"motion"` 里确认或修改并写明理由，所以只有素材与气质真的相近时，同类产品的片子才会长得像。阈值是经验判断：某个选择不适合这款产品时，改片子并在第 5 节写明。
+
+### 10. 按产品与场景设计特效和转场
+转场要有动机：来自画面里的某个元素，或故事的转折。为这款产品专门设计，用 film.json 的关键帧（`"cuts"`、`"cameras"`，`at` = 运动围绕的画面坐标点；见 `references/custom-scenes.md`），并在方案第 6 节写明每个转场的动机。可以从这些模式出发：
+| 前后两个场景 | 有动机的转场 |
+| --- | --- |
+| 下一幕就在上一幕里面（一个面板、一个按钮、产品的一处细节） | **穿越推进**：上一幕推进那个元素（`"at": [x, y]`，`"to": {"s": 3, "o": 0}`），下一幕从同一点展开（`"reveal": "circle"`） |
+| 同一个产品或界面的另一面 | **匹配剪辑**：画框不变、内容变化（简单交叉淡化或 `rack`），或绕着它转（`"to": {"ry": 25}`） |
+| 流程向前一步（导入 → 清洗 → 分析；冲泡 → 倒出） | **方向推移**：两幕都朝流程阅读的方向运动（`"from": {"x": 400}`，`"to": {"x": -400}`） |
+| 之前 → 之后，旧方式 → 新方式 | 沿分界线的**擦除**（`"reveal": "left"`） |
+| 时间流逝、一章结束 | **dip** 或缓慢的 `light` |
+| 结果出现（图表、做好的菜、打印好的页面） | 按结果自身形状**揭开**（柱子升起用 `"reveal": "up"`，杯子或表盘用 `"circle"`） |
+| 卡拍的激烈蒙太奇 | 甩镜、运镜 `pulse`、短 `len` |
+按产品类型，最好的特效就是产品本身的动作：数据工具会绘制、排序、筛选（像排序一样扫过的遮罩、落定的数字）；硬件会转动、打开、亮起（绕产品旋转、开机时的漏光）；食品饮料会冒热气、倾倒、融化（柔和的模糊加提亮溶解、缓慢推进质感）；时尚美妆有光泽和垂坠（缓慢的焦点转移、一道光泽扫过）；应用会点按、滑动（下一屏顺着用户滑动的方向进入）。选一两个标志性转场作为母题反复使用，不要每个切点都换新花样；章节内部，最朴素的切换依然最有力。

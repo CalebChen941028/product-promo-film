@@ -47,6 +47,9 @@
   .ov { position: absolute; inset: 0; pointer-events: none; }
   .hl { position: absolute; opacity: 0; }
   .tag { position: absolute; white-space: nowrap; opacity: 0; }
+  .hl-badge { position: absolute; width: 40px; height: 40px; border-radius: 50%; opacity: 0; z-index: 3; display: flex; align-items: center; justify-content: center;
+              font: 700 17px var(--mono, monospace); color: var(--bg-edge, #000); background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent), 0 8px 20px rgba(0,0,0,0.35); }
+  .hl-spot { position: absolute; opacity: 0; border-radius: 12px; pointer-events: none; box-shadow: 0 0 0 4000px rgba(6,10,16,0.32); }   /* dims the screen around the current point */
   .cursor { position: absolute; width: 34px; height: 34px; z-index: 50; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.45)); }
   .ripple { position: absolute; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%; border: 3px solid var(--accent); opacity: 0; }
   .chip { display: inline-flex; align-items: center; gap: 10px; white-space: nowrap; }
@@ -55,6 +58,8 @@
   .big-num, .h-display { line-height: 1 !important; }   /* tight boxes so automatic QA measures the glyphs, not air */
   #chapter { position: absolute; display: flex; align-items: baseline; gap: 18px; opacity: 0; }
   #chapter .ln { align-self: center; }
+  #illus { position: absolute; right: 96px; top: 64px; opacity: 0; z-index: 60; padding: 7px 14px; border-radius: 999px; font: 600 15px var(--zh); letter-spacing: 1px;
+           color: var(--ink); background: color-mix(in srgb, var(--bg-edge, #000) 72%, transparent); border: 1px solid color-mix(in srgb, var(--ink) 35%, transparent); }   /* never hidden: the frame is a redrawn UI, not a capture */
   #caption { position: absolute; left: 0; right: 0; bottom: 0; height: 250px; pointer-events: none; }
   #capband { position: absolute; inset: 0; opacity: 0; }
   #capzh, #capen { position: absolute; }
@@ -74,6 +79,7 @@
   <div id="bg"></div><div id="pulse"></div>
   <div id="scenes"></div>
   <div id="flash"></div>
+  <div id="illus"></div>
   <div id="chapter"><b></b><div class="ln"></div><span class="z"></span><span class="e"></span></div>
   <div id="caption"><div id="capband"></div><div id="capzh"></div><div id="capen"></div></div>
   <div id="vignette"></div>

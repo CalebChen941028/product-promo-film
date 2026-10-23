@@ -35,6 +35,10 @@ It works for software, apps, hardware, fashion, food, services, places and brand
 - **The film is data, not code.**
   - `film.json` picks from 17 scene types: cover · pain · feature · carousel · numbers · gallery · clip · phone · compare · statement · finale · endcard, plus photo · hero · detail · lineup · quote for physical products, places and people.
   - `make_film.py` runs check → build → voice → QA → render → finish, and every error prints a `FIX:` line.
+- **Products with source code, in motion:** with the user's yes, `record_ui.mjs` runs the product's own frontend in a sandbox (its own port, an empty profile, localhost only, demo responses for the backend) and records scripted interactions at 30 fps with a gliding cursor; flows that cannot run there can be redrawn in code from the source, always labelled 界面示意 · Illustrative UI on screen.
+- **Effects and transitions designed for the product:** keyframe cuts and moves anchored on an element (`"at"`): a zoom-through into the button or detail the story continues from, the product's own gesture as the effect (`references/director.md` §10).
+- **A briefing before any work** (`scripts/briefing.py`): what the skill will do and will not do, what the user is responsible for, how long it takes, and the questions that shape the film; nothing starts until the user confirms.
+- **The director proposes, the user decides** (`scripts/proposals.py`): 2–3 directions that look and move differently, each with a preview rendered from the real materials; the agent waits for the user's choice or changes, and the build refuses an unapproved draft.
 - **A look chosen from the materials, not by product type** (`scripts/look.py`): it scores all 8 styles on what the pictures actually are and writes its reasons into the treatment; the user's own words for the feel (`--mood`) count triple.
 - **A director that designs before it makes** (`scripts/director.py`): it reads every picture (screen or photo, dense or calm, the quiet side, where the subject sits) and gives each scene its own layout, camera move and cut, with the reason, in a storyboard you can read and overrule. 7 feature layouts, photo/gallery/carousel/detail variants, 15 camera moves (push, pan, crane, arc, dolly zoom, handheld…) and 12 cuts (rack focus, iris, doors, light leak, dip…), within the motion language's palette.
 - **Free to design the motion:** the director's shot plan is a proposal. Agents write their own camera moves and cuts as keyframes in film.json, design motion-graphics scenes (`"type": "mg"`: text, shapes, lines, numbers and real images on beat keyframes, strokes that draw themselves), or drop to code; only honesty, rights and legible frames are fixed.
@@ -147,6 +151,10 @@ Examples:
 - **片子是数据而不是代码**：
   - `film.json` 从 17 种场景中选择；新增的 photo · hero · detail · lineup · quote 用于实物产品、空间与人物。
   - `make_film.py` 一条命令完成检查到交付，出错时给出 `FIX:`。
+- **有源码的产品也能流畅演示**：用户同意后，`record_ui.mjs` 在沙盒里运行产品自己的前端（独立端口、空白配置、只访问本机、后端用演示数据），按脚本操作并以 30 帧录制，带平滑光标；沙盒里跑不起来的流程可按源码用代码重绘，画面上始终标注“界面示意 · Illustrative UI”。
+- **按产品设计特效与转场**：关键帧转场和运镜可锚定在画面元素上（`"at"`）：穿越推进到故事接下来的按钮或细节，用产品本身的动作做特效（`references/director.md` 第 10 节）。
+- **开工前先说明**（`scripts/briefing.py`）：会做什么、不会做什么、用户需负责什么、大概多久，以及决定成片效果的问题；用户确认后才开始。
+- **导演提方案，用户来拍板**（`scripts/proposals.py`）：2–3 套在视觉和动效上都不同的方向，每套附真实素材渲染的预览；智能体等待用户选择或修改，没有确认方向的草稿无法构建。
 - **视觉风格由素材决定，不按产品类型套用**（`scripts/look.py`）：按图片的真实情况给 8 种风格打分并把理由写进方案；用户描述风格的用词（`--mood`）权重三倍。
 - **动效可以自由设计**：导演的镜头表只是建议。智能体可以在 film.json 里用关键帧写自己的运镜和转场，设计 MG 动画场景（`"type": "mg"`：文字、形状、线条、数字和真实图片按节拍关键帧运动，描边可自动画出），也可以写代码；固定不变的只有诚实、版权和画面清晰。
 - **先设计、后制作的导演**（`scripts/director.py`）：读懂每张画面（截图还是照片、密还是疏、哪一侧安静、主体在哪），为每个场景选好版式、运镜和转场并写明理由，生成可读、可改的分镜表。功能场景 7 种版式，照片、画廊、轮播、细节各有变体，15 种运镜（推拉、横移、升降、环绕、希区柯克变焦、手持……）、12 种转场（焦点转移、圆形展开、对开、漏光、黑场……），都在本片动效语言的调色板之内。

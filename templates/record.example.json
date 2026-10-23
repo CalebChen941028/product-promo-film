@@ -1,0 +1,23 @@
+{
+  "_how": "node scripts/record_ui.mjs record.json --approved-by-user — only after the user said yes to running this product's frontend in a sandbox (references/capture.md)",
+  "serve": { "cmd": "npm run dev -- --port 5199 --strictPort", "cwd": "../frontend", "env": { "VITE_DEMO": "1" }, "url": "http://localhost:5199", "ready_timeout": 90000 },
+  "out": "materials",
+  "viewport": [1920, 1080],
+  "scale": 2,
+  "network": "local",
+  "mock": [
+    { "url": "**/api/upload", "json": "mock/upload.json", "delay": 600 },
+    { "url": "**/api/analyze", "json": "mock/analyze.json", "delay": 1200 }
+  ],
+  "storage": { "onboarding_done": "1" },
+  "takes": [
+    { "name": "02-data-upload", "steps": [ { "hold": 600 }, { "upload": "demo/prediabetes_trial.csv" }, { "wait_for": "320 rows" }, { "hold": 1500 } ] },
+    { "name": "07-analysis-run", "steps": [
+      { "click": "Independent t-test" },
+      { "drag": "hba1c_24", "to": "Outcome" },
+      { "drag": "arm", "to": "Group" },
+      { "click": "Run" },
+      { "wait_for": "APA table" },
+      { "hold": 2500 } ], "tail": 800 }
+  ]
+}

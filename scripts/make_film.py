@@ -122,6 +122,8 @@ def check_keyframes(spec):
                 bad = set((c.get(side) or {}).keys()) - KF_FIELDS
                 if bad: err(f'{kind}.{name}.{side}: unknown field(s) {sorted(bad)}', f'use {sorted(KF_FIELDS)}')
             if c.get('ease') and c['ease'] not in ('eio', 'eo', 'ex', 'esoft', 'eback', 'linear'): err(f'{kind}.{name}.ease = {c["ease"]!r}', 'use eio, eo, ex, esoft, eback or linear')
+            if c.get('at') is not None and not (isinstance(c['at'], list) and len(c['at']) == 2 and all(isinstance(v, (int, float)) for v in c['at'])):
+                err(f'{kind}.{name}.at = {c["at"]!r}', 'a stage point [x, y] in px (0–1920, 0–1080)')
             if kind == 'cuts' and c.get('reveal') and c['reveal'] not in REVEALS: err(f'cuts.{name}.reveal = {c["reveal"]!r}', f'use one of {sorted(REVEALS)}')
             if kind == 'cameras':
                 to = c.get('to') or {}
@@ -375,6 +377,10 @@ def sharpness(spec, base_dir, plan, roles):
 def check(spec, base_dir):
     if spec.get('genre') and spec['genre'] != 'auto' and spec['genre'] not in GENRES:
         err(f"genre '{spec['genre']}' unknown", f'use one of {list(GENRES)} (scripts/genres.py --list)')
+    if 'approved' in spec and not spec.get('approved') and not spec.get('_preview'):
+        err("the director's proposals are not approved yet",
+            'run python3 scripts/proposals.py film.json, show proposals.md and its previews to the user, WAIT for their choice or changes, '
+            'then proposals.py film.json --apply <A|B|C> (--by assumed only when the user cannot be asked)')
     resolve_look(spec, base_dir)
     if spec.get('style') not in STYLES:
         err(f"style '{spec.get('style')}' unknown", f'use one of {STYLES} (scripts/recommend_style.py suggests one)')
@@ -615,9 +621,22 @@ def build(spec, base_dir, out):
     if not rest and total_bars - fixed > 6:
         print(f'WARN  {total_bars - fixed} bars of music left unused — set the last scene to "bars": "rest"')
     each_rest = (total_bars - fixed) // max(1, len(rest))
+    track_s = dur
     if grid.get('generated'):
         each_rest = rest_bars(grid['bpm'])
         dur = min(dur, G + BAR * (fixed + each_rest * len(rest) + 1))   # end on the ring-out bar, not the reverb tail (the mix fades it)
+    elif rest and each_rest > rest_bars(grid['bpm']) + 1:
+        # the user's track is longer than the film: the end card never soaks up the rest of the song (it would hold one
+        # frame for a minute). It gets ~8 s, the music fades out on the bar after it, and the agent hears the real length.
+        each_rest = rest_bars(grid['bpm']) + 1
+        dur = min(dur, G + BAR * (fixed + each_rest * len(rest) + 1))
+        print(f'WARN  the film is {dur:.0f} s but the track is {track_s:.0f} s: the end card is capped at {each_rest} bars and the music fades out at {dur:.0f} s.\n'
+              f'  FIX: if the user asked for a longer film, add scenes (more chapters, more real screens, a breath) until the story fills the track; '
+              f'never hold the end card to fill time')
+        want = (spec.get('_autofilm') or {}).get('seconds') or spec.get('target_seconds')
+        if want and dur < 0.8 * float(want):
+            sys.exit(f'ERROR the film is {dur:.0f} s; the user asked for about {float(want):.0f} s.\n'
+                     f'  FIX: add scenes until the story reaches the length the user asked for (or ask them whether a shorter film is fine)')
     # hi-energy bars → chorus ranges (background pulse)
     his = [bb['hi'] for bb in grid['bars']]
     q = sorted(his)[int(len(his) * 0.66)] if his else 1
@@ -677,6 +696,7 @@ def build(spec, base_dir, out):
         return copied[key]
     brand = dict(spec['brand']); brand['logo'] = media(brand['logo'])
     lines, calls, chapters, b0, segs = [], [], [], 0, []
+    illus = []   # bars where the frame shows a UI redrawn in code: the film labels it on screen
     plan, _ = DIR.plan_shots(spec, base_dir, material_roles(base_dir))
     for i, sc in enumerate(spec['scenes']):
         nb = each_rest if sc.get('bars') == 'rest' else sc['bars']
@@ -709,6 +729,7 @@ def build(spec, base_dir, out):
             calls.append(f"LIB.{sc['type']}(bar({b0}), {'CONFIG.DUR' if i == len(spec['scenes']) - 1 else f'bar({b1})'}, {json.dumps(o, ensure_ascii=False)});")
         if sc.get('chapter'):
             n, zh, en = sc['chapter']; chapters.append([b0, b1, n, zh, en])
+        if sc.get('illustrative'): illus.append([b0, b1])
         says = sc.get('say', [])
         for k, s in enumerate(says):
             at = s.get('at', 0.3 + k * nb / max(1, len(says)))
@@ -724,7 +745,7 @@ def build(spec, base_dir, out):
     cin_cfg, cues = direct(cin, segs, G, BAR, dur, plan)
     print(DIR.shot_table(spec, plan))
     cfg = {'STYLE': spec['style'], 'MOTION': spec.get('motion', ''), 'G': G, 'BAR': BAR, 'DUR': round(dur, 3), 'FADE_OUT': 2.6,
-           'CHORUS_BARS': chorus, 'CHAPTERS': merged, 'ONSCREEN': onscreen, 'SHOTS': 'media/', 'ASSETS': 'media/', 'BRAND': brand,
+           'CHORUS_BARS': chorus, 'CHAPTERS': merged, 'ILLUSTRATIVE': illus, 'ILLUS_LABEL': spec.get('illustrative_label') or '界面示意 · Illustrative UI', 'ONSCREEN': onscreen, 'SHOTS': 'media/', 'ASSETS': 'media/', 'BRAND': brand,
            'MOTIONS_EXTRA': spec.get('motions') or {}, 'CAMERAS_EXTRA': spec.get('cameras') or {}, 'CUTS_EXTRA': spec.get('cuts') or {}, 'CSS': css_links, 'CINEMA': cin_cfg, 'PALETTE': {k: v for k, v in (spec.get('palette') or {}).items() if k in ('accent', 'accent2')}}
     json.dump(cues, open(aud / 'sfx_cues.json', 'w'), indent=1)
     (film / 'config.js').write_text('const CONFIG = ' + json.dumps(cfg, ensure_ascii=False, indent=1) + ';\nconst bar = (b) => CONFIG.G + CONFIG.BAR * b;\nObject.assign(window, { CONFIG, bar });\n')
@@ -863,7 +884,11 @@ def vo(spec, base_dir, out):
 def qa(spec, out):
     guard_generated(out)
     q = out / 'qa'; q.mkdir(exist_ok=True)
+    (q / 'qa_report.json').unlink(missing_ok=True)   # never read a report left by an earlier build
     r = subprocess.run(['node', out / 'tools' / 'qa_check.mjs', out / 'film' / 'film.html', q], cwd=out)
+    if r.returncode != 0 or not (q / 'qa_report.json').exists():
+        sys.exit('ERROR QA could not run: the film page failed to load or crashed (see the error above).\n'
+                 '  FIX: a script error in a custom scene, a keyframe or the engine stops the page; fix it, rebuild, then run --stage qa again')
     rep = json.load(open(q / 'qa_report.json'))
     print(f"QA: {len(rep['errors'])} errors, {len(rep['warnings'])} warnings — contact sheets in {q}")
     for e in rep['errors'][:30]: print('  ERROR', e)

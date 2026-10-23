@@ -42,7 +42,14 @@ Design an MG beat in film.json: layers, each with keyframes in **beats** from th
 ```
 - A camera moves the whole scene from `from` to `to` over its length (`x y z` px, `s` scale, `rx ry rz` degrees); `pulse` adds a scale kick on every beat.
 - A cut brings the incoming scene from `from` (`o` opacity, `blur`, `bright` too) and sends the outgoing one towards `to` (default: it stays); `reveal` opens the incoming scene as `left` `right` `up` `down` `circle` or `center`; `len` × the style's crossfade (0.4–2).
+- `"at": [x, y]` (stage px) makes either one scale and turn around that point, and a `circle` reveal open from it: a **zoom-through** dives into a button or a detail and the next scene grows out of it: `"cuts": {"dive": {"at": [1000, 560], "from": {"o": 0, "s": 0.6}, "to": {"s": 3.2, "o": 0, "blur": 10}, "reveal": "circle", "len": 1.8}}`. Which cut fits which product and scene: `references/director.md` §10.
 - Use them by name (`"camera": "float-up"`, `"cut": "lift"`), or write the object straight on a scene: `"cut": {"from": {"o": 0, "x": -200}, "reveal": "circle"}`.
+
+### Redrawn UI (illustrative): a product's logic in code
+When a flow cannot be recorded (a native engine, licensed data, hardware) and the user agreed, redraw it from the source and mark the scene `"illustrative": true`: the film then shows 界面示意 · Illustrative UI on screen for that scene (`"illustrative_label"` changes the words, never empty), and `check_treatment.py` requires §8 to name it. Start from `templates/ui-sim.example.js` (`CUSTOM.uiSim`: a window drawn from the product's tokens, a cursor that types and clicks, a progress bar, table rows and bars that grow, the true value shown only when a bar lands).
+- Take everything from the source: the tokens from its CSS or theme, the labels from its components or i18n files, the flow from its handlers (what is typed, what is clicked, what appears, in what order). Demo values only.
+- Simplify, never embellish: leave out what is not needed, but add nothing the product does not do and no result it cannot produce.
+- Prefer a real recording (`record_ui.mjs`) or a real capture wherever one is possible; a redrawn scene explains, a real one proves.
 
 ### Custom scenes (code)
 List your files in film.json `"scripts": ["scenes/mine.js"]` (paths relative to film.json); they load after the library. Register a scene and use it:
@@ -113,7 +120,14 @@ That check then advises instead of blocking. Checks you can name: One idea, Hook
 在 film.json 写 `"cameras"` 与 `"cuts"`（示例见上方英文）：
 - 运镜让整个场景在场景时长内从 `from` 运动到 `to`（`x y z` 像素、`s` 缩放、`rx ry rz` 角度）；`pulse` 让每拍有一次轻微的缩放冲击。
 - 转场让进入的场景从 `from` 进来（也可用 `o` 不透明度、`blur`、`bright`），离开的场景朝 `to` 离开（默认不动）；`reveal` 以 `left` `right` `up` `down` `circle` `center` 的形状揭开新场景；`len` 是风格交叉淡化时长的倍数（0.4–2）。
+- `"at": [x, y]`（画面像素）让运镜或转场围绕该点缩放、旋转，`circle` 揭开也从该点展开：**穿越推进**——推进一个按钮或一处细节，下一幕从那里长出来（示例见上方英文）。哪种转场适合哪种产品和场景：`references/director.md` 第 10 节。
 - 按名字使用（`"camera": "float-up"`、`"cut": "lift"`），或直接把对象写在场景上：`"cut": {"from": {"o": 0, "x": -200}, "reveal": "circle"}`。
+
+### 重绘界面（界面示意）：用代码展示产品逻辑
+某个流程无法录制（原生引擎、授权数据、硬件）且用户同意时，可以按源码重绘，并给该场景写 `"illustrative": true`：片子会在这个场景的画面上显示“界面示意 · Illustrative UI”（可用 `"illustrative_label"` 改文字，但不能为空），`check_treatment.py` 也会要求方案第 8 节写明。从 `templates/ui-sim.example.js` 开始（`CUSTOM.uiSim`：用产品的设计变量绘制窗口，光标输入和点击，进度条，表格逐行出现，柱子生长，柱子落定后才显示真实数值）。
+- 一切取自源码：设计变量取自它的 CSS 或主题，文字取自组件或多语言文件，流程取自事件处理代码（输入什么、点什么、出现什么、什么顺序）。只用演示数据。
+- 只简化、不美化：可以省略不需要的部分，但不添加产品做不到的功能，也不展示它产生不了的结果。
+- 能录制（`record_ui.mjs`）或截图的地方，优先用真实素材；重绘的场景用来讲解，真实的场景用来证明。
 
 ### 自定义场景（代码）
 在 film.json 写 `"scripts": ["scenes/mine.js"]`（相对 film.json 的路径），脚本在场景库之后加载。注册场景（`CUSTOM.名字 = (start, end, o) => { scene(...) }`），然后用 `{"type": "custom", "fn": "名字", "bars": 4, "assets": {...}}` 调用。`assets` 里的图片会随片子复制，在脚本里用 `o.assets.xxx` 读取；其他字段都以 `o.*` 传入。可用的 API 与场景库相同（见上方英文与 `templates/engine.js` 开头）。规则：结果只取决于时间（不用定时器、CSS 动画、随机数）；颜色和字体取自风格变量；边距 96 px；只用真实画面。`.webm` 会作为视频播放。完整示例：`templates/custom.example.js`。

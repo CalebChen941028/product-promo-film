@@ -5,8 +5,9 @@
 //   rect = the UI region the point is about (base coords); focus = crop to zoom to (default: rect padded to 16:9)
 // Layout (opts.layout, or the director's choice in SHOT.layout, else the motion language's own):
 //   center     3D window centre, focus pushes to each point, glowing highlight + tag          (cinematic-3d)
-//   split      flat window left, numbered list right, leader lines from list to highlight      (precision-data)
-//   split-r    the mirror: numbered list left, window right, leader lines                      (any)
+//   split      flat window left, numbered list right; the highlight carries the point's number badge and a spotlight
+//              dims the rest of the screen (both live inside the window, so they never drift off the box)   (precision-data)
+//   split-r    the mirror: numbered list left, window right, same badges and spotlight         (any)
 //   full       full-bleed window, the headline card slams in per point                         (kinetic-launch)
 //   soft       soft window left, one line of text at a time on the right                       (gentle-story)
 //   stickers   tilted window, points pop as sticker bubbles around it                          (playful-pop)
@@ -36,14 +37,13 @@ function feature(start, end, opts) {
   scene(start, end, (R, S) => {
     S.W = win(R, { srcs: opts.srcs, base, w: L.w, chrome: opts.chrome || 'auto' });
     S.h = P.map((p) => hl(S.W, p.rect));
-    S.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    S.svg.setAttribute('width', 1920); S.svg.setAttribute('height', 1080); Object.assign(S.svg.style, { position: 'absolute', left: 0, top: 0, pointerEvents: 'none' });
-    R.appendChild(S.svg);
     const title = `<div class="h-zh" style="letter-spacing:4px;font-size:44px">${opts.title?.zh || ''}</div><div class="kicker" style="margin-top:10px">${opts.title?.en || ''}</div>`;
     if (LIST) {
       S.title = textEl(R, title, { width: '520px' });
       S.items = P.map((p, i) => textEl(R, `<div style="display:flex;gap:18px;align-items:flex-start"><div class="accent" style="font:700 22px var(--mono);min-width:42px">${String(i + 1).padStart(2, '0')}</div><div><div style="font:600 28px var(--zh)">${p.zh}</div><div class="muted" style="font:500 17px var(--en);margin-top:4px">${p.en || ''}</div></div></div>`, { width: '520px' }));
-      S.lines = P.map(() => { const l = document.createElementNS('http://www.w3.org/2000/svg', 'path'); l.setAttribute('fill', 'none'); l.setAttribute('stroke', 'var(--accent)'); l.setAttribute('stroke-width', 2); S.svg.appendChild(l); return l; });
+      // no leader lines across the stage (they drift off the box when the window moves): each highlight wears its number
+      S.badges = P.map((p, i) => div('hl-badge', S.W.ov, String(i + 1).padStart(2, '0')));
+      S.spot = div('hl-spot', S.W.ov);
       if (LAY === 'editorial') S.index = textEl(R, '01', { whiteSpace: 'nowrap' }), S.index.className += ' big-num accent';
     } else if (LAY === 'soft') {
       S.title = textEl(R, title, { width: '560px' });
@@ -80,14 +80,19 @@ function feature(start, end, opts) {
       M.text(S.title, lt, 0.3, { x: colX, y: ty });
       if (S.index) { S.index.textContent = String(Math.max(cur, 0) + 1).padStart(2, '0'); M.text(S.index, lt, 0.2, { x: -700, y: -360, o: 0.9 }); }
       S.items.forEach((it, i) => M.text(it, lt, T[i] - 0.2, { x: colX, y: iy + i * 120, o: i === cur ? 1 : 0.45 }));
-      S.lines.forEach((ln, i) => {
-        if (ed || P[i].nohl || lt < T[i] + MO.focus.dur * 0.6) { ln.setAttribute('d', ''); return; }
-        // the leader leaves the list on the side that faces the window
-        const [hx, hy] = stageXY(i), lx = 960 + colX + (LAY === 'split' ? -280 : 280), ly = 540 + iy + i * 120 + 6, mid = (lx + hx) / 2;
-        const len = Math.hypot(lx - hx, ly - hy) * 1.3, a = ex(prog(lt, T[i] + MO.focus.dur * 0.6, T[i] + MO.focus.dur * 0.6 + 0.5));
-        ln.setAttribute('d', `M${lx},${ly} C${mid},${ly} ${mid},${hy} ${hx},${hy}`);
-        ln.setAttribute('stroke-dasharray', len); ln.setAttribute('stroke-dashoffset', len * (1 - a)); ln.setAttribute('opacity', i === cur ? 1 : 0.35);
+      // the point's number pinned to its highlight, and a soft spotlight on the current one (window space: exact)
+      S.badges.forEach((bd, i) => {
+        const on = ed || P[i].nohl ? 0 : i === cur || i < cur ? fade(lt, T[i] + MO.focus.dur * 0.5, d + 0.2, 0.25) * (i === cur ? 1 : 0.5) : 0;
+        const [x, y] = P[i].rect, bx = mapX(S.W, x), by = mapY(S.W, y);
+        const inView = bx > -12 && by > -12 && bx < S.W.w + 12 && by < S.W.h + 12;   // its box's corner is on screen: otherwise a badge would point at nothing
+        const k = inView ? clamp(on * 1.6) : 0, s2 = lerp(0.4, 1, (MO.pop === 'elastic' ? elastic : eback)(clamp(on * 1.4)));
+        Object.assign(bd.style, { left: clamp(bx, 24, S.W.w - 24) + 'px', top: clamp(by, 24, S.W.h - 24) + 'px', opacity: k, transform: `translate(-50%,-50%) scale(${s2.toFixed(3)})` });
       });
+      if (S.spot) {
+        const i = cur, on = i >= 0 && !ed && !P[i].nohl ? fade(lt, T[i] + MO.focus.dur * 0.4, (T[i + 1] ?? d + 1) - 0.05, 0.35) : 0;
+        if (on > 0) { const [x, y, w, h] = P[i].rect, pad = 10; Object.assign(S.spot.style, { left: mapX(S.W, x) - pad + 'px', top: mapY(S.W, y) - pad + 'px', width: w * S.W.s + 2 * pad + 'px', height: h * S.W.s + 2 * pad + 'px', opacity: (on * 0.9).toFixed(3) }); }
+        else S.spot.style.opacity = 0;
+      }
     } else if (LAY === 'soft') {
       M.text(S.title, lt, 0.4, { x: 640, y: -300 });
       S.lines.forEach((el, i) => { const on = i === cur ? 1 : 0; M.text(el, lt, T[i], { x: 640, y: -40, o: on ? 1 - prog(lt, (T[i + 1] ?? d + 1) - 0.6, T[i + 1] ?? d + 1) : 0 }); });

@@ -70,7 +70,7 @@
 {{BEATS}}
 
 - Shot sizes · 景别: <write: read the size column of the storyboard: the open moves close → wide or wide → close on purpose, a chapter goes wide → medium → close, never three alike in a row>
-- Cuts · 转场: <write: confirm the designed cuts sit where the story turns (or say what you changed and why)>
+- Cuts · 转场: <write: every designed cut and effect with what motivates it in THIS product and story (a shared element to zoom through, the product's own gesture, a story turn); the plain cuts that stay plain. Design your own keyframe cuts and moves where the library has nothing that fits (references/director.md §10)>
 - Breathing room · 留白: <write: where the film rests for a moment, and why>
 
 ## 7. Composer & sound designer · 作曲与声音

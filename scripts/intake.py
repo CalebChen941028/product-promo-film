@@ -7,7 +7,7 @@ What it does
   images   → size, alpha, role guess (logo / desktop / phone / photo / cutout / figure), suggested `base` for win()
              photo = natural photograph; cutout = product on a transparent background (hero/lineup scenes)
              (captures ≥ 2400 px wide are treated as 2× → base = size / 2)
-  videos   → duration/size/fps; transcoded to build/clips/<name>.webm (VP9, ≤1920 wide, 30 fps, no audio)
+  videos   → duration/size/fps; transcoded to build/clips/<name>.webm (VP9, ≤1920 wide (screen recordings ≤3840), 30 fps, no audio)
              because Playwright's Chromium cannot decode H.264 and WebM seeks frame-exactly
   audio    → duration; music converted to build/audio/<name>.wav (48 kHz); files named *vo*/*voice*/*narration*
              are flagged as user-recorded voice-over (then skip TTS)
@@ -108,7 +108,8 @@ for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswi
         if re.search(r'screen|record|录屏|界面|demo', f.stem, re.I): it['role'] = 'screen'
         if not a.no_transcode:
             dst = out / 'clips' / (f.stem + '.webm')
-            vf = 'scale=min(1920\\,iw):-2,fps=30'
+            cap = 3840 if it.get('role') == 'screen' else 1920   # a 4K screen recording keeps its pixels: the film zooms into the UI
+            vf = f'scale=min({cap}\\,iw):-2,fps=30'
             # crf 20: text in a screen recording and texture in footage stay crisp (32 smeared both)
             subprocess.run([a.ffmpeg, '-y', '-loglevel', 'error', '-i', str(f), '-an', '-vf', vf, '-c:v', 'libvpx-vp9', '-crf', '20', '-b:v', '0', '-row-mt', '1', '-pix_fmt', 'yuv420p', str(dst)], check=True)
             it['webm'] = str(dst)
@@ -126,6 +127,13 @@ for f in sorted(p for p in src.rglob('*') if p.is_file() and not p.name.startswi
     else:
         items.append({'file': rel, 'kind': 'other'})
 
+# a desktop product's tall crop (an AI panel, a side bar) is not a phone: with 3+ desktop screens and no phone in the name,
+# a portrait UI is a figure (shown as a crop, never inside a phone frame)
+if sum(1 for i in items if i.get('role') == 'desktop') >= 3:
+    for i in items:
+        if i.get('role') == 'phone' and not re.search(r'phone|mobile|ios|android|手机', Path(i['file']).stem, re.I):
+            w, h = i['size']; sc = 2 if w >= 2400 else 1
+            i['role'], i['base'] = 'figure', [round(w / sc), round(h / sc)]
 json.dump({'materials': str(src.resolve()), 'items': items}, open(out / 'manifest.json', 'w'), ensure_ascii=False, indent=1)
 count = lambda k, r=None: sum(1 for i in items if i['kind'] == k and (r is None or i.get('role') == r))
 print(f"images {count('image')} (desktop {count('image', 'desktop')}, phone {count('image', 'phone')}, photo {count('image', 'photo')}, cutout {count('image', 'cutout')}, figure {count('image', 'figure')}, logo {count('image', 'logo')})"

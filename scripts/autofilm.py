@@ -32,11 +32,17 @@ import suggest_rects as SR  # noqa: E402
 ap = argparse.ArgumentParser()
 ap.add_argument('materials'); ap.add_argument('--out'); ap.add_argument('--brief'); ap.add_argument('--genre'); ap.add_argument('--style'); ap.add_argument('--motion'); ap.add_argument('--mood', default='', help="the user's own words for the feel (e.g. '大气 商业 科技感', 'warm, human, quiet'); steers the look")
 ap.add_argument('--music', default='auto'); ap.add_argument('--seconds', type=float, default=0); ap.add_argument('--voice', default='auto'); ap.add_argument('--fill-copy', action='store_true')
+ap.add_argument('--variety', choices=['calm', 'balanced', 'rich'], help='how much the shots vary (the director\'s pace); proposals.py sets it per option')
 ap.add_argument('--allow-thin', action='store_true', help='accept fewer than 8 screens captured from an app (only when the app truly has no more to show)')
 a = ap.parse_args()
 src = Path(a.materials).resolve()
 if not src.is_dir(): sys.exit(f'ERROR {src} is not a folder.\n  FIX: pass the folder that holds the screenshots/photos/clips/logo/docs')
 proj = Path(a.out).resolve() if a.out else src.parent / (src.name + '-film')
+# the briefing comes first: the user has seen what the skill does and does not do, and answered (scripts/briefing.py)
+if not any((d / 'briefing.json').exists() for d in (proj, src)):
+    sys.exit(f'ERROR the user has not confirmed the briefing for this project.\n'
+             f'  FIX: python3 scripts/briefing.py --project "{proj}" --materials "{src}" → show it to the user as it is and WAIT for their reply,\n'
+             f'       then python3 scripts/briefing.py --project "{proj}" --ack "<their reply>" (--assumed only when they cannot be asked)')
 proj.mkdir(parents=True, exist_ok=True)
 build = proj / 'build'
 ff = MF.find_ffmpeg({}) or sys.exit('ERROR ffmpeg not found.\n  FIX: python3 -m pip install imageio-ffmpeg')
@@ -548,7 +554,12 @@ film = {
               'contacts': brief.get('contacts', []), 'chips': P.get('platforms', []) + ([P['status']] if P.get('status') else []),
               **({'cta': P['cta']} if isinstance(P.get('cta'), dict) else {})},   # the call to action, only from the brief (true next step)
     'scenes': scenes,
+    # the director proposes 2–3 directions (scripts/proposals.py) and the USER picks or edits one; the build waits for it
+    'approved': None,
+    '_autofilm': {k: v for k, v in {'materials': str(src.resolve()), 'brief': str(Path(a.brief).resolve()) if a.brief else None, 'genre': a.genre,
+                  'mood': a.mood, 'music': a.music, 'seconds': a.seconds or None, 'voice': a.voice}.items() if v not in (None, '')},
 }
+if a.variety: film['direction'] = {'variety': a.variety}
 # 3b · direct: the director reads every picture and designs each scene's frame, camera move and cut BEFORE any copy is
 # written (scripts/director.py). The plan lands in the scenes with its reason ("_shot") and in treatment.md §6.
 import director as DIR  # noqa: E402
@@ -590,4 +601,4 @@ print(f"length  {LENGTH_NOTE}")
 print(f"voice   {voice['engine']}" + (f" {voice.get('voice')}" if voice['engine'] == 'kokoro' else '') + (f"  ({voice['_note']})" if voice.get('_note') else ''))
 print(f"study   {SKILL / 'templates' / 'golden' / (('tour' if tour else genre['arc']) + '.json')} and references/copy-bank.md before writing a word")
 if tour: print(f"tour    {len(tour)} chapters from the shot names ({', '.join(tour)}): name each chapter (≤ 4 字) and give it one result line; merge or drop a chapter that says nothing new")
-print("next    1) run the crew: fill treatment.md (anchor lines first)   2) replace every TODO in film.json   3) python3 scripts/make_film.py film.json --stage check")
+print("next    " + ("1) the crew fills treatment.md with the approved direction (anchor lines first)   2) replace every TODO in film.json   3) python3 scripts/make_film.py film.json --stage check" if film.get("approved") else "1) python3 scripts/proposals.py film.json → write each option's concept, hook and hero, show proposals.md and its previews to the user, and WAIT   2) proposals.py film.json --apply <A|B|C> with their changes   3) then the crew"))
