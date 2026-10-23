@@ -93,7 +93,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `chart` | 3 | `data` [{label, value}] (2–8), `kind?` `bar`/`line`, `unit?`, `title?`, `source?` | real numbers drawn on the beat; each value appears only when its bar lands. Every value needs a source in the user's docs (gated) |
 
 ### Coordinates
-`base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units. `scripts/suggest_rects.py <image> --preview .` suggests numbered rects (cards, panels, charts, tables) in base units for any image size; autofilm pre-fills feature points with them. Measure by hand with `scripts/grid_overlay.py` (grid labels are base units for 1920×1080 captures) or `scripts/modal_bbox.py` for dialogs.
+`base` is the coordinate space of an image: for a 2× capture of a 1920×1080 window use `[1920, 1080]` (default); `intake.py` prints a suggested `base` for every image. `rect`/`crop`/`focus` = `[x, y, w, h]` in base units, or `"@the element's words"`. At build, every `rect` and `crop` snaps onto the real element under it (`scripts/snap.py`: the shot's element boxes, else blocks in the pixels); `"exact": true` on a point or crop keeps it as written; `film_out/check/boxes-*.jpg` shows the result. `scripts/suggest_rects.py <image> --preview .` suggests numbered rects (cards, panels, charts, tables) in base units for any image size; autofilm pre-fills feature points with them. Measure by hand with `scripts/grid_overlay.py` (grid labels are base units for 1920×1080 captures) or `scripts/modal_bbox.py` for dialogs.
 
 ## 中文
 

@@ -46,6 +46,8 @@ Stills cut together are stiff; a real interaction recorded from the product's ow
 The data on screen is demo data: say so in the film as for any demo. Where a flow cannot run in a sandbox (a native engine, licensed data, hardware), and the user agreed, redraw it in code instead (`references/custom-scenes.md`, "Redrawn UI"): it is labelled 界面示意 · Illustrative UI on screen.
 
 ### Steps in a shot list
+Crops: write `"clip": "@the words on the card or panel"` rather than pixel numbers: the crop then follows the element with a 16 px margin and never cuts through a table or a paragraph. Every shot, clipped or not, records its element boxes (`<shot>.regions.json`).
+
 `click` (visible text; `"exact": false` for part of a text), `css`, `click_xy`, `upload`, `open_dialog` (the app's native Open dialog returns a file), `fill`, `type`, `select`, `key`, `hover`, `wait_for`, `sleep`, `scroll`, `wheel`, `shot` (optional `clip`), `tall` (a whole scrolling panel as one image), `download` (a real export; Word and PDF also get a page-1 preview PNG on macOS), `seq` (timestamped frames of a moving moment). The full list is at the top of `scripts/capture_app.mjs`. A `download` step saves a file the product exports on this computer; it is not a download from the internet, so "download nothing" (about models and voices) does not rule it out. Every `shot` is checked for visible error or empty-state messages: a flagged shot is reshot or dropped, never filmed.
 
 ### Filming AI features honestly
@@ -101,6 +103,8 @@ The data on screen is demo data: say so in the film as for any demo. Where a flo
 画面里是演示数据，片中要像其他演示一样注明。沙盒里跑不起来的流程（原生引擎、授权数据、硬件），在用户同意后可改用代码重绘（见 `references/custom-scenes.md` 的“重绘界面”），画面上会标注“界面示意 · Illustrative UI”。
 
 ### 镜头清单里的步骤
+裁剪：写 `"clip": "@卡片或面板上的文字"`，不要写像素数字：裁剪会沿着元素外扩 16 像素，不会切断表格或段落。每张截图（包括裁剪的）都会记录元素位置（`<镜头名>.regions.json`）。
+
 `click`（可见文字；`"exact": false` 表示匹配部分文字）、`css`、`click_xy`、`upload`、`open_dialog`（让应用的原生“打开”对话框返回指定文件）、`fill`、`type`、`select`、`key`、`hover`、`wait_for`、`sleep`、`scroll`、`wheel`、`shot`（可加 `clip`）、`tall`（把整个滚动面板拍成一张长图）、`download`（真实导出；在 macOS 上 Word、PDF 还会生成第一页的预览 PNG）、`seq`（带时间戳的连续帧）。完整说明见 `scripts/capture_app.mjs` 文件开头。`download` 是把产品导出的文件存到本机，不是从网上下载，所以“不要下载任何东西”（指模型、音色）并不禁止它。每个 `shot` 都会检查画面里有没有报错或空状态提示：被标出的镜头要重拍或删掉，绝不放进片子。
 
 ### 诚实地拍 AI 功能

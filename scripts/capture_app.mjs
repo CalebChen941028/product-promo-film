@@ -27,8 +27,9 @@
 //   {"select": 1, "in": "select.method"}  {"key": "Enter"}   {"key": "Escape"}   {"hover": "text"}   {"wheel": [0, 260], "times": 6}
 //   {"wait_for": "text that appears when ready", "timeout": 60000}            {"sleep": 1500}
 //   {"scroll": "text inside a scroll area", "by": 600}
-//   {"shot": "03-results"}               {"shot": "name", "clip": [x, y, w, h]}  (CSS px of the 1920×1080 window)
-//                                        a full shot also writes <name>.regions.json: the exact boxes of the panels,
+//   {"shot": "03-results"}               {"shot": "name", "clip": "@text"}  a crop around the card or panel that holds that text (+16 px), never through it
+//                                        {"shot": "name", "clip": [x, y, w, h]}  (CSS px of the 1920×1080 window)
+//                                        every shot (clipped ones too, in the clip's coordinates) writes <name>.regions.json: the exact boxes of the panels,
 //                                        headings and buttons on screen, so a point in film.json can say "rect": "@APA 三线表"
 //   {"tall": "text inside a scrolling panel", "name": "ai-answer"}   the whole scroll content as one tall image
 //   {"download": "button text", "file": "report.docx"}  real export (browser download, Save dialog or will-download)
@@ -215,29 +216,56 @@ async function run(ctx, s) {
     }, [s.scroll, s.by || 600]); await page.waitForTimeout(wait);
   }
   else if (s.shot) {
-    await page.screenshot({ path: path.join(OUT, `${s.shot}.png`), ...(s.clip ? { clip: { x: s.clip[0], y: s.clip[1], width: s.clip[2], height: s.clip[3] } } : {}) });
-    // the exact boxes of what is on screen (panels, cards, headings, buttons, with their text), read from the page itself:
-    // a highlight can then name its target ("rect": "@APA 三线表") instead of guessing pixel coordinates by eye
-    if (!s.clip) {
-      const regions = await page.evaluate(() => {
-        const vw = innerWidth, vh = innerHeight, out = [];
-        for (const e of document.querySelectorAll('body *')) {
-          const r = e.getBoundingClientRect();
-          if (r.width < 24 || r.height < 14 || r.right <= 0 || r.bottom <= 0 || r.left >= vw || r.top >= vh) continue;
-          const area = (r.width * r.height) / (vw * vh); if (area > 0.6) continue;
-          const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || +cs.opacity === 0 || cs.display === 'none') continue;
-          const own = [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join(' ').trim();
+    // "clip": [x, y, w, h] (CSS px) or "@text": the smallest card or panel around that text, with a margin — a crop
+    // that follows an element never cuts through a table or a paragraph the way a guessed rectangle does
+    let clip = s.clip;
+    if (typeof clip === 'string') {
+      clip = await page.evaluate(([want, pad]) => {
+        const t = want.replace(/^@/, '').trim().toLowerCase();
+        const leaf = [...document.querySelectorAll('body *')].find((e) => e.childElementCount === 0 && (e.textContent || '').trim().toLowerCase().includes(t) && e.getBoundingClientRect().width > 0);
+        if (!leaf) return null;
+        let el = leaf, best = null;
+        while (el && el !== document.body) {
+          const r = el.getBoundingClientRect(), cs = getComputedStyle(el), a = (r.width * r.height) / (innerWidth * innerHeight);
           const boxy = (parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== 'none') || !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor) || cs.boxShadow !== 'none';
-          const kind = /^H[1-6]$/.test(e.tagName) ? 'heading' : e.tagName === 'BUTTON' || e.getAttribute('role') === 'button' ? 'button' : boxy && area > 0.004 ? 'panel' : own ? 'text' : '';
-          if (!kind) continue;
-          const text = (own || (e.innerText || '').trim().split('\n')[0] || '').replace(/\s+/g, ' ').slice(0, 48);
-          const x = Math.max(0, r.x), y = Math.max(0, r.y);
-          out.push({ kind, text, rect: [x, y, Math.min(vw, r.right) - x, Math.min(vh, r.bottom) - y].map(Math.round) });
+          if (boxy && a > 0.02) { best = r; break; }
+          el = el.parentElement;
         }
-        return out.slice(0, 1500);
-      }).catch(() => []);
-      fs.writeFileSync(path.join(OUT, `${s.shot}.regions.json`), JSON.stringify({ base: [W, H], regions }));
+        if (!best) return null;
+        const x = Math.max(0, best.x - pad), y = Math.max(0, best.y - pad);
+        return [x, y, Math.min(innerWidth - x, best.width + 2 * pad), Math.min(innerHeight - y, best.height + 2 * pad)].map(Math.round);
+      }, [clip, s.pad ?? 16]).catch(() => null);
+      if (!clip) throw new Error(`clip "${s.clip}": no card or panel holds that text on screen`);
     }
+    await page.screenshot({ path: path.join(OUT, `${s.shot}.png`), ...(clip ? { clip: { x: clip[0], y: clip[1], width: clip[2], height: clip[3] } } : {}) });
+    // the exact boxes of what is on screen (panels, cards, headings, buttons, with their text), read from the page itself:
+    // a highlight can then name its target ("rect": "@APA 三线表") instead of guessing pixel coordinates by eye.
+    // A clipped shot gets them too, in the clip's own coordinates.
+    const regions = await page.evaluate(() => {
+      const vw = innerWidth, vh = innerHeight, out = [];
+      for (const e of document.querySelectorAll('body *')) {
+        const r = e.getBoundingClientRect();
+        if (r.width < 24 || r.height < 14 || r.right <= 0 || r.bottom <= 0 || r.left >= vw || r.top >= vh) continue;
+        const area = (r.width * r.height) / (vw * vh); if (area > 0.6) continue;
+        const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || +cs.opacity === 0 || cs.display === 'none') continue;
+        const own = [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join(' ').trim();
+        const boxy = (parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== 'none') || !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor) || cs.boxShadow !== 'none';
+        const kind = /^H[1-6]$/.test(e.tagName) ? 'heading' : e.tagName === 'BUTTON' || e.getAttribute('role') === 'button' ? 'button'
+          : ['TABLE', 'CANVAS', 'SVG', 'svg', 'IMG'].includes(e.tagName) && area > 0.004 ? 'panel' : boxy && area > 0.004 ? 'panel' : own ? 'text' : '';
+        if (!kind) continue;
+        const text = (own || (e.innerText || '').trim().split('\n')[0] || '').replace(/\s+/g, ' ').slice(0, 48);
+        const x = Math.max(0, r.x), y = Math.max(0, r.y);
+        out.push({ kind, text, rect: [x, y, Math.min(vw, r.right) - x, Math.min(vh, r.bottom) - y].map(Math.round) });
+      }
+      return out.slice(0, 1500);
+    }).catch(() => []);
+    let reg = regions, base = [W, H];
+    if (clip) {
+      const [cx, cy, cw, ch] = clip; base = [Math.round(cw), Math.round(ch)];
+      reg = regions.map((r) => { const [x, y, w, h] = r.rect, x0 = Math.max(x, cx), y0 = Math.max(y, cy), x1 = Math.min(x + w, cx + cw), y1 = Math.min(y + h, cy + ch);
+        return x1 - x0 >= 12 && y1 - y0 >= 10 ? { ...r, rect: [x0 - cx, y0 - cy, x1 - x0, y1 - y0].map(Math.round) } : null; }).filter(Boolean);
+    }
+    fs.writeFileSync(path.join(OUT, `${s.shot}.regions.json`), JSON.stringify({ base, regions: reg }));
     // a film never shows a failure: flag visible error / not-configured / empty-state messages in the shot
     const bad = await page.evaluate(() => {
       // precise phrases only: statistics UIs say 异常值 (outlier), "Std. Error" and "未设置…时" in ordinary help text

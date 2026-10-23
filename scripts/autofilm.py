@@ -111,8 +111,16 @@ motto = (mo['zh'][:2] if isinstance(mo.get('zh'), list) and len(mo['zh']) >= 2 e
 
 # guess name / positioning from docs when there is no brief
 def guess_name():
+    """The product's name from the docs' first heading, without what the document is about ("X — Installation Guide",
+    "X 用户手册", "README: X"); else the folder name. Any product."""
     m = re.search(r'^#\s+(.+)$', docs, re.M)
-    return (m.group(1).strip() if m else src.name.replace('-', ' ').replace('_', ' ').title())[:40]
+    if not m: return src.name.replace('-', ' ').replace('_', ' ').title()[:40]
+    parts = [p_ for p_ in re.split(r'\s*[—–|:：]\s*|\s+-\s+|\s*[(（]', m.group(1).strip()) if p_.strip()]
+    docword = r'^(readme|installation|install|setup|user guide|guide|manual|documentation|docs|release notes?|changelog|说明|用户手册|使用说明|安装说明)$'
+    t = next((p_ for p_ in parts if not re.match(docword, p_.strip(), re.I)), parts[0] if parts else '')
+    t = re.sub(r'\b(readme|installation|install|setup|user|guide|manual|documentation|docs|release notes?|changelog)\b.*$', '', t, flags=re.I)
+    t = re.sub(r'(安装|使用|用户|操作)?(说明|指南|手册|文档)$|内测版?发布说明$|发布说明$', '', t).strip(' -—:：')
+    return (t or src.name)[:40]
 
 def doc_facts(limit=10):
     """The docs' own bullet points and first paragraph: what the copywriter may say."""

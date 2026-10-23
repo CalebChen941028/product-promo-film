@@ -492,6 +492,15 @@ const FILM = {
     };
     window.ready = (async () => {
       await document.fonts.ready;
+      // a long product name never runs off the frame: every display title is measured once and shrunk to the safe width
+      for (const sc of SCENES) {
+        const was = sc.root.style.display; sc.root.style.display = 'block';
+        for (const el of sc.root.querySelectorAll('.h-display')) {
+          const max = 1920 - 2 * 96 - 40, w = el.scrollWidth;
+          if (w > max) { const fs = parseFloat(getComputedStyle(el).fontSize); el.style.fontSize = (fs * max / w).toFixed(1) + 'px'; }
+        }
+        sc.root.style.display = was;
+      }
       await Promise.all(IMGS.map((i) => (i.complete ? null : new Promise((r) => { i.onload = i.onerror = r; }))));
       await Promise.all(IMGS.map((i) => i.decode().catch(() => {})));
       await Promise.all(VIDS.map((v) => (v.readyState >= 2 ? null : new Promise((r) => { v.onloadeddata = v.onerror = r; setTimeout(r, 8000); }))));

@@ -131,6 +131,72 @@ def check_keyframes(spec):
                     warn(f'cameras.{name}: a big move (scale {to.get("s", 1)}, x {to.get("x", 0)}, y {to.get("y", 0)})', 'fine if the film wants it; check the QA sheets that text stays inside the frame')
 
 
+def snap_rects(spec, base_dir, out_dir=None):
+    """Every highlight box lands on a real element (scripts/snap.py): a box written by eye is replaced by the element it
+    overlaps most — the page's own element boxes when the shot came from capture_app.mjs, else boxes found in the
+    pixels. Product-agnostic; "exact": true on a point or crop keeps it as written. Also draws boxes-<scene>.png."""
+    import snap as SN
+    from PIL import Image, ImageDraw
+    cache, report = {}, []
+    def cands(media, base):
+        if media not in cache:
+            p = base_dir / media
+            reg = DIR.regions_for(base_dir, media)
+            if reg and reg.get('base') and list(reg['base']) != list(base):   # regions in another coordinate space: scale them
+                kx, ky = base[0] / reg['base'][0], base[1] / reg['base'][1]
+                reg = {'base': base, 'regions': [{**r, 'rect': [r['rect'][0] * kx, r['rect'][1] * ky, r['rect'][2] * kx, r['rect'][3] * ky]} for r in reg.get('regions', [])]}
+            cache[media] = SN.candidates(p, base, reg) if p.exists() else ([], [])
+        return cache[media]
+    for i, sc in enumerate(spec.get('scenes', [])):
+        groups = []
+        m = sc.get('media') if isinstance(sc.get('media'), str) else None
+        if m and m.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')) and sc.get('frame') != 'photo':
+            groups.append((m, sc.get('base'), [('points', k, p_) for k, p_ in enumerate(sc.get('points') or [])] + [('crops', k, c) for k, c in enumerate(sc.get('crops') or [])]))
+        for k, pn in enumerate(sc.get('panels') or []):
+            if isinstance(pn.get('media'), str) and isinstance(pn.get('crop'), list): groups.append((pn['media'], pn.get('base'), [('panels', k, {'rect': pn['crop'], '_panel': pn})]))
+        for media, base, items in groups:
+            if not (base_dir / media).exists(): continue
+            if not base:
+                import suggest_rects as SR
+                base = SR.default_base(*Image.open(base_dir / media).size)
+            dom, pix = cands(media, list(base))
+            reg_txt = DIR.regions_for(base_dir, media)
+            if reg_txt and reg_txt.get('base') and list(reg_txt['base']) != list(base): reg_txt = None   # texts only in the shot's own coordinates
+            if not reg_txt:   # any screenshot: the words read from the pixels (OCR) plus the pixel blocks as their cards
+                words = SN.ocr_regions(base_dir / media, list(base))
+                if words: reg_txt = {'base': list(base), 'regions': words + [{'kind': 'panel', 'text': '', 'rect': c} for c in pix]}
+            drawn = []
+            for kind, k, it in items:
+                r = it.get('rect')
+                if not (isinstance(r, list) and len(r) == 4) or it.get('exact'): continue
+                new, ov, src = SN.snap_with_text(r, [it.get('zh'), it.get('en')], reg_txt, DIR.find_region, dom, pix) if reg_txt else SN.snap(r, dom, pix)
+                if src == 'kept':
+                    report.append((i, f'{kind}[{k}] {it.get("zh") or ""}', ov))
+                else:
+                    x0, y0 = max(0, new[0]), max(0, new[1]); x1, y1 = min(base[0], new[0] + new[2]), min(base[1], new[1] + new[3])
+                    new = [round(x0), round(y0), round(x1 - x0), round(y1 - y0)]   # inside the picture
+                    if '_panel' in it: it['_panel']['crop'] = new
+                    else: it['rect'] = new
+                drawn.append((new if src != 'kept' else r, src, it.get('zh') or f'{kind}{k}'))
+            if out_dir and drawn:
+                try:
+                    im = Image.open(base_dir / media).convert('RGB'); sx = im.size[0] / base[0]
+                    d = ImageDraw.Draw(im)
+                    for n, (r, src, label) in enumerate(drawn):
+                        col = (40, 200, 120) if src != 'kept' else (240, 70, 60)
+                        d.rectangle([r[0] * sx, r[1] * sx, (r[0] + r[2]) * sx, (r[1] + r[3]) * sx], outline=col, width=max(3, int(4 * sx)))
+                        d.text((r[0] * sx + 8, r[1] * sx + 6), f'{n + 1}', fill=col)
+                    (out_dir / 'check').mkdir(parents=True, exist_ok=True)
+                    im.thumbnail((1600, 1600)); im.save(out_dir / 'check' / f'boxes-{i:02d}.jpg', quality=85)
+                except Exception:
+                    pass
+    for i, what, ov in report:
+        warn(f'scenes[{i}].{what}: the box sits on no real element (best overlap {ov:.2f}); it is drawn as written',
+             'name the element instead ("rect": "@its text", capture_app shots), or move the box onto the card / table / button it is about '
+             '(film_out/check/boxes-*.jpg shows every box: green = on an element, red = as written); "exact": true keeps a box on purpose')
+    return report
+
+
 def resolve_look(spec, base_dir=None):
     """Fill style/motion when they are "auto" or missing: the director's look.py on the materials, in place."""
     g = GENRES.get(spec.get('genre') or '', None)
@@ -445,6 +511,31 @@ def check(spec, base_dir):
     check_keyframes(spec)
     check_mg(spec, base_dir)
     plan, design_warns = DIR.plan_shots(spec, base_dir, roles)
+    # the same picture in two scenes reads as filler (cover and finale may call each other back)
+    uses = {}
+    for i, sc in enumerate(scenes):
+        if sc.get('type') in ('cover', 'finale', 'endcard'): continue
+        ms = [sc.get('media')] if isinstance(sc.get('media'), str) else list(sc.get('media') or []) if isinstance(sc.get('media'), list) else []
+        ms += [p_.get('media') for p_ in sc.get('panels', []) or []] + [it.get('media') for it in sc.get('items', []) or [] if isinstance(it, dict)]
+        for m in {m for m in ms if isinstance(m, str)}: uses.setdefault(m, []).append(i)
+    for m, idx in uses.items():
+        if len(idx) > 1:
+            warn(f'{Path(m).name} appears in scenes {idx}', 'one picture, one beat: give the later scene another real screen or output (or a different, named crop of it), so no beat repeats')
+    # a crop that cuts through content (a word, a table, a frame runs off its edge): any screenshot, any product (scripts/snap.py)
+    import snap as SN
+    for m in sorted(uses):
+        p_ = base_dir / m
+        if not p_.exists() or not m.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')): continue
+        role = roles.get(str(p_.resolve()))
+        try:
+            from PIL import Image as _I; w_, h_ = _I.open(p_).size
+        except Exception:
+            continue
+        crop = role == 'figure' or (role in ('desktop', None) and not 1.70 <= w_ / h_ <= 1.82)   # a full window is 16:9 and touches its own edges
+        if role in ('photo', 'cutout', 'logo', 'phone') or not crop: continue
+        sides = SN.cut_edges(p_)
+        if sides:
+            warn(f'{p_.name}: the crop cuts through content on the {", ".join(sides)} edge', 'recapture it around the whole element ("clip": "@its text" in the shot list adds a margin), or crop wider so nothing is cut off')
     for i, msg, fix in design_warns: warn(f'scenes[{i}] ({scenes[i].get("type")}): {msg}', fix)
     for msg, fix in sharpness(spec, base_dir, plan, roles): warn(msg, fix)
     for i, msg, fix in DIR.rect_warnings(spec, base_dir): warn(f'scenes[{i}] ({scenes[i].get("type")}): {msg}', fix)
@@ -978,6 +1069,7 @@ if __name__ == '__main__':
     resolve_keyframes(spec)
     base = spec_path.parent
     for msg, fix in DIR.resolve_rects(spec, base): err(msg, fix)   # "rect": "@APA 三线表" → the exact panel box
+    snap_rects(spec, base, (base / spec.get('out', 'film_out')).resolve())   # boxes written by eye land on the real element under them
     out = (base / spec.get('out', 'film_out')).resolve()
     out.mkdir(parents=True, exist_ok=True)
     check(spec, base)

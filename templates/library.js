@@ -66,7 +66,7 @@ const LIB = (() => {
         return { w, lab };
       });
     }, (S, lt, d) => {
-      const out = eio(prog(lt, d - 1.2, d)), k = 1 - out, step = (d - 1.6) / 4;
+      const out = eio(prog(lt, d - 1.2, d)), k = 1 - out, step = Math.min(0.75, (d - 1.6) / 4);   // all four land in the first seconds: the tangle is the picture, not one window at a time
       S.wins.forEach((W, i) => {
         const a = prog(lt, 0.15 + i * step, 0.75 + i * step), [x, y, r] = pos[i];
         place(W.w, { ...M.pop(lt, 0.15 + i * step, { x: x * k, y: y * k, z: -out * 600, rz: r * k + out * 40, s: lerp(1, 0.2, out) }), o: clamp(a) * k });
