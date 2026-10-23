@@ -1,5 +1,7 @@
 # product-promo-film
 
+[![AgentShield Security](https://merx.help/badge/A+.svg)](https://merx.help/shield)
+
 **Commercial-grade promo films for any product, from a folder of materials: an agent skill.**
 **任何产品，一个素材文件夹，做出商业级宣传片：给 AI 智能体用的 skill。**
 
