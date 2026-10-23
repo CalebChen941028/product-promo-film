@@ -250,6 +250,7 @@ if len(sys.argv) > 2:
     copy_items = [(p_, v) for p_, v in lint_copy.walk(spec)] + [(f'brand.chips[{k}]', c) for k, c in enumerate(b.get('chips') or []) if isinstance(c, str)]
     copy_items += [(f'scenes[{i}].stats[{k}]', f"{st.get('value', '')}{st.get('suffix', '')} {st.get('en', '')} {st.get('zh', '')}") for i, sc in enumerate(spec.get('scenes', [])) for k, st in enumerate(sc.get('stats', []))]
     copy_items += [(f'scenes[{i}].data[{k}]', f"{x.get('value', '')}{sc.get('unit', '')} {x.get('label', '')}") for i, sc in enumerate(spec.get('scenes', [])) if sc.get('type') == 'chart' for k, x in enumerate(sc.get('data', [])) if isinstance(x, dict)]
+    copy_items += [(f'scenes[{i}].layers[{k}]', f"{L.get('value', '')}{L.get('suffix', '')} {L.get('en', '')} {L.get('zh', '')}") for i, sc in enumerate(spec.get('scenes', [])) if sc.get('type') == 'mg' for k, L in enumerate(sc.get('layers', [])) if isinstance(L, dict) and L.get('kind') == 'number']
     name_nums = set(re.findall(r'\d+', f"{b.get('name', '')} {b.get('nameAccent', '')}"))
     unsourced = []
     sec8 = section(md, 8)

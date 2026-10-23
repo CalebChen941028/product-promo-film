@@ -37,6 +37,7 @@ It works for software, apps, hardware, fashion, food, services, places and brand
   - `make_film.py` runs check → build → voice → QA → render → finish, and every error prints a `FIX:` line.
 - **A look chosen from the materials, not by product type** (`scripts/look.py`): it scores all 8 styles on what the pictures actually are and writes its reasons into the treatment; the user's own words for the feel (`--mood`) count triple.
 - **A director that designs before it makes** (`scripts/director.py`): it reads every picture (screen or photo, dense or calm, the quiet side, where the subject sits) and gives each scene its own layout, camera move and cut, with the reason, in a storyboard you can read and overrule. 7 feature layouts, photo/gallery/carousel/detail variants, 15 camera moves (push, pan, crane, arc, dolly zoom, handheld…) and 12 cuts (rack focus, iris, doors, light leak, dip…), within the motion language's palette.
+- **Free to design the motion:** the director's shot plan is a proposal. Agents write their own camera moves and cuts as keyframes in film.json, design motion-graphics scenes (`"type": "mg"`: text, shapes, lines, numbers and real images on beat keyframes, strokes that draw themselves), or drop to code; only honesty, rights and legible frames are fixed.
 - **Story drawn in code, any product:** journey maps, many-into-one hubs, kinetic type and real-number charts glue the materials together; real footage plays from its best moment and can open the film.
 - **A restrained director's cinema layer:** a colour script, a LUT grade, adaptive 180° motion blur, a subtle lens and light, and quiet synthesised sound design. Effects are felt, not seen.
 - **Automatic layout QA** measures overlaps, off-frame content and caption collisions, so mid-sized models ship clean frames.
@@ -147,6 +148,7 @@ Examples:
   - `film.json` 从 17 种场景中选择；新增的 photo · hero · detail · lineup · quote 用于实物产品、空间与人物。
   - `make_film.py` 一条命令完成检查到交付，出错时给出 `FIX:`。
 - **视觉风格由素材决定，不按产品类型套用**（`scripts/look.py`）：按图片的真实情况给 8 种风格打分并把理由写进方案；用户描述风格的用词（`--mood`）权重三倍。
+- **动效可以自由设计**：导演的镜头表只是建议。智能体可以在 film.json 里用关键帧写自己的运镜和转场，设计 MG 动画场景（`"type": "mg"`：文字、形状、线条、数字和真实图片按节拍关键帧运动，描边可自动画出），也可以写代码；固定不变的只有诚实、版权和画面清晰。
 - **先设计、后制作的导演**（`scripts/director.py`）：读懂每张画面（截图还是照片、密还是疏、哪一侧安静、主体在哪），为每个场景选好版式、运镜和转场并写明理由，生成可读、可改的分镜表。功能场景 7 种版式，照片、画廊、轮播、细节各有变体，15 种运镜（推拉、横移、升降、环绕、希区柯克变焦、手持……）、12 种转场（焦点转移、圆形展开、对开、漏光、黑场……），都在本片动效语言的调色板之内。
 - **用代码讲故事，适用于任何产品**：旅程图、多合一汇聚、动态文字、真实数字图表把素材串起来；实拍视频从最好的片段播放，也可以做开场。
 - **克制的导演电影层**：色彩脚本、LUT 调色、自适应 180° 运动模糊、含蓄的镜头与光效、轻声的合成声音设计；效果感受得到，看不出来。

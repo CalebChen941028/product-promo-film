@@ -578,9 +578,55 @@ const LIB = (() => {
     });
   }
 
+
+  // mg { layers: [...] } — motion graphics designed in film.json, no code. Every layer has keyframes in BEATS from the
+  // scene's start, so the motion lands on the music: "keys": [[beat, {x, y, s, sx, sy, rz, o, blur}], …] (x/y px from
+  // the centre; a key may name its ease: [beat, {…}, "eback"]). Kinds:
+  //   text    {zh, en?, size?, align?}  *word* in the accent     rect    {w, h, radius?, fill?, stroke?, width?}
+  //   circle  {r, fill?, stroke?, width?, draw?: [b0, b1]}       line    {points: [[x, y], …], stroke?, width?, draw?}
+  //   path    {d (SVG, stage px 0–1920 × 0–1080), stroke?, fill?, width?, draw?}
+  //   number  {value, suffix?, zh?, en?, at: beat} — the true value appears on its beat, never counts through others
+  //   image   {media (a real material), w, radius?}
+  // Colours: "accent" | "accent2" | "ink" | "muted" | "faint" | "bg" | any CSS colour. draw: the stroke traces itself between two beats.
+  function mg(start, end, o) {
+    const B = CONFIG.BAR / 4, Ls = o.layers || [];
+    const col = (c, d) => (!c ? d : ({ accent: 'var(--accent)', accent2: 'var(--accent2, var(--accent))', ink: 'var(--ink)', muted: 'color-mix(in srgb, var(--ink) 55%, transparent)', faint: 'var(--faint)', bg: 'var(--bg-edge)' })[c] || c);
+    const keysOf = (L) => (L.keys && L.keys.length ? L.keys : [[0, { o: 0, y: 20 }], [1, { o: 1, y: 0 }]]).map(([b, v, e]) => [b * B, v, EASES[e] || EASES[L.ease] || eo]);
+    scene(start, end, (R, S) => {
+      S.svg = stageSVG(R);
+      S.ls = Ls.map((L) => {
+        const k = L.kind || 'text';
+        if (k === 'text') return { L, el: textEl(R, `<div class="h-zh" style="font-size:${L.size || 64}px;letter-spacing:${Math.round((L.size || 64) / 12)}px;text-align:${L.align || 'center'};white-space:nowrap">${emph(L.zh)}</div>${L.en ? `<div class="kicker" style="text-align:${L.align || 'center'};margin-top:12px">${emph(L.en)}</div>` : ''}`, { whiteSpace: 'nowrap' }) };
+        if (k === 'number') return { L, el: textEl(R, `<div class="big-num${L.accent === false ? '' : ' accent'}" style="text-align:center">${L.value}${L.suffix || ''}</div>${L.zh ? `<div style="font:600 28px var(--zh);text-align:center;margin-top:10px">${L.zh} <span class="muted" style="font:700 15px var(--en);letter-spacing:5px">${(L.en || '').toUpperCase()}</span></div>` : ''}`, { whiteSpace: 'nowrap' }) };
+        if (k === 'rect') { const el = div('abs', R); Object.assign(el.style, { width: (L.w || 200) + 'px', height: (L.h || 6) + 'px', borderRadius: (L.radius || 0) + 'px', background: col(L.fill, L.stroke ? 'transparent' : 'var(--accent)'), border: L.stroke ? `${L.width || 2}px solid ${col(L.stroke)}` : 'none' }); return { L, el }; }
+        if (k === 'image') { const el = div('abs pic', R); el.dataset.qa = 'media'; Object.assign(el.style, { width: (L.w || 600) + 'px', borderRadius: (L.radius ?? 14) + 'px', overflow: 'hidden', boxShadow: '0 30px 70px rgba(0,0,0,0.35)' }); const im = img(L.media, el); Object.assign(im.style, { width: '100%', display: 'block' }); return { L, el }; }
+        const g = svgEl('g', {}, S.svg), attrs = { fill: col(L.fill, 'none'), stroke: col(L.stroke, k === 'circle' && L.fill ? 'none' : 'var(--accent)'), 'stroke-width': L.width || 3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' };
+        const sh = k === 'circle' ? svgEl('circle', { cx: 960, cy: 540, r: L.r || 100, ...attrs }, g)
+          : k === 'line' ? svgEl('polyline', { points: (L.points || []).map(([x, y]) => `${960 + x},${540 + y}`).join(' '), ...attrs }, g)
+          : svgEl('path', { d: L.d || '', ...attrs }, g);
+        return { L, g, sh, svg: true };
+      });
+    }, (S, lt) => {
+      S.ls.forEach(({ L, el, g, sh, svg }) => {
+        const v = kf(lt, keysOf(L)), x = v.x || 0, y = v.y || 0, s = v.s ?? 1, o = v.o ?? 1, rz = v.rz || 0;
+        if (svg) {
+          g.setAttribute('transform', `translate(${960 + x} ${540 + y}) rotate(${rz}) scale(${s * (v.sx ?? 1)} ${s * (v.sy ?? 1)}) translate(-960 -540)`);
+          g.setAttribute('opacity', clamp(o));
+          if (L.draw) { const len = sh.getTotalLength ? sh.getTotalLength() : 2000, a = eio(prog(lt, L.draw[0] * B, L.draw[1] * B)); sh.setAttribute('stroke-dasharray', len); sh.setAttribute('stroke-dashoffset', len * (1 - a)); }
+          return;
+        }
+        let oo = o;
+        if (L.kind === 'number') oo = Math.min(o, lt >= (L.at ?? 0) * B ? prog(lt, (L.at ?? 0) * B, (L.at ?? 0) * B + 0.25) : 0);
+        place(el, { x, y, s, rz, o: clamp(oo) });
+        if (v.sx != null || v.sy != null) el.style.transform += ` scale(${v.sx ?? 1}, ${v.sy ?? 1})`;
+        el.style.filter = v.blur ? `blur(${v.blur}px)` : '';
+      });
+    });
+  }
+
   // footage { media: '*.webm', base?, offset?, rate?, title?, layout? } — real camera footage full-bleed (or framed:
   // layout 'split'), with the photo's scrims and text sides. The clip plays from the director's chosen moment.
   function footage(start, end, o) { photo(start, end, o); }
 
-  return { cover, pain, feature: featureScene, carousel, numbers, gallery, clip: clipScene, phone, compare, statement, finale, endcard, photo, hero, detail, lineup, quote, flow, hub, type, chart, footage };
+  return { cover, pain, feature: featureScene, carousel, numbers, gallery, clip: clipScene, phone, compare, statement, finale, endcard, photo, hero, detail, lineup, quote, flow, hub, type, chart, footage, mg };
 })();

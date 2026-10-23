@@ -76,6 +76,7 @@ Short-film and title-design craft, built in (each implemented from scratch in `t
 4. **Your word wins**: `"layout"`, `"camera"`, `"cut"` or `"motion"` on a scene overrides the plan; `"direction": {"variety": "calm" | "balanced" | "rich"}` sets how far the plan strays from the signature (default balanced).
 
 ### 7. Code-drawn animation: story glue between the materials
+Beyond the built-in glue (flow, hub, type, chart), design your own motion graphics in film.json with an `mg` scene: layers of text, shapes, lines, numbers and real images on beat keyframes (`references/custom-scenes.md`).
 Some beats are better drawn than shown. The scene library draws them in code, in the film's style and motion language — never a fake product UI, only diagrams, type and real numbers:
 | Scene | Story job | Where autofilm puts it |
 | --- | --- | --- |
@@ -164,6 +165,7 @@ Nothing picks a style by product type alone. `look.py` reads every picture (scre
 4. **人工优先**：场景上写了 `"layout"`、`"camera"`、`"cut"`、`"motion"` 就以它为准；`"direction": {"variety": "calm" | "balanced" | "rich"}` 决定偏离招牌风格的程度（默认 balanced）。
 
 ### 7. 代码动画：素材之间的叙事衔接
+除了内置的衔接（flow、hub、type、chart），也可以用 `mg` 场景在 film.json 里设计自己的 MG 动画：文字、形状、线条、数字和真实图片按节拍关键帧运动（见 `references/custom-scenes.md`）。
 有些拍点画出来比拍出来更好。场景库用代码按本片的风格和动效语言绘制它们：只画示意图、文字和真实数字，绝不伪造产品界面。
 | 场景 | 叙事作用 | autofilm 放在哪里 |
 | --- | --- | --- |

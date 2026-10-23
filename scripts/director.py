@@ -203,7 +203,7 @@ def plan_shots(spec, base_dir, roles=None):
                 camera = 'handheld'; why.append('photograph breathes (handheld)')
             elif t == 'photo' and toward and k >= 3:
                 camera = toward; why.append(f'drifts toward the subject ({a["sx"]:.0%} across)')
-            elif t in ('cover', 'endcard', 'finale', 'hero', 'photo', 'detail', 'clip', 'phone', 'flow', 'hub', 'type', 'chart', 'footage', 'custom'):
+            elif t in ('cover', 'endcard', 'finale', 'hero', 'photo', 'detail', 'clip', 'phone', 'flow', 'hub', 'type', 'chart', 'footage', 'custom', 'mg'):
                 camera = None   # these move inside the frame already (push-ins, reveals): the language's own camera
             elif t in ('statement', 'quote'):
                 camera = 'push' if k >= 3 else None
@@ -252,6 +252,7 @@ def shot_size(sc, layout, a):
     type, maps and charts, 'card' for the name and the end card."""
     t = sc.get('type')
     if t in ('flow', 'hub', 'type', 'chart', 'statement', 'numbers', 'compare', 'pain', 'quote'): return 'graphic'
+    if t == 'mg': return sc.get('size') or 'graphic'
     if t == 'endcard': return 'card'
     if t == 'custom': return sc.get('size') or 'free'   # the director's cut sets its own frame
     if t == 'cover':

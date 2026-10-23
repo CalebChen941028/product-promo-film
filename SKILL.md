@@ -31,9 +31,10 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
 5. **Gates (enforced).** `make_film.py` refuses to build until `check_treatment.py` passes, and refuses to render until QA has 0 errors on the latest build. Generated files are fingerprinted: a hand edit in `film_out/` stops the pipeline.
 6. **Restraint.** Calm, professional, premium: effects are felt, not seen, and the film has one hero moment (`references/director.md`).
 
-### Two routes
+### Two routes (and you are free to design)
+The motion, the camera, the cuts and the motion graphics are yours to design. The director's shot plan, the 6 motion languages, the 12 cuts and the built-in camera moves are a proposal and a vocabulary, not a cage: change any scene's `layout` / `camera` / `cut` / `motion`, write your own moves and cuts as keyframes in film.json, design MG scenes (`"type": "mg"`), or write code. No permission and no `Deliberate` note is needed for a creative choice; say your intent in treatment §6. Only the hard rules and the QA bind.
 - **Autopilot (any model):** follow the steps. autofilm drafts the film, the director proposes every shot, the colour director the palette, the crew writes the words, the checks keep it clean. This is the floor, and it is a good film.
-- **Director's cut (when you can see further):** keep the hard rules and the tools, and replace any default with something better — your own scenes, motion language, camera moves, cuts and look in code (`references/custom-scenes.md`), any scene order, any length. When a taste check stands in the way of a better film, break it on purpose and say why in the treatment (`- Deliberate · 刻意: Rhythm — …`): the check then advises instead of blocking. The QA, the captions, the grade, the sound and the honesty gates still run on everything you write.
+- **Director's cut (when you can see further):** keep the hard rules and the tools, and replace any default with something better — your own motion language, camera moves and cuts as keyframes in film.json (`"cameras"`, `"cuts"`), motion graphics as `mg` scenes (layers of text, shapes, lines, numbers and real images on beat keyframes), or your own scenes, moves and look in code (`references/custom-scenes.md`); any scene order, any length. When a taste check stands in the way of a better film, break it on purpose and say why in the treatment (`- Deliberate · 刻意: Rhythm — …`): the check then advises instead of blocking. The QA, the captions, the grade, the sound and the honesty gates still run on everything you write.
 
 ### Steps (do them in order)
 1. **Environment.** Run `python3 scripts/doctor.py` and fix every `MISS`. First time only: in this folder run `npm i playwright && npx playwright install chromium`.
@@ -66,7 +67,7 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
    - Screen points come with suggested `rect`s. Check them: `python3 scripts/suggest_rects.py <screenshot> --preview .` draws numbered boxes; give each point the box it talks about. Real photos (`"frame": "photo"`) need none. Never put `"frame": "photo"` on a screenshot to silence a warning.
    - Scene types and fields are in `references/film-spec.md`.
    - Then run `python3 scripts/check_treatment.py treatment.md film.json`. It checks that the film says what the treatment says, that proof lines carry facts from the docs, and it caps any taste score the film does not earn.
-6. **Direct.** Do the director's pass (`references/director.md` §5). Defaults already set the colour script, hits, light and sound, and a **shot plan** gives every scene its own layout, camera move and cut (`--stage check` prints it; §6). For a calmer or richer film set `"direction": {"variety": "calm" | "rich"}`; override a scene's `layout` / `camera` / `cut` only on purpose.
+6. **Direct.** Do the director's pass (`references/director.md` §5). Defaults already set the colour script, hits, light and sound, and a **shot plan** gives every scene its own layout, camera move and cut (`--stage check` prints it; §6). For a calmer or richer film set `"direction": {"variety": "calm" | "rich"}`; the plan is a proposal: replace any scene's `layout` / `camera` / `cut` / `motion`, or design your own (keyframe `"cameras"` / `"cuts"`, `mg` scenes; `references/custom-scenes.md`) wherever the film is better for it.
 7. **Check.** Run `python3 scripts/make_film.py film.json --stage check` until there is no ERROR. Fix copy warnings from the lint too.
 8. **Build + voice + QA.** Run `--stage build`, then `--stage vo`, then `--stage qa`. QA must have 0 errors. If you can view images, read `film_out/qa/sheet*.png` and fix anything ugly in `film.json`.
 9. **Render.** Optional quick look: `--stage render --draft`, then `--stage finish --draft`. Final, as ONE command so nothing waits on you in between: `python3 scripts/make_film.py film.json --stage render && python3 scripts/make_film.py film.json --stage finish`. It takes 5–20 minutes; if you run it in the background, wait for that command to exit, then check `final/`. Motion blur is applied only to frames that move.
@@ -121,9 +122,10 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
 5. **关卡（强制）**：`check_treatment.py` 不通过，`make_film.py` 拒绝构建；最近一次构建的 QA 不是 0 错误，拒绝渲染。生成文件带指纹，手改 `film_out/` 会让流程停下。
 6. **克制**：平静、专业、高级；效果“感受得到，看不出来”，全片只有一个高潮（`references/director.md`）。
 
-### 两条路线
+### 两条路线（动效可以自由设计）
+动效、运镜、转场和 MG 动画由你来设计。导演的镜头表、6 种动效语言、12 种转场和内置运镜都是建议和词汇表，不是限制：任何场景的 `layout` / `camera` / `cut` / `motion` 都可以改；可以在 film.json 里用关键帧写你自己的运镜和转场，设计 MG 场景（`"type": "mg"`），或者写代码。创意选择不需要许可，也不需要写 `Deliberate`；在方案第 6 节写明意图即可。只有硬性规则和 QA 是约束。
 - **自动驾驶（任何模型）**：按步骤走。autofilm 起草，导演为每个镜头给出建议，色彩导演定配色，团队写文案，检查保证干净。这是底线，也是一部好片子。
-- **导演剪辑版（当你看得更远时）**：守住硬性规则、用好工具，把任何默认值换成更好的：用代码写你自己的场景、动效语言、运镜、转场和视觉（`references/custom-scenes.md`），任意场景顺序、任意长度。某条审美检查挡住了更好的片子时，有意打破它，并在方案里写明理由（`- Deliberate · 刻意: Rhythm — …`），该检查就从阻止改为提醒。QA、字幕、调色、声音和诚实关卡对你写的一切照常生效。
+- **导演剪辑版（当你看得更远时）**：守住硬性规则、用好工具，把任何默认值换成更好的：在 film.json 里用关键帧写你自己的动效语言、运镜和转场（`"cameras"`、`"cuts"`），用 `mg` 场景做 MG 动画（文字、形状、线条、数字和真实图片按节拍关键帧运动），或用代码写你自己的场景、运镜和视觉（`references/custom-scenes.md`）；任意场景顺序、任意长度。某条审美检查挡住了更好的片子时，有意打破它，并在方案里写明理由（`- Deliberate · 刻意: Rhythm — …`），该检查就从阻止改为提醒。QA、字幕、调色、声音和诚实关卡对你写的一切照常生效。
 
 ### 步骤（按顺序）
 1. **环境**：运行 `python3 scripts/doctor.py`，修好所有 `MISS`。首次需在本目录运行 `npm i playwright && npx playwright install chromium`。
@@ -156,7 +158,7 @@ description: Make a commercial-grade promo film (45 s – 4 min as the materials
    - 界面截图的要点已预填建议的 `rect`。用 `python3 scripts/suggest_rects.py <截图> --preview .` 画出编号框核对，每个要点对应它所说的那个框；真实照片（`"frame": "photo"`）不需要。不要给截图加 `"frame": "photo"` 来消除警告。
    - 场景类型与字段见 `references/film-spec.md`。
    - 然后运行 `check_treatment.py treatment.md film.json`：它检查片子说的是否就是方案里写的、证据句是否带有文档里的事实，并会给片子撑不起的品味分封顶。
-6. **导演检查**：按 `references/director.md` 第 5 节检查。默认值已设好色彩脚本、击点、光效和声音；**镜头表**为每个场景自动选好版式、运镜和转场（`--stage check` 会打印，见第 6 节）。想更克制或更丰富，设 `"direction": {"variety": "calm" 或 "rich"}`；只有刻意为之才逐场景覆盖 `layout` / `camera` / `cut`。
+6. **导演检查**：按 `references/director.md` 第 5 节检查。默认值已设好色彩脚本、击点、光效和声音；**镜头表**为每个场景自动选好版式、运镜和转场（`--stage check` 会打印，见第 6 节）。想更克制或更丰富，设 `"direction": {"variety": "calm" 或 "rich"}`；镜头表只是建议：任何场景的 `layout` / `camera` / `cut` / `motion` 都可以换，也可以自己设计（关键帧 `"cameras"` / `"cuts"`、`mg` 场景，见 `references/custom-scenes.md`），只要片子因此更好。
 7. **检查**：`python3 scripts/make_film.py film.json --stage check` 直到没有 ERROR，文案检查的提示也要处理。
 8. **构建 + 配音 + QA**：依次运行 `--stage build`、`--stage vo`、`--stage qa`，QA 必须 0 错误；能看图就看 `film_out/qa/sheet*.png`，不满意就改 `film.json`。
 9. **渲染**：可选快速预览 `--stage render --draft`，再 `--stage finish --draft`。终版用**一条命令**连跑，中间不用等你：`python3 scripts/make_film.py film.json --stage render && python3 scripts/make_film.py film.json --stage finish`，需 5–20 分钟；若放在后台运行，等这条命令结束后再检查 `final/`（运动模糊只用于运动的帧）。

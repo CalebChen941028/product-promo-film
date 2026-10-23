@@ -41,6 +41,7 @@ TYPES = {
     'footage': (2, ['media'], {}),   # real camera footage (.webm from intake), full-bleed or framed
     'custom': (1, ['fn'], {}),       # the director's cut: a scene the film writes itself (film.json "scripts"; references/custom-scenes.md)
     'flow': (2, ['steps'], {'steps': 5}), 'hub': (3, ['items'], {'items': 6}), 'type': (2, ['lines'], {'lines': 4}), 'chart': (3, ['data'], {'data': 8}),
+    'mg': (1, ['layers'], {'layers': 24}),   # motion graphics designed in film.json: layers with beat keyframes (references/custom-scenes.md)
 }
 
 
@@ -78,6 +79,54 @@ def style_profile(style):
     for k in ('bloom', 'grain', 'xf'):
         m = re.search(k + r'\s*:\s*([\d.]+)', src); out[k] = float(m.group(1)) if m else 0.0
     return out
+
+
+KF_FIELDS = {'x', 'y', 'z', 's', 'rx', 'ry', 'rz', 'o', 'blur', 'bright'}
+REVEALS = {'left', 'right', 'up', 'down', 'circle', 'center'}
+
+
+def resolve_keyframes(spec):
+    """A scene's "camera" / "cut" may be a keyframe object instead of a name: register it as cameras/cuts "_cam<i>"/"_cut<i>"."""
+    cams, cuts = spec.setdefault('cameras', {}), spec.setdefault('cuts', {})
+    for i, sc in enumerate(spec.get('scenes', [])):
+        if isinstance(sc.get('camera'), dict): cams[f'_cam{i}'] = sc['camera']; sc['camera'] = f'_cam{i}'
+        if isinstance(sc.get('cut'), dict): cuts[f'_cut{i}'] = sc['cut']; sc['cut'] = f'_cut{i}'
+    if not cams: spec.pop('cameras')
+    if not cuts: spec.pop('cuts')
+
+
+def check_mg(spec, base_dir):
+    kinds = {'text', 'rect', 'circle', 'line', 'path', 'number', 'image'}
+    keyf = {'x', 'y', 's', 'sx', 'sy', 'rz', 'o', 'blur'}
+    for i, sc in enumerate(spec.get('scenes', [])):
+        if sc.get('type') != 'mg': continue
+        for k, L in enumerate(sc.get('layers') or []):
+            w = f'scenes[{i}].layers[{k}]'
+            if L.get('kind', 'text') not in kinds: err(f'{w}.kind = {L.get("kind")!r}', f'use one of {sorted(kinds)}'); continue
+            for key in L.get('keys') or []:
+                if not (isinstance(key, list) and len(key) >= 2 and isinstance(key[0], (int, float)) and isinstance(key[1], dict)):
+                    err(f'{w}.keys: {key!r}', 'each key is [beat, {x, y, s, sx, sy, rz, o, blur}, "ease"?]'); break
+                bad = set(key[1]) - keyf
+                if bad: err(f'{w}.keys: unknown field(s) {sorted(bad)}', f'use {sorted(keyf)}'); break
+            if L.get('kind') == 'image' and not (L.get('media') and (base_dir / L['media']).exists()):
+                err(f'{w}: image media not found: {L.get("media")}', 'an mg image is a real material; paths are relative to film.json')
+            if L.get('kind') == 'number' and not isinstance(L.get('value'), (int, float, str)):
+                err(f'{w}: number without a value', 'give the true value from the docs')
+
+
+def check_keyframes(spec):
+    for kind in ('cameras', 'cuts'):
+        for name, c in (spec.get(kind) or {}).items():
+            if not isinstance(c, dict): err(f'{kind}.{name} must be an object', 'see references/custom-scenes.md (keyframe moves)'); continue
+            for side in ('from', 'to'):
+                bad = set((c.get(side) or {}).keys()) - KF_FIELDS
+                if bad: err(f'{kind}.{name}.{side}: unknown field(s) {sorted(bad)}', f'use {sorted(KF_FIELDS)}')
+            if c.get('ease') and c['ease'] not in ('eio', 'eo', 'ex', 'esoft', 'eback', 'linear'): err(f'{kind}.{name}.ease = {c["ease"]!r}', 'use eio, eo, ex, esoft, eback or linear')
+            if kind == 'cuts' and c.get('reveal') and c['reveal'] not in REVEALS: err(f'cuts.{name}.reveal = {c["reveal"]!r}', f'use one of {sorted(REVEALS)}')
+            if kind == 'cameras':
+                to = c.get('to') or {}
+                if abs(to.get('s', 1) - 1) > 0.35 or abs(to.get('x', 0)) > 400 or abs(to.get('y', 0)) > 300:
+                    warn(f'cameras.{name}: a big move (scale {to.get("s", 1)}, x {to.get("x", 0)}, y {to.get("y", 0)})', 'fine if the film wants it; check the QA sheets that text stays inside the frame')
 
 
 def resolve_look(spec, base_dir=None):
@@ -386,7 +435,9 @@ def check(spec, base_dir):
     if scenes and scenes[-1].get('type') != 'endcard':
         warn('last scene is not an endcard', 'end with {"type": "endcard", "bars": "rest"}')
     roles = material_roles(base_dir)
-    own_cuts, own_cams = script_names(spec, base_dir, 'CUT'), script_names(spec, base_dir, 'CAMERA')
+    own_cuts, own_cams = script_names(spec, base_dir, 'CUT') | set(spec.get('cuts') or {}), script_names(spec, base_dir, 'CAMERA') | set(spec.get('cameras') or {})
+    check_keyframes(spec)
+    check_mg(spec, base_dir)
     plan, design_warns = DIR.plan_shots(spec, base_dir, roles)
     for i, msg, fix in design_warns: warn(f'scenes[{i}] ({scenes[i].get("type")}): {msg}', fix)
     for msg, fix in sharpness(spec, base_dir, plan, roles): warn(msg, fix)
@@ -646,6 +697,9 @@ def build(spec, base_dir, out):
         sh = {k: v for k, v in plan[i].items() if k in ('layout', 'camera', 'motion') and v}
         sh.update({k: sc[k] for k in ('offset', 'rate') if isinstance(sc.get(k), (int, float))})   # where footage plays from
         calls.append(f"shot({json.dumps(sh, ensure_ascii=False)});")
+        if sc['type'] == 'mg':
+            for L in o.get('layers') or []:
+                if L.get('kind') == 'image' and L.get('media'): L['media'] = media(L['media'])   # a real material, copied with the film
         if sc['type'] == 'custom':
             for k, v in list((o.get('assets') or {}).items()): o['assets'][k] = media(v)   # pictures a custom scene uses
             o.pop('fn', None)
@@ -671,7 +725,7 @@ def build(spec, base_dir, out):
     print(DIR.shot_table(spec, plan))
     cfg = {'STYLE': spec['style'], 'MOTION': spec.get('motion', ''), 'G': G, 'BAR': BAR, 'DUR': round(dur, 3), 'FADE_OUT': 2.6,
            'CHORUS_BARS': chorus, 'CHAPTERS': merged, 'ONSCREEN': onscreen, 'SHOTS': 'media/', 'ASSETS': 'media/', 'BRAND': brand,
-           'MOTIONS_EXTRA': spec.get('motions') or {}, 'CSS': css_links, 'CINEMA': cin_cfg, 'PALETTE': {k: v for k, v in (spec.get('palette') or {}).items() if k in ('accent', 'accent2')}}
+           'MOTIONS_EXTRA': spec.get('motions') or {}, 'CAMERAS_EXTRA': spec.get('cameras') or {}, 'CUTS_EXTRA': spec.get('cuts') or {}, 'CSS': css_links, 'CINEMA': cin_cfg, 'PALETTE': {k: v for k, v in (spec.get('palette') or {}).items() if k in ('accent', 'accent2')}}
     json.dump(cues, open(aud / 'sfx_cues.json', 'w'), indent=1)
     (film / 'config.js').write_text('const CONFIG = ' + json.dumps(cfg, ensure_ascii=False, indent=1) + ';\nconst bar = (b) => CONFIG.G + CONFIG.BAR * b;\nObject.assign(window, { CONFIG, bar });\n')
     (film / 'scenes.js').write_text("'use strict';\n// generated by make_film.py from film.json — edit film.json, not this file\n" + '\n'.join(calls) + '\nshot({});\n')
@@ -896,6 +950,7 @@ if __name__ == '__main__':
     spec_path = Path(a.spec).resolve()
     spec = json.load(open(spec_path))
     resolve_flow(spec)
+    resolve_keyframes(spec)
     base = spec_path.parent
     for msg, fix in DIR.resolve_rects(spec, base): err(msg, fix)   # "rect": "@APA 三线表" → the exact panel box
     out = (base / spec.get('out', 'film_out')).resolve()

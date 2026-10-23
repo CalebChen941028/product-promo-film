@@ -22,6 +22,7 @@ Rules:
 - Kokoro or the user's voice; ask before any download.
 - Never type the user's API keys.
 - Restraint: one hero moment (a default; break it on purpose with a reason in the treatment).
+- Motion, camera, cuts and motion graphics are yours to design: the director's plan is a proposal. Write your own moves and cuts as keyframes in film.json (`"cameras"`, `"cuts"`), MG scenes as `"type": "mg"` (layers on beat keyframes), or code (`references/custom-scenes.md`); no permission is needed for a creative choice.
 - Everything else is a default you may replace when the film is better for it: your own scenes, motion, camera moves, cuts and look in code (`references/custom-scenes.md`); a taste check you break on purpose goes in the treatment as `- Deliberate · 刻意: <check> — <why>`. Honesty, rights and legible frames never bend.
 
 ## 中文
@@ -43,4 +44,5 @@ Rules:
 - 配音用 Kokoro 或用户录音；任何下载前先征得同意。
 - 不替用户填写 API Key。
 - 保持克制，全片只有一个高潮（这是默认值；有理由时可在方案中写明后打破）。
+- 动效、运镜、转场和 MG 动画由你设计，导演方案只是建议：可在 film.json 里用关键帧写运镜和转场（`"cameras"`、`"cuts"`），用 `"type": "mg"` 做 MG 场景（图层按节拍关键帧运动），或写代码（`references/custom-scenes.md`）；创意选择无需许可。
 - 其余都是默认值，片子需要时可以换成你自己的：用代码写场景、动效、运镜、转场和视觉（`references/custom-scenes.md`）；有意打破的审美检查写进方案：`- Deliberate · 刻意: <检查项> — <理由>`。诚实、版权和画面清晰永不变通。

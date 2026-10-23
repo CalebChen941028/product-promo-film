@@ -28,6 +28,8 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `scripts` | list of paths | no | the film's own JS: custom scenes (`CUSTOM.x`), camera moves (`CAMERA.x`), cuts (`CUT.x`); loaded after the library (`references/custom-scenes.md`) |
 | `css` | list of paths | no | the film's own stylesheet(s), loaded after the style: variables, fonts, any rule |
 | `motions` | object | no | the film's own motion languages: `{"id": {"like": "<built-in>", enter, text, hl, pop, camera, tilt, drift, focus, palette}}`; use the id as `motion` |
+| `cameras` | object | no | the film's own camera moves as keyframes: `{"name": {"from": {x, y, z, s, rx, ry, rz}, "to": {…}, "ease"?, "pulse"?}}`; use as a scene's `"camera"`, or put the object on the scene (`references/custom-scenes.md`) |
+| `cuts` | object | no | the film's own cuts as keyframes: `{"name": {"from": {x, y, s, rz, o, blur, bright}, "to"?, "reveal"?, "ease"?, "len"?}}`; use as a scene's `"cut"`, or put the object on the scene |
 | `palette` | object | no | `{"accent": "#…", "accent2": "#…", "why": "…"}`: the film's accent colours, chosen by the colour director (`scripts/palette.py`: the brand, colour psychology for the genre, harmony with the materials, ≥ 3:1 contrast). Background and ink stay the style's. Remove it to use the style's own accent |
 | `direction` | object | no | `{"variety": "calm" \| "balanced" \| "rich"}`: how far the shot plan strays from the motion language's signature layout, move and cut (default `balanced`; `references/director.md` §6) |
 
@@ -82,6 +84,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `lineup` | 2 | `items[{media,zh?,en?}]` ≤ 6, `title?`, `cutout?` | the range (colours, models, sizes) standing together |
 | `quote` | 2 | `zh`, `en?`, `who`, `role?` | a **real**, approved testimonial; large and quiet |
 | `custom` | 1 | `fn`, `assets?`, `size?`, any field | the director's cut: a scene your script registers as `CUSTOM.<fn>` (`references/custom-scenes.md`) |
+| `mg` | 1 | `layers` (≤ 24), `size?` | motion graphics designed in JSON: text, rect, circle, line, path, number and real-image layers on beat keyframes, strokes that draw themselves (`references/custom-scenes.md`) |
 | `footage` | 2 | `media` (.webm from intake), `base?`, `offset?`, `rate?`, `poster?`, `title?`, `layout?` | real camera footage, full-bleed (text on the quiet side) or framed (`split`). `offset` = where it plays from (autofilm picks the best moment with `scripts/footage.py`). A `.webm` also works as the media of `cover`, `photo` and `hero` |
 | `flow` | 2 | `steps` = [{zh, en}] (2–5) or `"chapters"`, `title?` | code-drawn journey map: the line draws, a light travels, each step lights on its slice. `"chapters"` = the film's own chapter names |
 | `hub` | 3 | `items` [{zh, en}] (3–6), `center?` {zh, en}, `title?` | code-drawn many-into-one: scattered grey items gather into a ring around the product and light up |
@@ -117,6 +120,8 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `scripts` | 路径列表 | 否 | 本片自己的 JS：自定义场景（`CUSTOM.x`）、运镜（`CAMERA.x`）、转场（`CUT.x`），在场景库之后加载（见 `references/custom-scenes.md`） |
 | `css` | 路径列表 | 否 | 本片自己的样式表，在风格之后加载：变量、字体、任意规则 |
 | `motions` | 对象 | 否 | 本片自己的动效语言：`{"id": {"like": "<内置语言>", enter, text, hl, pop, camera, tilt, drift, focus, palette}}`，把 id 写进 `motion` 使用 |
+| `cameras` | 对象 | 否 | 全片自定义的关键帧运镜：`{"名字": {"from": {x, y, z, s, rx, ry, rz}, "to": {…}, "ease"?, "pulse"?}}`；在场景的 `"camera"` 里按名字使用，或把对象直接写在场景上（见 `references/custom-scenes.md`） |
+| `cuts` | 对象 | 否 | 全片自定义的关键帧转场：`{"名字": {"from": {x, y, s, rz, o, blur, bright}, "to"?, "reveal"?, "ease"?, "len"?}}`；在场景的 `"cut"` 里按名字使用，或把对象直接写在场景上 |
 | `palette` | 对象 | 否 | `{"accent": "#…", "accent2": "#…", "why": "…"}`：全片强调色，由色彩导演（`scripts/palette.py`）根据品牌色、本类产品的色彩心理、与素材的色彩和谐、≥ 3:1 对比度选出；背景与文字色仍用风格自带的。删除则使用风格默认强调色 |
 | `direction` | 对象 | 否 | `{"variety": "calm" \| "balanced" \| "rich"}`：镜头表偏离动效语言招牌版式、运镜、转场的程度（默认 `balanced`，见 `references/director.md` 第 6 节） |
 
@@ -171,6 +176,7 @@ English first, 中文在后。Paths are relative to `film.json`. 1 bar = 4 beats
 | `lineup` | 2 | `items[{media,zh?,en?}]` ≤ 6、`title?`、`cutout?` | 产品系列（颜色、型号、尺寸）并排展示 |
 | `quote` | 2 | `zh`、`en?`、`who`、`role?` | **真实**且经授权的用户评价，大字、安静 |
 | `custom` | 1 | `fn`、`assets?`、`size?`、任意字段 | 导演剪辑版：由你的脚本注册为 `CUSTOM.<fn>` 的场景（见 `references/custom-scenes.md`） |
+| `mg` | 1 | `layers`（≤ 24）、`size?` | 用 JSON 设计的 MG 动画：文字、矩形、圆、线、路径、数字与真实图片图层，按节拍关键帧运动，描边可自动画出（见 `references/custom-scenes.md`） |
 | `footage` | 2 | `media`（intake 转出的 .webm）、`base?`、`offset?`、`rate?`、`poster?`、`title?`、`layout?` | 真实拍摄的视频，满幅（文字放在安静的一侧）或加框（`split`）。`offset` 为起播位置（autofilm 用 `scripts/footage.py` 选出最好的片段）。`.webm` 也可直接作为 `cover`、`photo`、`hero` 的素材 |
 | `flow` | 2 | `steps` = [{zh, en}]（2–5）或 `"chapters"`、`title?` | 代码绘制的流程图：线条逐段画出、光点前进、各步骤依次点亮；`"chapters"` 即用本片的章节名 |
 | `hub` | 3 | `items` [{zh, en}]（3–6）、`center?` {zh, en}、`title?` | 代码绘制的“多合一”：散落的灰色事项汇聚到产品周围并点亮 |

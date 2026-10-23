@@ -59,7 +59,7 @@ function kfRect(t, keys) {
 // ---------- motion languages (independent of the visual style) ----------
 // CONFIG.MOTION picks one; otherwise the style's default. Each language defines how things ENTER, how held
 // shots BREATHE, how TEXT reveals, how HIGHLIGHTS appear, how FOCUS moves inside a screenshot, and what the
-// CAMERA does on the beat. Choose by the material's theme (scripts/recommend_style.py), not by taste alone.
+// CAMERA does on the beat. These are starting points: a film may define its own (keyframes in film.json or code).
 const MOTIONS = {
   // serious tech / platforms: 3D fly-ins from depth, slow orbit drift, rise text, glowing grow highlights
   'cinematic-3d': { enter: 'fly', tilt: 1, drift: 1, text: 'rise', hl: 'grow', focus: { dur: 1.3, ease: eio }, camera: 'orbit', pop: 'back' },
@@ -89,6 +89,36 @@ for (const [id, m] of Object.entries(CONFIG.MOTIONS_EXTRA || {})) {
 //   CAMERA.<name> = ({t, lt, dur, p, beat, bar}) => 'css transform'        p = eased 0→1 over the scene
 //   CUT.<name> = ({p, inc}) => ({transform?, opacity?, filter?, clipPath?})  (optional CUT.<name>.len = × crossfade)
 const CAMERA = {}, CUT = {};
+// the film's own camera moves and cuts written as keyframes in film.json — no code (references/custom-scenes.md):
+//   "cameras": {"name": {"from": {x, y, z, s, rx, ry, rz}, "to": {…}, "ease": "esoft", "pulse": 0.01}}
+//     x/y/z px, s scale, rx/ry/rz degrees; the scene moves from "from" to "to" over its length; pulse = a scale kick on every beat
+//   "cuts": {"name": {"from": {x, y, s, rz, o, blur, bright}, "to": {…}, "reveal": "left|right|up|down|circle|center", "ease": "eio", "len": 1.2}}
+//     the incoming scene arrives from "from" (and reveals in that shape); the outgoing one leaves towards "to" (default: it stays)
+const KF_KEYS = { x: 0, y: 0, z: 0, s: 1, rx: 0, ry: 0, rz: 0, o: 1, blur: 0, bright: 1 };
+const kfMix = (a, b, e) => { const v = {}; for (const [k, d] of Object.entries(KF_KEYS)) v[k] = lerp(a[k] ?? d, b[k] ?? d, e); return v; };
+const kfTf = (v) => `translate3d(${v.x.toFixed(2)}px,${v.y.toFixed(2)}px,${v.z.toFixed(1)}px) rotateX(${v.rx.toFixed(3)}deg) rotateY(${v.ry.toFixed(3)}deg) rotateZ(${v.rz.toFixed(3)}deg) scale(${v.s.toFixed(4)})`;
+const kfReveal = (r, e) => {
+  const q = ((1 - e) * 100).toFixed(2);
+  return r === 'left' ? `inset(0 ${q}% 0 0)` : r === 'right' ? `inset(0 0 0 ${q}%)` : r === 'up' ? `inset(${q}% 0 0 0)` : r === 'down' ? `inset(0 0 ${q}% 0)`
+    : r === 'circle' ? `circle(${(e * 115).toFixed(2)}% at 50% 50%)` : r === 'center' ? `inset(0 ${(q / 2).toFixed(2)}% 0 ${(q / 2).toFixed(2)}%)` : '';
+};
+for (const [id, c] of Object.entries(CONFIG.CAMERAS_EXTRA || {})) {
+  const ease = EASES[c.ease] || EASES.esoft;
+  CAMERA[id] = ({ lt, dur, beat }) => {
+    const v = kfMix(c.from || {}, c.to || {}, ease(clamp(lt / Math.max(0.01, dur))));
+    if (c.pulse) v.s *= 1 + c.pulse * Math.exp(-beat * 6);
+    return kfTf(v);
+  };
+}
+for (const [id, c] of Object.entries(CONFIG.CUTS_EXTRA || {})) {
+  const ease = EASES[c.ease] || EASES.eio;
+  CUT[id] = ({ p, inc }) => {
+    const e = ease(clamp(p)), v = inc ? kfMix(c.from || { o: 0 }, {}, e) : kfMix({}, c.to || {}, e);
+    return { transform: kfTf(v), opacity: clamp(v.o), filter: `blur(${Math.max(0, v.blur).toFixed(1)}px) brightness(${v.bright.toFixed(3)})`,
+             clipPath: inc && c.reveal ? kfReveal(c.reveal, e) : '' };
+  };
+  CUT[id].len = Math.min(2, Math.max(0.4, c.len || 1.2));
+}
 const FILM_MO = MOTIONS[CONFIG.MOTION] ? CONFIG.MOTION : (MOTIONS[ST.motionDefault] ? ST.motionDefault : 'cinematic-3d');
 let MO_ID = FILM_MO, MO = MOTIONS[FILM_MO];
 let SHOT = {};
