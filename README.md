@@ -86,9 +86,10 @@ git clone https://github.com/CalebChen941028/reelwright.git
 cd reelwright
 ./install.sh                 # ~/.agents/skills + Claude Code + Codex   (Windows: .\install.ps1)
 ./install.sh all             # + OpenCode, Antigravity, DeepSeek Harness, Kimi Code, Cursor, Copilot, Gemini CLI, Qwen Code, Trae
-npm i playwright && npx playwright install chromium
+npm install && npx playwright install chromium   # Playwright lives in this folder; the installed copies read it from here (any order works)
 python3 scripts/doctor.py
 ```
+Keep the cloned folder where it is: if you move it, run `./install.sh` again.
 Where each agent looks for skills: [references/agents.md](references/agents.md). Agents without skill support: point them at [AGENTS.md](AGENTS.md).
 
 ### Quick start
@@ -176,7 +177,7 @@ Examples:
 风格与动效分开选择，都由导演读素材后决定（没有默认值，见 `scripts/look.py`）；对照表与预览见上方英文部分。新增 `luxe-noir`（安静的奢华感：时尚、美妆、珠宝、高端硬件）与 `natural-fresh`（日光与材质：食品、身心健康、旅行、家居、亲子）。
 
 ### 安装与快速开始
-命令见上方英文部分（开工说明 → 起草 → 方案选择 → 团队创作 → 构建）。对智能体说：“用 Reelwright（片匠）skill，根据 ~/materials 里的素材给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。示例：
+安装命令见上方英文部分：克隆后运行 `./install.sh`，并在克隆的文件夹里运行 `npm install && npx playwright install chromium`（先后顺序不限；安装副本通过 `.source` 文件读取这里的 Playwright，所以请保留这个文件夹，移动后重新运行 `./install.sh`）。使用流程见上方英文部分（开工说明 → 起草 → 方案选择 → 团队创作 → 构建）。对智能体说：“用 Reelwright（片匠）skill，根据 ~/materials 里的素材给我的产品做一部宣传片”，它会按 [SKILL.md](SKILL.md) 执行。示例：
 - [examples/product-demo](examples/product-demo)：实物产品，无音乐，含完整团队方案。
 - [examples/demo](examples/demo)：软件，使用用户音乐。
 - [examples/medstat-pilot](examples/medstat-pilot)：已安装桌面应用的已验证镜头清单，含演示数据与脚本化 AI 回复。

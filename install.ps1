@@ -18,6 +18,8 @@ foreach ($t in $Targets) {
   New-Item -ItemType Directory -Force -Path $Dest[$t] | Out-Null
   if (Test-Path $d) { Remove-Item -Recurse -Force $d }
   robocopy $Src $d /E /XD node_modules film_out .git /NFL /NDL /NJH /NJS | Out-Null
+  Set-Content -Path (Join-Path $d ".source") -Value $Src -Encoding UTF8   # the installed copy finds Playwright in the folder it came from
   Write-Host "installed -> $d"
 }
-Write-Host "Next: cd `"$Src`"; npm i playwright; npx playwright install chromium; python scripts\doctor.py"
+Write-Host "Next: cd `"$Src`"; npm install; npx playwright install chromium; python scripts\doctor.py"
+Write-Host "(keep this folder: the installed copies read Playwright from it; if you move it, run .\install.ps1 again)"

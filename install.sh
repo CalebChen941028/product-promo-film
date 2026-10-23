@@ -35,8 +35,10 @@ for t in $targets; do
   else
     mkdir -p "$d/$NAME"; (cd "$SRC" && tar --exclude node_modules --exclude film_out --exclude .git -cf - .) | (cd "$d/$NAME" && tar -xf -)
   fi
-  # the capture and render tools need Playwright: share this folder's node_modules (local, nothing downloaded)
-  if [ -d "$SRC/node_modules/playwright" ]; then ln -s "$SRC/node_modules" "$d/$NAME/node_modules"; fi
+  # the installed copy finds Playwright in the folder it was installed from (scripts/_pw.mjs, doctor.py, make_film.py read .source);
+  # no symlink (Windows has none without rights) and any order works: npm install here before or after installing
+  printf '%s\n' "$SRC" > "$d/$NAME/.source"
   echo "installed → $d/$NAME"
 done
-echo "Next: cd \"$SRC\" && npm i playwright && npx playwright install chromium && python3 scripts/doctor.py"
+echo "Next: cd \"$SRC\" && npm install && npx playwright install chromium && python3 scripts/doctor.py"
+echo "(keep this folder: the installed copies read Playwright from it; if you move it, run ./install.sh again)"

@@ -38,7 +38,8 @@
 // Rules: drive the product the way a user would; never fake the UI; never type a user's real API key or password;
 // skip settings, licence, account and delete screens unless the user asked. A failed step saves _fail-<scenario>.png
 // and lists what CAN be clicked there; the next scenario still runs.
-import { chromium, _electron } from 'playwright';
+import { loadPlaywright } from './_pw.mjs';
+const { chromium, _electron } = await loadPlaywright();
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';

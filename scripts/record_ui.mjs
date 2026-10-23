@@ -26,7 +26,8 @@
 //   {"hold": 1500}  keep recording what is on screen (let a result settle, let the eye read)
 // Rules: a sandbox, never the user's installed app or profile, never their real data or keys; never kill anything but the
 // server this script started; demo data only, and the film says so. A failed step saves _fail-<take>.png and moves on.
-import { chromium } from 'playwright';
+import { loadPlaywright } from './_pw.mjs';
+const { chromium } = await loadPlaywright();
 import { spawn, execFileSync } from 'child_process';
 import { createServer } from 'http';
 import fs from 'fs';

@@ -7,7 +7,7 @@ English first, 中文在后。
 | Symptom | Cause | Fix |
 | --- | --- | --- |
 | `ffmpeg not found` | not installed | `python3 -m pip install imageio-ffmpeg` (bundled static ffmpeg) or install ffmpeg |
-| `playwright not found` / `Cannot find package 'playwright'` | not installed where scripts run | `npm i playwright && npx playwright install chromium` in the skill folder; or set `PLAYWRIGHT_NODE_MODULES=/path/to/node_modules` |
+| `playwright not found` / `Cannot find package 'playwright'` | not installed, or the cloned folder moved | `npm install && npx playwright install chromium` in the folder you cloned; if you moved it, run `./install.sh` again (the installed copy reads the path from `.source`); or set `PLAYWRIGHT_NODE_MODULES=/path/to/node_modules` |
 | Chinese shows as boxes (Linux) | no CJK font | `sudo apt install fonts-noto-cjk` |
 | Video clip is black | H.264 source (Chromium build cannot decode it) | run `intake.py` → use the `.webm` it made |
 | Kokoro: `Error processing file '…/phontab'` then exit | espeak-ng ignores data paths longer than its buffer; phonemizer resolves symlinks | copy `espeak-ng-data` to a short REAL folder (`~/.cache/kes`) and set `voice.espeak_data` |
@@ -38,7 +38,7 @@ English first, 中文在后。
 | 现象 | 原因 | 解决 |
 | --- | --- | --- |
 | 找不到 ffmpeg | 未安装 | `python3 -m pip install imageio-ffmpeg`（自带静态 ffmpeg），或安装 ffmpeg |
-| 找不到 playwright | 脚本运行位置没有安装 | 在 skill 目录 `npm i playwright && npx playwright install chromium`，或设置 `PLAYWRIGHT_NODE_MODULES` |
+| 找不到 playwright | 没有安装，或克隆的文件夹被移动了 | 在你克隆的文件夹里运行 `npm install && npx playwright install chromium`；移动过文件夹就重新运行 `./install.sh`（安装副本从 `.source` 读取路径）；或设置 `PLAYWRIGHT_NODE_MODULES` |
 | 中文显示成方块（Linux） | 没有中文字体 | `sudo apt install fonts-noto-cjk` |
 | 录屏是黑的 | 源文件是 H.264，Chromium 无法解码 | 运行 `intake.py`，使用它生成的 `.webm` |
 | Kokoro 报 `phontab` 后退出 | espeak-ng 忽略过长的数据路径，phonemizer 会解析软链接 | 把 `espeak-ng-data` 复制到短路径的真实目录（`~/.cache/kes`），并设置 `voice.espeak_data` |

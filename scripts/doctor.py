@@ -38,10 +38,12 @@ if ff:
 node = shutil.which('node')
 need(bool(node), 'node ≥ 18', 'install Node.js 18+ (https://nodejs.org)')
 pw = None
-for c in [os.environ.get('PLAYWRIGHT_NODE_MODULES'), SKILL / 'node_modules', Path.cwd() / 'node_modules']:
+try: _src = Path((SKILL / '.source').read_text().strip()) / 'node_modules'   # the folder install.sh / install.ps1 copied this skill from
+except Exception: _src = None
+for c in [os.environ.get('PLAYWRIGHT_NODE_MODULES'), SKILL / 'node_modules', _src, Path.cwd() / 'node_modules']:
     if c and (Path(c) / 'playwright').exists():
         pw = c; break
-need(bool(pw), f'playwright ({pw or "missing"})', f'cd "{SKILL}" && npm i playwright && npx playwright install chromium')
+need(bool(pw), f'playwright ({pw or "missing"})', f'in the Reelwright folder (where you cloned it): npm install && npx playwright install chromium')
 # CJK fonts (Linux servers often have none → Chinese renders as boxes)
 if platform.system() == 'Linux':
     fc = subprocess.run(['fc-list', ':lang=zh'], capture_output=True, text=True).stdout if shutil.which('fc-list') else ''

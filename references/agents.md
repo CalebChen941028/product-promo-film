@@ -10,7 +10,7 @@ English first, 中文在后。The skill is plain files: `SKILL.md` (frontmatter 
 ./install.sh all        # every folder below
 ./install.sh antigravity deepseek kimi
 ```
-Windows: `.\install.ps1` (same targets). After installing: `npm i playwright && npx playwright install chromium` inside the installed folder (or the repo), then `python3 scripts/doctor.py`.
+Windows: `.\install.ps1` (same targets). After installing: `npm install && npx playwright install chromium` in the folder you cloned (the installed copies read Playwright from it through the `.source` file the installer writes, in any order), then `python3 scripts/doctor.py`. If you move the cloned folder, run the installer again.
 
 | Agent | Global skills folder | Project folder | Source |
 | --- | --- | --- | --- |
@@ -46,7 +46,7 @@ Point them at `AGENTS.md` (copy it into the project root, or paste: *"Follow the
 ./install.sh all        # 复制到下表全部目录
 ./install.sh antigravity deepseek kimi
 ```
-Windows 用 `.\install.ps1`。安装后在安装目录（或仓库）里运行 `npm i playwright && npx playwright install chromium`，再运行 `python3 scripts/doctor.py`。
+Windows 用 `.\install.ps1`。安装后在你克隆的文件夹里运行 `npm install && npx playwright install chromium`（安装好的副本通过安装器写入的 `.source` 文件读取这里的 Playwright，先后顺序不限），再运行 `python3 scripts/doctor.py`。移动了克隆的文件夹时，请重新运行安装器。
 
 各智能体的目录见上方英文表格。路径会随版本变化：如果智能体没有列出这个 skill，查它的文档，或直接告诉它“读取 `<路径>/SKILL.md` 并照做”。
 

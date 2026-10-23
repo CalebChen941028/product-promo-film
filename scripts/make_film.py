@@ -277,7 +277,10 @@ def find_ffmpeg(spec):
 
 
 def find_playwright(spec):
-    cand = [spec.get('tools', {}).get('node_modules'), os.environ.get('PLAYWRIGHT_NODE_MODULES'), SKILL / 'node_modules', Path.cwd() / 'node_modules']
+    src = None
+    try: src = Path((SKILL / '.source').read_text().strip()) / 'node_modules'   # the folder install.sh / install.ps1 copied this skill from
+    except Exception: pass
+    cand = [spec.get('tools', {}).get('node_modules'), os.environ.get('PLAYWRIGHT_NODE_MODULES'), SKILL / 'node_modules', src, Path.cwd() / 'node_modules']
     try:
         cand.append(subprocess.run(['npm', 'root', '-g'], capture_output=True, text=True).stdout.strip())
     except Exception:
@@ -651,7 +654,7 @@ def check(spec, base_dir):
         if not find_ffmpeg(spec):
             err('ffmpeg not found', 'pip install imageio-ffmpeg  (or install ffmpeg)  — then rerun')
     if not find_playwright(spec):
-        err('playwright not found', f'cd "{SKILL}" && npm i playwright && npx playwright install chromium')
+        err('playwright not found', 'in the Reelwright folder (where you cloned it): npm install && npx playwright install chromium; then python3 scripts/doctor.py')
 
 
 # ---------------------------------------------------------------- composed music (no track supplied)

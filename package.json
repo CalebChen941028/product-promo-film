@@ -1,0 +1,10 @@
+{
+  "name": "reelwright",
+  "version": "1.0.0",
+  "description": "Reelwright (片匠): an agent skill that turns a folder of real material into a commercial-grade promo film.",
+  "private": true,
+  "license": "MIT",
+  "type": "commonjs",
+  "scripts": { "setup": "playwright install chromium" },
+  "dependencies": { "playwright": "^1.58.2" }
+}

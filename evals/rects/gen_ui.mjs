@@ -3,7 +3,8 @@
 //   → <out>/ui-NNN.png (2× screenshot), ui-NNN.regions.json (what capture_app.mjs records), ui-NNN.truth.json (targets)
 // Variety on purpose: light / dark / low-contrast themes, borderless cards, dense tables, forms, charts, sidebars, dialogs,
 // phone-width layouts, CJK and Latin text. Nothing here comes from any one product.
-import { chromium } from 'playwright';
+import { loadPlaywright } from '../../scripts/_pw.mjs';
+const { chromium } = await loadPlaywright();
 import fs from 'fs';
 import path from 'path';
 
